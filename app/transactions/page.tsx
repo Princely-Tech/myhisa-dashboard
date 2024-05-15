@@ -40,7 +40,7 @@ const CheckboxSelect = ({
   paramsKey: string;
 }) => {
   const updateParams = () => {
-    const 
+    // const 
   }
   return (
     <div>
