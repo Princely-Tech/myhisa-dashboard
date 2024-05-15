@@ -24,9 +24,7 @@ const Transactions = () => {
           paramsKey=""
         />
       </div>
-      {/* <div className="flex-1 bg-red-500  overflow-hidden"> */}
       <TransactionTable data={tableJson()} />
-      {/* </div> */}
     </div>
   );
 };
@@ -41,6 +39,9 @@ const CheckboxSelect = ({
   checkItems: string[];
   paramsKey: string;
 }) => {
+  const updateParams = () => {
+    const 
+  }
   return (
     <div>
       <h4 className="">{title}</h4>
