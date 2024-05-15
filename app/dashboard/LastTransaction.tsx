@@ -4,8 +4,8 @@ const LastTransaction = () => {
   return (
     <div>
       <h1 className="">Last 20 Transactions</h1>
-      <div class="table-responsive h-[400px]  max-w-full">
-        <table id="datatable" class="table table-striped table-bordered ">
+      <div className="table-responsive h-[400px]  max-w-full">
+        <table id="datatable" className="table table-striped table-bordered ">
           <thead>
             <tr>
               <th>sm</th>

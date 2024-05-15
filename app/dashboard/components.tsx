@@ -19,12 +19,12 @@ const TransactionStats = () => {
           value: 500,
         },
       ].map((item, index) => (
-        <div key={index} class="iq-card iq-card-block iq-card-stretch ">
-          <div class="iq-card-body">
-            <div class="icon iq-icon-box iq-bg-primary rounded">
-              <i class="ri-drag-move-2-fill"></i>
+        <div key={index} className="iq-card iq-card-block iq-card-stretch ">
+          <div className="iq-card-body">
+            <div className="icon iq-icon-box iq-bg-primary rounded">
+              <i className="ri-drag-move-2-fill"></i>
             </div>
-            <div class="mt-4">
+            <div className="mt-4">
               <h2>{item.value}</h2>
               <p>{item.title}</p>
             </div>
@@ -39,12 +39,12 @@ const WalletBalances = () => {
   return (
     <div>
       <h3 className="">Wallet Balances</h3>
-      <div class="iq-card  iq-card-stretch iq-card-height ">
-        <div class="iq-card-body">
-          <h4 class="text-uppercase text-black mb-0">Total</h4>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="font-size-80 text-black">12</div>
-            <div class="text-left">
+      <div className="iq-card  iq-card-stretch iq-card-height ">
+        <div className="iq-card-body">
+          <h4 className="text-uppercase text-black mb-0">Total</h4>
+          <div className="d-flex justify-content-between align-items-center">
+            <div className="font-size-80 text-black">12</div>
+            <div className="text-left">
               {[
                 {
                   title: "Main",
@@ -61,11 +61,11 @@ const WalletBalances = () => {
               ].map((item, index) => (
                 <div key={index}>
                   {" "}
-                  <p class="m-0 text-uppercase font-size-12">{item.title}</p>
-                  <div class="mb-1 text-black">
+                  <p className="m-0 text-uppercase font-size-12">{item.title}</p>
+                  <div className="mb-1 text-black">
                     {item.value}
-                    <span class="text-danger">
-                      <i class="ri-arrow-down-s-fill"></i>3.25%
+                    <span className="text-danger">
+                      <i className="ri-arrow-down-s-fill"></i>3.25%
                     </span>
                   </div>
                 </div>

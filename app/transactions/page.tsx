@@ -16,9 +16,13 @@ const Transactions = () => {
         <InputField type="date" title="to" />
       </div>
       <div className="flex gap-3 flex-wrap justify-between mb-4">
-        <CheckboxSelect checkItems={statusArray} title="Status" />
-        <CheckboxSelect checkItems={typeArray} title="Type" />
-        <CheckboxSelect checkItems={networkArray} title="Network" />
+        <CheckboxSelect checkItems={statusArray} title="Status" paramsKey="" />
+        <CheckboxSelect checkItems={typeArray} title="Type" paramsKey="" />
+        <CheckboxSelect
+          checkItems={networkArray}
+          title="Network"
+          paramsKey=""
+        />
       </div>
       {/* <div className="flex-1 bg-red-500  overflow-hidden"> */}
       <TransactionTable data={tableJson()} />
