@@ -13,9 +13,9 @@ const SidebarTwo = () => {
   const searchParams = useSearchParams();
   const fromDate = searchParams.get("from_date");
 
-  // if (pathname == routes.login) {
+  if (pathname == routes.login) {
     return null;
-  // }
+  }
   const currentDate = new Date();
   const date = formatDateTimeYYYYMMDD(currentDate);
   var last7DaysDate = new Date();

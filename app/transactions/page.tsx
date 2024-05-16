@@ -42,6 +42,7 @@ const Transactions = () => {
       <FormField>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-x-3">
           <InputField
+            key="reference"
             placeholder="Reference"
             inputClassName="h-[30px]"
             showTitle={false}
