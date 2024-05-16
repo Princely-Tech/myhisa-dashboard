@@ -26,7 +26,10 @@ const Transactions = () => {
           paramsKey=""
         />
       </div>
-      <TransactionTable data={tableJson()} />
+
+      <Suspense>
+        <TransactionTable data={tableJson()} />
+      </Suspense>
     </div>
   );
 };
