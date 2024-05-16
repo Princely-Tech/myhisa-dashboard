@@ -8,7 +8,7 @@ const Dashbaord = () => {
       <h3 className="">Wallet Balances</h3>
       <div className="grid sm:grid-cols-2 gap-4">
         <WalletBalances />
-        <Clock />{" "}
+        <Clock />
       </div>
       <TransactionStats />
       <LastTransaction />

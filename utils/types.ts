@@ -26,4 +26,4 @@ interface CustomButtonProps extends ButtonProps {
   tokenConfig?: Partial<AliasToken>;
   componentConfig?: ComponentsConfig;
 }
-export type { TransactionItem, CustomButtonProps };
+export type { TransactionItem, CustomButtonProps ,RippleProps};

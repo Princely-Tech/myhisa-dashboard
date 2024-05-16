@@ -15,7 +15,7 @@ const Clock = () => {
 
   const formatedDate = setDate(time);
   return (
-    <div className="iq-card iq-card-stretch iq-card-height flex flex-col items-center justify-center ">
+    <div className="iq-card iq-card-stretch iq-card-height h-full flex flex-col items-center justify-center ">
       <p className="text-[20px] font-medium">{formatedDate.readableDateStr}</p>
       <p className="text-[30px] font-bold">{formatedDate.localTimeStr} </p>
     </div>
