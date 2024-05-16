@@ -25,6 +25,13 @@ function stripSearchParams(route: string) {
   }
   return route;
 }
+function formatDateTimeYYYYMMDD(date:Date) {
+  // const date = new Date(); // Create a new date object with the current date and time
+  const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  return formattedDate;
+}
 function setDate(date: Date) {
   // const date = new Date(dateStr);
   const monthAbbr = monthsAbbr[date.getMonth()];
@@ -50,9 +57,8 @@ function formatDateSideBySide(dateTimeString: string) {
   const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   return formattedDate;
 }
+function koboToNaira(kobo:number){
+  return kobo / 100;
+}
 
-// Example usage:
-const dateTimeString = "2023-10-19T11:31:48.355+01:00";
-console.log(formatDateSideBySide(dateTimeString)); // Output: 10/19/2023 11:31:48 AM
-
-export { toggleSidebar, stripSearchParams, formatDateSideBySide, setDate };
+export { toggleSidebar, koboToNaira,stripSearchParams, formatDateSideBySide, setDate,formatDateTimeYYYYMMDD };

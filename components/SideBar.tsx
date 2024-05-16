@@ -8,14 +8,18 @@ import {
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Button, Menu } from "antd";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import routes from "@/utils/routes";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
 const MyHisaSideBar: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+  if (pathname == routes.login) {
+    return null;
+  }
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
@@ -66,18 +70,18 @@ const MyHisaSideBar: React.FC = () => {
     },
   ];
   return (
-    <div className="bg-teal-500 max-w-[200px]">
-      <Button
-        type="primary"
-        onClick={toggleCollapsed}
-        style={{ marginBottom: 16 }}
-      >
+    <div
+      className={`bg-teal-500 z-50 max-w-[200px] fixed  sm:relative sm:h-screen ${
+        !collapsed && "h-screen"
+      }`}
+    >
+      <Button type="primary" onClick={toggleCollapsed}>
         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       </Button>
       <Menu
-        className="bg-transparent"
+        className={`bg-transparent ${collapsed && "hidden"} sm:block mt-[16px]`}
         defaultSelectedKeys={["1"]}
-        defaultOpenKeys={["sub1"]}
+        // defaultOpenKeys={["sub1"]}
         mode="inline"
         theme="light"
         inlineCollapsed={collapsed}

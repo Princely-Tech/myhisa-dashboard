@@ -1,6 +1,11 @@
 import { faker } from "@faker-js/faker";
-const statusArray = ["Pending", "Successful", "Failed"];
-const typeArray = ["Airtime", "Data", "Bill Payment"];
+const searchParamKeys = {
+  status: "status",
+  type: "type",
+  network: "network",
+};
+const statusArray = ["Pending", "Successful", "Failed", 'Others'];
+const typeArray = ["Airtime", "Data"];
 const networkArray = ["Airtel", "MTN", "Glo", "9mobile"];
 const generateRandomTransaction = () => {
   const transaction_id = faker.string.uuid();
@@ -26,4 +31,4 @@ const tableJson = () => {
   return Array.from({ length: 20 }, () => generateRandomTransaction());
 };
 export default tableJson;
-export { statusArray, typeArray, networkArray };
+export { statusArray, typeArray, networkArray,searchParamKeys };

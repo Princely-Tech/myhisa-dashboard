@@ -15,7 +15,34 @@ type TransactionItem = {
   type: string;
   external_ref: string;
   status: string;
+  commission_amount:number;
   created_at: string;
+};
+type TransactionHistory = {
+  pagination: {
+    current_page: number;
+    next_page: number;
+    next_page_url: string;
+    prev_page: number;
+    prev_page_url: string;
+    total_pages: number;
+  };
+  records: TransactionItem[];
+  total_records: number;
+};
+type TransactionStats = {
+  date_from: string;
+  date_to: string;
+  failed: number;
+  internal_error: number;
+  invalid_amount: number;
+  invalid_msisdn: number;
+  others: number;
+  pending: number;
+  telco_error: number;
+  total_successful: number;
+  total_transactions: number;
+  total_unsuccessful: number;
 };
 interface RippleProps {
   duration: number;
@@ -26,4 +53,9 @@ interface CustomButtonProps extends ButtonProps {
   tokenConfig?: Partial<AliasToken>;
   componentConfig?: ComponentsConfig;
 }
-export type { TransactionItem, CustomButtonProps ,RippleProps};
+export type {
+  TransactionItem,
+  CustomButtonProps,
+  RippleProps,
+  TransactionStats,TransactionHistory,
+};

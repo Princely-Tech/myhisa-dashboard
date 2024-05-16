@@ -5,6 +5,9 @@ import "@/css/typography.css";
 import "@/css/variable.css";
 import "@/css/style-customizer.css";
 import { MyHisaSideBar } from "@/components";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import SidebarTwo from "@/components/SidebarTwo";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Next.js",
@@ -18,11 +21,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body >
-        <div className="flex gap-2 overflow-hidden  max-h-full max-w-full">
-          <MyHisaSideBar />
-          {children}
-        </div>
+      <body>
+        <AntdRegistry>
+          <div className="flex gap-2 overflow-hidden  max-h-full max-w-full">
+            <Suspense>
+              {" "}
+              <SidebarTwo />
+            </Suspense>
+            {children}
+          </div>
+        </AntdRegistry>
       </body>
     </html>
   );

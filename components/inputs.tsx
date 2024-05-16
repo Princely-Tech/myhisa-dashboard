@@ -30,6 +30,7 @@ interface InputFieldProps extends InputProps {
   uploadProps?: UploadProps;
   className?: string;
   titleClassName?: string;
+  inputClassName?: string;
 }
 const InputField: React.FC<InputFieldProps> = ({
   placeholder,
@@ -43,6 +44,7 @@ const InputField: React.FC<InputFieldProps> = ({
   showTitle = true,
   prefix,
   suffix,
+  inputClassName = "h-full px-[14px] py-[10px]",
   className = "",
   required = false,
   ...rest
@@ -51,7 +53,9 @@ const InputField: React.FC<InputFieldProps> = ({
   return (
     <div className={`w-full ${className}`}>
       {(placeholder || title) && showTitle && (
-        <h2 className={`text-[#344054] font-medium mb-1 text-[14px] ${titleClassName}`}>
+        <h2
+          className={`text-[#344054] font-medium mb-1 text-[14px] ${titleClassName}`}
+        >
           {title ?? placeholder}
         </h2>
       )}
@@ -114,7 +118,7 @@ const InputField: React.FC<InputFieldProps> = ({
           {" "}
           <DatePicker
             className="w-full"
-            placeholder="DD/MM/YYYY"
+            placeholder={placeholder ?? "DD/MM/YYYY"}
             required={required}
           />
         </Form.Item>
@@ -157,12 +161,12 @@ const InputField: React.FC<InputFieldProps> = ({
     }
 
     return (
-      <Form.Item label="" {...formItemProps}  >
+      <Form.Item label="" {...formItemProps}>
         <Input
           placeholder={placeholder}
           prefix={prefix}
           suffix={suffix}
-          className="h-full  px-[14px] py-[10px]"
+          className={`${inputClassName}`}
           required={required}
           type={type}
           {...rest}

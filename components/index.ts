@@ -3,5 +3,13 @@ import FormField from "./Formfield";
 import InputField from "./inputs";
 import Ripple from "./ripple/ripple";
 import { AuthCard } from "./widgets";
-import MyHisaSideBar from "./SideBar";
-export { BlueButton, FormField, InputField, Ripple, AuthCard, MyHisaSideBar };
+import MyHisaSideBar from "./SideBar";import TransactionTable from "./TransactionTable";
+export {
+  BlueButton,
+  FormField,
+  InputField,
+  Ripple,
+  AuthCard,
+  MyHisaSideBar,
+  TransactionTable,
+};

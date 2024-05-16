@@ -15,6 +15,21 @@ const emailFormItemProps = {
     },
   ],
 };
+const passwordFormItemProps = {
+  name: "password",
+  rules: [
+    {
+      validator: (_: unknown, value: string) => {
+        if (!value || value == "") {
+          return Promise.reject("Enter password");
+        } else if (value.length < 6) {
+          return Promise.reject("Password should be at least 6 digit");
+        }
+        return Promise.resolve();
+      },
+    },
+  ],
+};
 const nameFormItemProps = {
   name: "name",
   rules: [
@@ -41,21 +56,7 @@ const phoneFormItemProps = {
     },
   ],
 };
-const passwordFormItemProps = {
-  name: "password",
-  rules: [
-    {
-      validator: (_: unknown, value: string) => {
-        if (!value || value == "") {
-          return Promise.reject("Enter password");
-        } else if (value.length < 6) {
-          return Promise.reject("Password should be at least 6 digit");
-        }
-        return Promise.resolve();
-      },
-    },
-  ],
-};
+
 const confirmPasswordFormItemProps = {
   name: "confirmPassword",
   dependencies: ["password"],
