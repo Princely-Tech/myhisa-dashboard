@@ -7,7 +7,7 @@ import tableJson, {
   networkArray,
 } from "@/data/tableJson";
 import TransactionTable from "./Table";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 const Transactions = () => {
   return (
@@ -41,24 +41,31 @@ const CheckboxSelect = ({
   checkItems: string[];
   paramsKey: string;
 }) => {
-  const [selected, setSelected] = useState([]);
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
-  const updateParams = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    // const
-  };
   return (
-    <div>
-      <h4 className="">{title}</h4>
-      <div className="flex">
-        {checkItems.map((item, index) => (
-          <Checkbox key={index} defaultChecked={true}>
-            {item}
-          </Checkbox>
-        ))}
-      </div>
-    </div>
+    <Suspense>
+      <Body />
+    </Suspense>
   );
+  function Body() {
+    const [selected, setSelected] = useState([]);
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const router = useRouter();
+    const updateParams = () => {
+      const params = new URLSearchParams(searchParams.toString());
+      // const
+    };
+    return (
+      <div>
+        <h4 className="">{title}</h4>
+        <div className="flex">
+          {checkItems.map((item, index) => (
+            <Checkbox key={index} defaultChecked={true}>
+              {item}
+            </Checkbox>
+          ))}
+        </div>
+      </div>
+    );
+  }
 };
