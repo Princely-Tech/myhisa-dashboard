@@ -8,7 +8,7 @@ const generateRandomTransaction = () => {
   const network = faker.helpers.arrayElement(networkArray);
   const msisdn = faker.phone.number();
   const type = faker.helpers.arrayElement(typeArray);
-  const external_ref = faker.random.alphaNumeric(5);
+  const external_ref = faker.string.alphanumeric(5);
   const status = faker.helpers.arrayElement(statusArray);
   const created_at = faker.date.past().toISOString();
   return {

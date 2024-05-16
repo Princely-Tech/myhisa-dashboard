@@ -1,3 +1,4 @@
+"use client";
 import { InputField } from "@/components";
 import { Card, Checkbox } from "antd";
 import tableJson, {
@@ -7,9 +8,7 @@ import tableJson, {
 } from "@/data/tableJson";
 import TransactionTable from "./Table";
 import { useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useRouter } from "next/router";
-
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 const Transactions = () => {
   return (
     <div className="flex flex-col  h-screen w-screen flex-1 border p-4">
@@ -42,11 +41,11 @@ const CheckboxSelect = ({
   checkItems: string[];
   paramsKey: string;
 }) => {
+  const [selected, setSelected] = useState([]);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
   const updateParams = () => {
-    const [selected,setSelected] = useState([]);
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const router = useRouter();
     const params = new URLSearchParams(searchParams.toString());
     // const
   };

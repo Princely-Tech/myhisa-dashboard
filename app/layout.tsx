@@ -18,11 +18,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        {/* <div className="flex gap-2"> */}
-          {/* <MyHisaSideBar /> */}
+      <body >
+        <div className="flex gap-2 overflow-hidden  max-h-full max-w-full">
+          <MyHisaSideBar />
           {children}
-        {/* </div> */}
+        </div>
       </body>
     </html>
   );
