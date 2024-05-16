@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex">
+      <body>
         {/* <div className="flex gap-2"> */}
           {/* <MyHisaSideBar /> */}
           {children}

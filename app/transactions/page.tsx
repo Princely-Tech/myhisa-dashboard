@@ -6,6 +6,9 @@ import tableJson, {
   networkArray,
 } from "@/data/tableJson";
 import TransactionTable from "./Table";
+import { useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 
 const Transactions = () => {
   return (
@@ -40,8 +43,13 @@ const CheckboxSelect = ({
   paramsKey: string;
 }) => {
   const updateParams = () => {
-    // const 
-  }
+    const [selected,setSelected] = useState([]);
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const router = useRouter();
+    const params = new URLSearchParams(searchParams.toString());
+    // const
+  };
   return (
     <div>
       <h4 className="">{title}</h4>
