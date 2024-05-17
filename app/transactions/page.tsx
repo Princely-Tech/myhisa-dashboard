@@ -5,7 +5,7 @@ import {
   InputField,
   TransactionTable,
 } from "@/components";
-import { Card, Checkbox, Spin } from "antd";
+import { Card, Checkbox, Form, Spin } from "antd";
 import tableJson, {
   statusArray,
   typeArray,
@@ -16,89 +16,129 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { TransactionHistory } from "@/utils/types";
 import AxiosHandler from "@/utils/api/axiosHandler";
-import { formatDateTimeYYYYMMDD } from "@/utils/helperfunctions";
+import {
+  formatDateTimeYYYYMMDD,
+  updateSearchParams,
+} from "@/utils/helperfunctions";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { FormProps } from "antd/lib/form";
+import constants from "@/utils/constants";
+import dayjs from "dayjs";
 type FieldType = {
-  id: string;
-  mssisdn: string;
-  ref: string;
+  dateRange: [dayjs.Dayjs | null, dayjs.Dayjs | null];
+  reference: string;
+  beneficiary: string;
+  externalRef: string;
 };
 const Transactions = () => {
   const [data, setData] = useState<TransactionHistory | null>(null);
-  const [reference, setReference] = useState("");
-  const [beneficiary, setBeneficiary] = useState("");
-  const [ExternalRef, setExternalRef] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [isFiltering, setIsFiltering] = useState(false);
-  const referenceInputRef = useRef(null);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const currentDate = new Date();
+  const toDate =
+    searchParams.get(constants.searchParamsKeys.toDate) ??
+    formatDateTimeYYYYMMDD(currentDate);
+  const fromDate =
+    searchParams.get(constants.searchParamsKeys.fromDate) ??
+    formatDateTimeYYYYMMDD(currentDate);
+  const reference =
+    searchParams.get(constants.searchParamsKeys.reference) ?? "";
+  const beneficiary =
+    searchParams.get(constants.searchParamsKeys.beneficiary) ?? "";
+  const externalRef =
+    searchParams.get(constants.searchParamsKeys.externalRef) ?? "";
+  const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
+  console.log(fromDate, toDate);
   useEffect(() => {
     process();
-  }, []);
-
+  }, [searchParams]);
+  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
+    const paramValues: { key: string; value: string }[] = [];
+    paramValues.push({
+      key: constants.searchParamsKeys.beneficiary,
+      value: values.beneficiary ?? "",
+    });
+    paramValues.push({
+      key: constants.searchParamsKeys.reference,
+      value: values.reference ?? "",
+    });
+    paramValues.push({
+      key: constants.searchParamsKeys.externalRef,
+      value: values.externalRef ?? "",
+    });
+    paramValues.push({
+      key: constants.searchParamsKeys.isFiltering,
+      value: "true",
+    });
+    if (values.dateRange) {
+      const fromDateDate = values.dateRange[0]!.toDate();
+      const toDateDate = values.dateRange[1]!.toDate();
+      if (fromDateDate) {
+        paramValues.push({
+          key: constants.searchParamsKeys.fromDate,
+          value: formatDateTimeYYYYMMDD(fromDateDate),
+        });
+      }
+      if (toDateDate) {
+        paramValues.push({
+          key: constants.searchParamsKeys.toDate,
+          value: formatDateTimeYYYYMMDD(toDateDate),
+        });
+      }
+    }
+    updateSearchParams({
+      values: paramValues,
+      pathname: pathname,
+      router: router,
+      searchParams: searchParams,
+    });
+  };
   return (
     <div className=" flex-1 border px-4 pt-2 pb-5 flex flex-col min-h-screen  overflow-hidden">
-      <FormField>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-x-3">
+      <FormField onFinish={onFinish}>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3">
           <InputField
-            key="reference"
             placeholder="Reference"
+            defaultValue={reference}
             inputClassName="h-[30px]"
             showTitle={false}
             className="max-h-[40px]"
-            value={reference}
-            onChange={(input) => {
-              setReference((prevValue) => input.target.value);
-            }}
+            name={constants.searchParamsKeys.reference}
+            formItemProps={{ name: constants.searchParamsKeys.reference }}
           />
           <InputField
             placeholder="Beneficiary"
-            value={beneficiary}
+            defaultValue={beneficiary}
             showTitle={false}
-            onChange={(input) =>
-              setBeneficiary((prevValue) => input.target.value)
-            }
             inputClassName="h-[30px]"
             className="max-h-[40px]"
+            formItemProps={{ name: constants.searchParamsKeys.beneficiary }}
           />
           <InputField
-            placeholder="From Date"
-            showTitle={false}
             className="max-h-[40px]"
-            type="date"
-            value={from}
-            onChange={(input) => setFrom((prevValue) => input.target.value)}
-          />{" "}
-          <InputField
-            placeholder="To Date"
-            className="max-h-[40px]"
-            showTitle={false}
-            type="date"
-            // showTitle={false}
-            value={to}
-            onChange={(input) => setTo((prevValue) => input.target.value)}
-          />{" "}
+            type="date-range"
+            formItemProps={{ name: "dateRange" }}
+            dateRangePickerProps={{
+              defaultValue: [dayjs(fromDate), dayjs(toDate)],
+              placeholder: ["From Date", "To Date"],
+              maxDate: dayjs(new Date()),
+            }}
+          />
           <InputField
             placeholder="External Ref"
+            defaultValue={externalRef}
             showTitle={false}
-            value={ExternalRef}
             inputClassName="h-[30px]"
-            onChange={(input) =>
-              setExternalRef((prevValue) => input.target.value)
-            }
+            className="max-h-[40px]"
+            formItemProps={{ name: constants.searchParamsKeys.externalRef }}
           />
-          <div className="flex justify-start items-start">
-            <BlueButton
-              onClick={async () => {
-                setIsFiltering(true);
-                await process();
-                setIsFiltering(false);
-              }}
-              loading={isFiltering}
-            >
-              Filter
-            </BlueButton>
+          <div className="flex justify-start items-start mb-[10px]">
+            <Form.Item>
+              <BlueButton htmlType="submit" loading={isFiltering}>
+                Filter
+              </BlueButton>
+            </Form.Item>
           </div>
         </div>
       </FormField>
@@ -130,11 +170,22 @@ const Transactions = () => {
     const apiService = new AxiosHandler();
     try {
       const res = await apiService.get({
-        endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${ExternalRef}`,
+        endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}`,
       });
       console.log(res.data);
       setData(res.data);
     } catch (err) {}
+    updateSearchParams({
+      values: [
+        {
+          key: constants.searchParamsKeys.isFiltering,
+          value: null,
+        },
+      ],
+      pathname: pathname,
+      router: router,
+      searchParams: searchParams,
+    });
   }
 };
 

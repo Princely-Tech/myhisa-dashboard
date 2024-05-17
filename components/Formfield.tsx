@@ -7,12 +7,14 @@ const FormField = ({
   children,
   scrollToFirstError = true,
   autoComplete = "off",
+  initialValues = { remember: false },
   ...rest
 }: FormProps & { children?: ReactNode }) => {
   return (
     <Form
       scrollToFirstError={scrollToFirstError}
       autoComplete={autoComplete}
+      initialValues={initialValues}
       {...rest}
     >
       {children}

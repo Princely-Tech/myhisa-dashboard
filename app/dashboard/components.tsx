@@ -1,23 +1,95 @@
 "use client";
+import { BlueLink, InputField } from "@/components";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import AxiosHandler from "@/utils/api/axiosHandler";
-import { formatDateTimeYYYYMMDD, koboToNaira } from "@/utils/helperfunctions";
+import constants from "@/utils/constants";
+import {
+  formatDateTimeYYYYMMDD,
+  koboToNaira,
+  updateSearchParams,
+} from "@/utils/helperfunctions";
+import routes from "@/utils/routes";
 import { TransactionStats } from "@/utils/types";
 import { faker } from "@faker-js/faker";
-import { Spin } from "antd";
+import { DatePicker, Spin } from "antd";
+import dayjs from "dayjs";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const TransactionStatsComponent = () => {
+const TransactionStatsComponent = ({
+  title = "Today’s Transaction Stats",
+  isMainPage = false,
+}: {
+  title?: string;
+  isMainPage?: boolean;
+}) => {
   const [transactionStats, setTransactionStats] =
     useState<TransactionStats | null>(null);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const currentDate = new Date();
+  const toDate =
+    searchParams.get(constants.searchParamsKeys.toDate) ??
+    formatDateTimeYYYYMMDD(currentDate);
+  const fromDate =
+    searchParams.get(constants.searchParamsKeys.fromDate) ??
+    formatDateTimeYYYYMMDD(currentDate);
   useEffect(() => {
     process();
-  }, []);
+  }, [searchParams]);
+
+  const dateFormat = "yyyy/mm/dd";
   return (
     <div className="mb-4">
-      <h3 className="">TransactionStats</h3>
+      <div className="flex flex-wrap gap-5 justify-between items-center mb-3">
+        <h3>{title}</h3>
+        {isMainPage ? (
+          <div className="flex gap-3">
+            <InputField
+              placeholder="Date Range"
+              className="max-h-[50px]"
+              type="date-range"
+              dateRangePickerProps={{
+                defaultValue: [dayjs(fromDate), dayjs(toDate)],
+                placeholder: ["From Date", "To Date"],
+                onChange: (input) => {
+                  const fromDateDate = input[0]!.toDate();
+                  const toDateDate = input[1]!.toDate();
+                  const dates: { key: string; value: string }[] = [];
+                  if (fromDateDate) {
+                    dates.push({
+                      key: constants.searchParamsKeys.fromDate,
+                      value: formatDateTimeYYYYMMDD(fromDateDate),
+                    });
+                  }
+                  if (toDateDate) {
+                    dates.push({
+                      key: constants.searchParamsKeys.toDate,
+                      value: formatDateTimeYYYYMMDD(toDateDate),
+                    });
+                  }
+                  updateSearchParams({
+                    values: dates,
+                    pathname: pathname,
+                    router: router,
+                    searchParams: searchParams,
+                  });
+                },
+                maxDate: dayjs(new Date()),
+              }}
+            />
+          </div>
+        ) : (
+          <BlueLink href={routes.transactionStats}>View More</BlueLink>
+        )}
+      </div>
       <Spin spinning={!transactionStats}>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div
+          className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${
+            !isMainPage && "xl:grid-cols-4"
+          }`}
+        >
           {transactionStatsData(transactionStats).map((item, index) => (
             <div
               key={index}
@@ -39,10 +111,9 @@ const TransactionStatsComponent = () => {
   );
   async function process() {
     const apiService = new AxiosHandler();
-    const date = formatDateTimeYYYYMMDD(new Date());
     try {
       const res = await apiService.post({
-        endPoint: `${apiEndpoints.transactionStats}?from_date=${date}&to_date=${date}`,
+        endPoint: `${apiEndpoints.transactionStats}?${constants.searchParamsKeys.fromDate}=${fromDate}&${constants.searchParamsKeys.toDate}=${toDate}`,
         body: {},
       });
       setTransactionStats(res.data);
@@ -66,7 +137,7 @@ const WalletBalances = () => {
           <h4 className="text-uppercase text-black mb-0">Main</h4>
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div className="text-[30px] text-black">
-            &#8358; {wallet ? koboToNaira(wallet.balance) : 0}
+              &#8358; {wallet ? koboToNaira(wallet.balance) : 0}
             </div>
             <div className="text-left grid grid-cols-2 gap-8 sm:block lg:grid xl:grid-cols-3 xl:gap-10">
               {[

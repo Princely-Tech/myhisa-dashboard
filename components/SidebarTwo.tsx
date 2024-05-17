@@ -7,13 +7,13 @@ import logo from "@/app/icon.png";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import Image from "next/image";
+import constants from "@/utils/constants";
 
 const SidebarTwo = () => {
-   const [hide, sethide] = useState(false);
+  const [hide, sethide] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const fromDate = searchParams.get("from_date");
-
+  const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
   if (pathname == routes.login) {
     return null;
   }
@@ -39,7 +39,6 @@ const SidebarTwo = () => {
       {/* <Cancel */}
       <div className="mt-4 ">
         <Image src={logo} alt="myHisa" />
-        
       </div>
       <div id="sidebar-scrollbar" className="">
         <nav className="iq-sidebar-menu">
@@ -65,14 +64,14 @@ const SidebarTwo = () => {
                 },
                 {
                   title: "Today",
-                  route: `${routes.transactions}?from_date=${date}&to_date=${date}`,
+                  route: `${routes.transactions}?${constants.searchParamsKeys.fromDate}=${date}&${constants.searchParamsKeys.toDate}=${date}`,
                   icon: <i className="las la-calendar-day iq-arrow-left"></i>,
                   isActive:
                     currentCollapsibleActive == transactionFilterStr.today,
                 },
                 {
                   title: "Last 7 days",
-                  route: `${routes.transactions}?from_date=${last7DaysDateStr}&to_date=${date}`,
+                  route: `${routes.transactions}?${constants.searchParamsKeys.fromDate}=${last7DaysDateStr}&${constants.searchParamsKeys.toDate}=${date}`,
                   isActive:
                     currentCollapsibleActive ==
                     transactionFilterStr.lastSevenDays,
@@ -80,7 +79,7 @@ const SidebarTwo = () => {
                 },
                 {
                   title: "Last 30 days",
-                  route: `${routes.transactions}?from_date=${last30DaysDateStr}&to_date=${date}`,
+                  route: `${routes.transactions}?${constants.searchParamsKeys.fromDate}=${last30DaysDateStr}&${constants.searchParamsKeys.toDate}=${date}`,
                   isActive:
                     currentCollapsibleActive ==
                     transactionFilterStr.lastThirtyDays,

@@ -4,6 +4,11 @@ const apiEndpoints = {
   login: "auth/login",
   me: "me",
   transactionStats: "transaction-stats",
-  transactionHistory: 'history'
+  transactionHistory: "history",
+};
+export const localApiEndPoints = {
+  main: "/api",
+  login: "/api/login",
+  logout: "/api/logout",
 };
 export default apiEndpoints;

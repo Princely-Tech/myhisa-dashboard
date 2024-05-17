@@ -2,11 +2,17 @@ import { ButtonProps } from "antd";
 import { OverrideToken } from "antd/es/theme/interface";
 import { MappingAlgorithm } from "antd/lib/theme";
 import { AliasToken } from "antd/lib/theme/internal";
+import { LinkProps } from "next/link";
 type ComponentsConfig = {
   [key in keyof OverrideToken]?: OverrideToken[key] & {
     algorithm?: boolean | MappingAlgorithm | MappingAlgorithm[];
   };
 };
+interface CustomLinkProps extends LinkProps {
+  children: React.ReactNode;
+  className?: string;
+  rippleProps?: RippleProps;
+}
 type TransactionItem = {
   transaction_id: string;
   amount: number;
@@ -54,7 +60,7 @@ interface CustomButtonProps extends ButtonProps {
   componentConfig?: ComponentsConfig;
 }
 export type {
-  TransactionItem,
+  TransactionItem,CustomLinkProps,
   CustomButtonProps,
   RippleProps,
   TransactionStats,TransactionHistory,
