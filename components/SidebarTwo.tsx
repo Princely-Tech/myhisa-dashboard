@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 
 const SidebarTwo = () => {
+   const [hide, sethide] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const fromDate = searchParams.get("from_date");
@@ -33,11 +34,14 @@ const SidebarTwo = () => {
     currentCollapsibleActive = transactionFilterStr.today;
   }
   return (
-    <div className="iq-card  m-0">
-      <div className="mt-4">
+    // <div className="iq-card  m-0 fixed z-10">
+    <div className="iq-card  m-0  z-10">
+      {/* <Cancel */}
+      <div className="mt-4 ">
         <Image src={logo} alt="myHisa" />
+        
       </div>
-      <div id="sidebar-scrollbar">
+      <div id="sidebar-scrollbar" className="">
         <nav className="iq-sidebar-menu">
           <ul id="iq-sidebar-toggle" className="iq-menu">
             <MenuItem

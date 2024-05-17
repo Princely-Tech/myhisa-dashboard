@@ -1,6 +1,6 @@
 const apiEndpoints = {
   tokenSetUrl: "token",
-  base: "http://94.229.72.28:3000/api/",
+  base: "https://api.airtimereport.com/api/",
   login: "auth/login",
   me: "me",
   transactionStats: "transaction-stats",
