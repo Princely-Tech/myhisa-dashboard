@@ -1,5 +1,8 @@
 "use client";
-import { formatDateTimeYYYYMMDD } from "@/utils/helperfunctions";
+import {
+  formatDateTimeYYYYMMDD,
+  updateSearchParams,
+} from "@/utils/helperfunctions";
 import routes, { transactionFilterStr } from "@/utils/routes";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -33,6 +36,7 @@ const SidebarTwo = () => {
   } else if (fromDate == date) {
     currentCollapsibleActive = transactionFilterStr.today;
   }
+
   return (
     // <div className="iq-card  m-0 fixed z-10">
     <div className="iq-card  m-0  z-10">
@@ -56,7 +60,11 @@ const SidebarTwo = () => {
               menuItems={[
                 {
                   title: "All",
-                  route: routes.transactions,
+                  route: updateSearchParams({
+                    pathname: routes.transactions,
+                    searchParams,
+                    values: [],
+                  }).pathname,
                   icon: <i className="las la-calendar-check iq-arrow-left"></i>,
                   isActive:
                     pathname == routes.transactions &&
@@ -64,14 +72,41 @@ const SidebarTwo = () => {
                 },
                 {
                   title: "Today",
-                  route: `${routes.transactions}?${constants.searchParamsKeys.fromDate}=${date}&${constants.searchParamsKeys.toDate}=${date}`,
+                  route: updateSearchParams({
+                    pathname: routes.transactions,
+                    searchParams,
+                    values: [
+                      {
+                        key: constants.searchParamsKeys.fromDate,
+                        value: date,
+                      },
+                      {
+                        key: constants.searchParamsKeys.toDate,
+                        value: date,
+                      },
+                    ],
+                  }).pathname,
                   icon: <i className="las la-calendar-day iq-arrow-left"></i>,
                   isActive:
                     currentCollapsibleActive == transactionFilterStr.today,
                 },
                 {
                   title: "Last 7 days",
-                  route: `${routes.transactions}?${constants.searchParamsKeys.fromDate}=${last7DaysDateStr}&${constants.searchParamsKeys.toDate}=${date}`,
+
+                  route: updateSearchParams({
+                    pathname: routes.transactions,
+                    searchParams,
+                    values: [
+                      {
+                        key: constants.searchParamsKeys.fromDate,
+                        value: last7DaysDateStr,
+                      },
+                      {
+                        key: constants.searchParamsKeys.toDate,
+                        value: date,
+                      },
+                    ],
+                  }).pathname,
                   isActive:
                     currentCollapsibleActive ==
                     transactionFilterStr.lastSevenDays,
@@ -79,7 +114,20 @@ const SidebarTwo = () => {
                 },
                 {
                   title: "Last 30 days",
-                  route: `${routes.transactions}?${constants.searchParamsKeys.fromDate}=${last30DaysDateStr}&${constants.searchParamsKeys.toDate}=${date}`,
+                  route: updateSearchParams({
+                    pathname: routes.transactions,
+                    searchParams,
+                    values: [
+                      {
+                        key: constants.searchParamsKeys.fromDate,
+                        value: last30DaysDateStr,
+                      },
+                      {
+                        key: constants.searchParamsKeys.toDate,
+                        value: date,
+                      },
+                    ],
+                  }).pathname,
                   isActive:
                     currentCollapsibleActive ==
                     transactionFilterStr.lastThirtyDays,

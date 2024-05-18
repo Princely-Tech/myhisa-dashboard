@@ -71,7 +71,7 @@ const updateSearchParams = ({
   values: { key: string; value: string | null }[];
   searchParams: URLSearchParams;
   pathname: string;
-  router: AppRouterInstance;
+  router?: AppRouterInstance;
 }) => {
   const params = new URLSearchParams(searchParams.toString());
   values.forEach((item) => {
@@ -82,7 +82,13 @@ const updateSearchParams = ({
     }
   });
   const newPathname = pathname + "?" + params.toString();
-  router.push(newPathname);
+  if (router) {
+    router.push(newPathname);
+  }
+  return {
+    pathname: newPathname,
+    params,
+  };
 };
 export {
   updateSearchParams,

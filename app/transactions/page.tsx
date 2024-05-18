@@ -12,7 +12,7 @@ import tableJson, {
   networkArray,
   searchParamKeys,
 } from "@/data/tableJson";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { TransactionHistory } from "@/utils/types";
 import AxiosHandler from "@/utils/api/axiosHandler";
@@ -24,6 +24,7 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 import { FormProps } from "antd/lib/form";
 import constants from "@/utils/constants";
 import dayjs from "dayjs";
+import { revalidatePath } from "next/cache";
 type FieldType = {
   dateRange: [dayjs.Dayjs | null, dayjs.Dayjs | null];
   reference: string;
@@ -49,7 +50,7 @@ const Transactions = () => {
   const externalRef =
     searchParams.get(constants.searchParamsKeys.externalRef) ?? "";
   const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
-  console.log(fromDate, toDate);
+
   useEffect(() => {
     process();
   }, [searchParams]);
@@ -96,11 +97,19 @@ const Transactions = () => {
   };
   return (
     <div className=" flex-1 border px-4 pt-2 pb-5 flex flex-col min-h-screen  overflow-hidden">
-      <FormField onFinish={onFinish}>
+      <FormField
+        onFinish={onFinish}
+        initialValues={{
+          reference: reference,
+          beneficiary: beneficiary,
+          dateRange: [dayjs(fromDate), dayjs(toDate)],
+          externalRef: externalRef,
+        }}
+      >
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3">
           <InputField
             placeholder="Reference"
-            defaultValue={reference}
+            // defaultValue={reference}
             inputClassName="h-[30px]"
             showTitle={false}
             className="max-h-[40px]"
@@ -109,7 +118,7 @@ const Transactions = () => {
           />
           <InputField
             placeholder="Beneficiary"
-            defaultValue={beneficiary}
+            // defaultValue={beneficiary}
             showTitle={false}
             inputClassName="h-[30px]"
             className="max-h-[40px]"
@@ -120,14 +129,14 @@ const Transactions = () => {
             type="date-range"
             formItemProps={{ name: "dateRange" }}
             dateRangePickerProps={{
-              defaultValue: [dayjs(fromDate), dayjs(toDate)],
+              // defaultValue: [dayjs(fromDate), dayjs(toDate)],
               placeholder: ["From Date", "To Date"],
               maxDate: dayjs(new Date()),
             }}
           />
           <InputField
             placeholder="External Ref"
-            defaultValue={externalRef}
+            // defaultValue={externalRef}
             showTitle={false}
             inputClassName="h-[30px]"
             className="max-h-[40px]"
