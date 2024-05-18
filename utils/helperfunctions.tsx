@@ -90,7 +90,36 @@ const updateSearchParams = ({
     params,
   };
 };
+
+const newSearchParams = ({
+  values,
+  pathname,
+  router,
+}: {
+  values: { key: string; value: string | null }[];
+  pathname: string;
+  router?: AppRouterInstance;
+}) => {
+  const params = new URLSearchParams();
+  values.forEach((item) => {
+    if (item.value) {
+      params.set(item.key, item.value);
+    } else {
+      params.delete(item.key);
+    }
+  });
+  const newPathname = pathname + "?" + params.toString();
+  if (router) {
+    router.push(newPathname);
+  }
+  return {
+    pathname: newPathname,
+    params,
+  };
+};
+
 export {
+  newSearchParams,
   updateSearchParams,
   toggleSidebar,
   koboToNaira,

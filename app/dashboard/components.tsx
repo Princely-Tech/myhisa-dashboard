@@ -43,7 +43,12 @@ const TransactionStatsComponent = ({
   return (
     <div className="mb-4">
       <div className="flex flex-wrap gap-5 justify-between items-center mb-3">
-        <h3>{title}</h3>
+        <h3>
+          {title}
+          {transactionStats != null && (
+            <span>({transactionStats.date_from} - {transactionStats.date_to})</span>
+          )}
+        </h3>
         {isMainPage ? (
           <div className="flex gap-3">
             <InputField
@@ -79,6 +84,7 @@ const TransactionStatsComponent = ({
                 maxDate: dayjs(new Date()),
               }}
             />
+            <small>Range must not be more than 6 months</small>
           </div>
         ) : (
           <BlueLink href={routes.transactionStats}>View More</BlueLink>
@@ -117,7 +123,10 @@ const TransactionStatsComponent = ({
         body: {},
       });
       setTransactionStats(res.data);
-    } catch (err) {}
+    } catch (err) {
+      console.error("error occurred");
+      console.error(err);
+    }
   }
 };
 const WalletBalances = () => {

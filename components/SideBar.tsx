@@ -42,7 +42,7 @@ const MyHisaSideBar: React.FC = () => {
           key: "5",
           label: "All",
           onClick: () => {
-            router.push(`${routes.transactions}`);
+            router.push(`${routes.transactions}?dateFilter=all`);
           },
         },
         {

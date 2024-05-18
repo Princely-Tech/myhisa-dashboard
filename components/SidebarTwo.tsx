@@ -1,6 +1,7 @@
 "use client";
 import {
   formatDateTimeYYYYMMDD,
+  newSearchParams,
   updateSearchParams,
 } from "@/utils/helperfunctions";
 import routes, { transactionFilterStr } from "@/utils/routes";
@@ -60,10 +61,18 @@ const SidebarTwo = () => {
               menuItems={[
                 {
                   title: "All",
-                  route: updateSearchParams({
+                  route: newSearchParams({
                     pathname: routes.transactions,
-                    searchParams,
-                    values: [],
+                    values: [
+                      {
+                        key: constants.searchParamsKeys.fromDate,
+                        value: null,
+                      },
+                      {
+                        key: constants.searchParamsKeys.toDate,
+                        value: null,
+                      },
+                    ],
                   }).pathname,
                   icon: <i className="las la-calendar-check iq-arrow-left"></i>,
                   isActive:
@@ -72,9 +81,8 @@ const SidebarTwo = () => {
                 },
                 {
                   title: "Today",
-                  route: updateSearchParams({
+                  route: newSearchParams({
                     pathname: routes.transactions,
-                    searchParams,
                     values: [
                       {
                         key: constants.searchParamsKeys.fromDate,
@@ -93,9 +101,8 @@ const SidebarTwo = () => {
                 {
                   title: "Last 7 days",
 
-                  route: updateSearchParams({
+                  route: newSearchParams({
                     pathname: routes.transactions,
-                    searchParams,
                     values: [
                       {
                         key: constants.searchParamsKeys.fromDate,
@@ -114,9 +121,8 @@ const SidebarTwo = () => {
                 },
                 {
                   title: "Last 30 days",
-                  route: updateSearchParams({
+                  route: newSearchParams({
                     pathname: routes.transactions,
-                    searchParams,
                     values: [
                       {
                         key: constants.searchParamsKeys.fromDate,
