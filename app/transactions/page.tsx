@@ -38,11 +38,9 @@ const Transactions = () => {
   const router = useRouter();
   const currentDate = new Date();
   const toDate =
-    searchParams.get(constants.searchParamsKeys.toDate) ??
-    formatDateTimeYYYYMMDD(currentDate);
+    searchParams.get(constants.searchParamsKeys.toDate);
   const fromDate =
-    searchParams.get(constants.searchParamsKeys.fromDate) ??
-    formatDateTimeYYYYMMDD(currentDate);
+    searchParams.get(constants.searchParamsKeys.fromDate);
   const reference =
     searchParams.get(constants.searchParamsKeys.reference) ?? "";
   const beneficiary =
@@ -50,10 +48,12 @@ const Transactions = () => {
   const externalRef =
     searchParams.get(constants.searchParamsKeys.externalRef) ?? "";
   const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
+  const formKey = Math.random() * 1000000;
 
   useEffect(() => {
     process();
   }, [searchParams]);
+
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     const paramValues: { key: string; value: string }[] = [];
     paramValues.push({
@@ -99,10 +99,11 @@ const Transactions = () => {
     <div className=" flex-1 border px-4 pt-2 pb-5 flex flex-col min-h-screen  overflow-hidden">
       <FormField
         onFinish={onFinish}
+        key={formKey}
         initialValues={{
           reference: reference,
           beneficiary: beneficiary,
-          dateRange: [dayjs(fromDate), dayjs(toDate)],
+          dateRange: [fromDate != null ? dayjs(fromDate) : null, toDate != null ? dayjs(toDate) : null],
           externalRef: externalRef,
         }}
       >
@@ -129,7 +130,7 @@ const Transactions = () => {
             type="date-range"
             formItemProps={{ name: "dateRange" }}
             dateRangePickerProps={{
-              // defaultValue: [dayjs(fromDate), dayjs(toDate)],
+              //defaultValue: [dayjs(fromDate), dayjs(toDate)],
               placeholder: ["From Date", "To Date"],
               maxDate: dayjs(new Date()),
             }}
@@ -178,8 +179,11 @@ const Transactions = () => {
   async function process() {
     const apiService = new AxiosHandler();
     try {
+
+      const queryFromDate = fromDate ?? ''
+      const queryToDate = toDate ?? ''
       const res = await apiService.get({
-        endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}`,
+        endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}&from_date=${queryFromDate}&to_date=${queryToDate}`,
       });
       console.log(res.data);
       setData(res.data);
