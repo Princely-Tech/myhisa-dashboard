@@ -14,7 +14,7 @@ const LastTransaction = () => {
   }, []);
   return (
     <div>
-      <h1 className="text-[30px] font-medium">Last 20 Transactions</h1>
+      <h1 className="text-[30px] font-medium">Latest Transactions Today</h1>
       <Spin spinning={!data} size="large">
         <TransactionTable
           data={data}

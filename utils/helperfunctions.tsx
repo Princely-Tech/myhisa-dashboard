@@ -1,3 +1,5 @@
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+
 const monthsAbbr = [
   "January",
   "Feb",
@@ -25,7 +27,7 @@ function stripSearchParams(route: string) {
   }
   return route;
 }
-function formatDateTimeYYYYMMDD(date:Date) {
+function formatDateTimeYYYYMMDD(date: Date) {
   // const date = new Date(); // Create a new date object with the current date and time
   const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
     .toString()
@@ -57,8 +59,43 @@ function formatDateSideBySide(dateTimeString: string) {
   const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   return formattedDate;
 }
-function koboToNaira(kobo:number){
+function koboToNaira(kobo: number) {
   return kobo / 100;
 }
-
-export { toggleSidebar, koboToNaira,stripSearchParams, formatDateSideBySide, setDate,formatDateTimeYYYYMMDD };
+const updateSearchParams = ({
+  values,
+  searchParams,
+  pathname,
+  router,
+}: {
+  values: { key: string; value: string | null }[];
+  searchParams: URLSearchParams;
+  pathname: string;
+  router?: AppRouterInstance;
+}) => {
+  const params = new URLSearchParams(searchParams.toString());
+  values.forEach((item) => {
+    if (item.value) {
+      params.set(item.key, item.value);
+    } else {
+      params.delete(item.key);
+    }
+  });
+  const newPathname = pathname + "?" + params.toString();
+  if (router) {
+    router.push(newPathname);
+  }
+  return {
+    pathname: newPathname,
+    params,
+  };
+};
+export {
+  updateSearchParams,
+  toggleSidebar,
+  koboToNaira,
+  stripSearchParams,
+  formatDateSideBySide,
+  setDate,
+  formatDateTimeYYYYMMDD,
+};

@@ -15,6 +15,8 @@ import {
   Checkbox,
   UploadProps,
   ConfigProvider,
+  DatePickerProps,
+  TimeRangePickerProps,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useState } from "react";
@@ -24,6 +26,7 @@ import constants from "@/utils/constants";
 interface InputFieldProps extends InputProps {
   footerText?: string;
   selectProps?: SelectProps<any>;
+  datePickerProps?: DatePickerProps;
   formItemProps?: FormItemProps;
   showTitle?: boolean;
   dropDownProps?: DropDownProps;
@@ -31,10 +34,13 @@ interface InputFieldProps extends InputProps {
   className?: string;
   titleClassName?: string;
   inputClassName?: string;
+  dateRangePickerProps?: TimeRangePickerProps;
 }
 const InputField: React.FC<InputFieldProps> = ({
   placeholder,
   uploadProps,
+  datePickerProps,
+  dateRangePickerProps,
   title,
   titleClassName = "",
   footerText,
@@ -120,9 +126,22 @@ const InputField: React.FC<InputFieldProps> = ({
             className="w-full"
             placeholder={placeholder ?? "DD/MM/YYYY"}
             required={required}
+            {...datePickerProps}
           />
         </Form.Item>
       );
+    if (type == "date-range")
+      return (
+        <Form.Item label="" {...formItemProps}>
+          <DatePicker.RangePicker
+            className="w-full"
+            // placeholder={placeholder ?? "DD/MM/YYYY"}
+            required={required}
+            {...dateRangePickerProps}
+          />
+        </Form.Item>
+      );
+
     if (type == "password")
       return (
         <Form.Item label="" {...formItemProps}>

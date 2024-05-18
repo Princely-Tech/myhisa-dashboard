@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import LastTransaction from "./LastTransaction";
 import Clock from "./clock";
 import { TransactionStatsComponent, WalletBalances } from "./components";
@@ -10,7 +11,10 @@ const Dashbaord = () => {
         <WalletBalances />
         <Clock />
       </div>
+   
+      <Suspense>
       <TransactionStatsComponent />
+      </Suspense>
       <LastTransaction />
     </div>
   );
