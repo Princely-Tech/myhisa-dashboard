@@ -38,11 +38,12 @@ const TransactionStatsComponent = ({
   useEffect(() => {
     process();
   }, [searchParams]);
-
+  const [messageApi, contextHolder] = message.useMessage();
+  const apiService = new AxiosHandler(messageApi);
   const dateFormat = "yyyy/mm/dd";
   return (
     <div className="mb-4">
-      <div className="flex flex-wrap gap-5 justify-between items-center mb-3">
+    {contextHolder}  <div className="flex flex-wrap gap-5 justify-between items-center mb-3">
         <h3>
           {title}
           {transactionStats != null && (
@@ -118,7 +119,7 @@ const TransactionStatsComponent = ({
     </div>
   );
   async function process() {
-    const apiService = new AxiosHandler();
+   
     try {
       const res = await apiService.post({
         endPoint: `${apiEndpoints.transactionStats}?${constants.searchParamsKeys.fromDate}=${fromDate}&${constants.searchParamsKeys.toDate}=${toDate}`,
@@ -146,7 +147,7 @@ const WalletBalances = () => {
   const [generatingAccount, setGeneratingAccount] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const apiService = new AxiosHandler();
+  const apiService = new AxiosHandler(messageApi);
 
   return (
     <div className="iq-card  iq-card-stretch iq-card-height m-0 lg:col-span-2">

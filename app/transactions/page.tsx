@@ -5,7 +5,7 @@ import {
   InputField,
   TransactionTable,
 } from "@/components";
-import { Card, Checkbox, Form, Spin } from "antd";
+import { Card, Checkbox, Form, Spin, message } from "antd";
 import tableJson, {
   statusArray,
   typeArray,
@@ -51,7 +51,9 @@ const Transactions = () => {
   useEffect(() => {
     process();
   }, [searchParams]);
-  const apiService = new AxiosHandler();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const apiService = new AxiosHandler(messageApi);
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     const paramValues: { key: string; value: string }[] = [];
     paramValues.push({
@@ -95,7 +97,7 @@ const Transactions = () => {
   };
   return (
     <div className=" flex-1 border px-4 pt-2 pb-5 flex flex-col min-h-screen  overflow-hidden">
-      <FormField
+    {contextHolder}  <FormField
         onFinish={onFinish}
         key={formKey}
         initialValues={{
@@ -181,7 +183,6 @@ const Transactions = () => {
     </div>
   );
   async function process() {
-   
     try {
       const queryFromDate = fromDate ?? "";
       const queryToDate = toDate ?? "";
