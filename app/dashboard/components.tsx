@@ -43,7 +43,8 @@ const TransactionStatsComponent = ({
   const dateFormat = "yyyy/mm/dd";
   return (
     <div className="mb-4">
-    {contextHolder}  <div className="flex flex-wrap gap-5 justify-between items-center mb-3">
+      {contextHolder}{" "}
+      <div className="flex flex-wrap gap-5 justify-between items-center mb-3">
         <h3>
           {title}
           {transactionStats != null && (
@@ -119,7 +120,6 @@ const TransactionStatsComponent = ({
     </div>
   );
   async function process() {
-   
     try {
       const res = await apiService.post({
         endPoint: `${apiEndpoints.transactionStats}?${constants.searchParamsKeys.fromDate}=${fromDate}&${constants.searchParamsKeys.toDate}=${toDate}`,
@@ -173,6 +173,7 @@ const WalletBalances = () => {
                 </div>
               ) : (
                 <Popover
+                  trigger={["click"]}
                   content={
                     <FormField
                       onFinish={(values) => {
@@ -195,7 +196,11 @@ const WalletBalances = () => {
                           ],
                         }}
                       />
-                      <BlueButton loading={generatingAccount} htmlType="submit">
+                      <BlueButton
+                        className="mt-[10px]"
+                        loading={generatingAccount}
+                        htmlType="submit"
+                      >
                         Create
                       </BlueButton>
                     </FormField>

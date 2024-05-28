@@ -1,6 +1,7 @@
 import axios from "axios";
 import apiEndpoints from "./apiEndpoints";
 import { MessageInstance } from "antd/es/message/interface";
+import constants from "../constants";
 
 const apiReturnMessages = {
   passwordEmailMismatch:
@@ -74,6 +75,7 @@ class AxiosHandler {
       this.messageApi!.open({
         type: "error",
         content: error,
+        duration:constants.messageDelayTime,
       });
     }
   }

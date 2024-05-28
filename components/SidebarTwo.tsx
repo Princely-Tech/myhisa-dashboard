@@ -139,6 +139,12 @@ const SidebarTwo = () => {
                     transactionFilterStr.lastThirtyDays,
                   icon: <i className="las la-calendar iq-arrow-left"></i>,
                 },
+                {
+                  title: "Export",
+                  route: routes.exportTransacton,
+                  isActive: pathname == routes.exportTransacton,
+                  icon: <i className="las la-file-export iq-arrow-left"></i>,
+                },
               ]}
             />{" "}
             <MenuItem
