@@ -15,11 +15,10 @@ interface PostOptions extends FetchOptions {
   body: {};
 }
 class AxiosHandler {
+ 
   getHeader() {
     let userToken = localStorage.getItem(apiEndpoints.tokenSetUrl);
     return {
-      //   next: { revalidate: 0 },
-      //   cache: "no-store",
       Accept: "application/json",
       Authorization: `Bearer ${userToken}`,
     };

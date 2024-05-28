@@ -62,7 +62,7 @@ const BlueButton: React.FC<CustomButtonProps> = ({
   return (
     <CustomButton
       tokenConfig={tokenConfig}
-      className={`${className}`}
+      className={` ${className} `}
       type="primary"
       {...rest}
     />

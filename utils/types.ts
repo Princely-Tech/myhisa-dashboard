@@ -21,7 +21,8 @@ type TransactionItem = {
   type: string;
   external_ref: string;
   status: string;
-  commission_amount:number;
+  balance_before: number;
+  commission_amount: number;
   created_at: string;
 };
 type TransactionHistory = {
@@ -34,6 +35,29 @@ type TransactionHistory = {
     total_pages: number;
   };
   records: TransactionItem[];
+  total_records: number;
+};
+type CreditHistoryItem = {
+  id: number;
+  wallet_id: number;
+  amount: number;
+  action: string;
+  provider: string;
+  description: string;
+  balance_before: number;
+  created_at: string;
+  updated_at: string;
+};
+type CreditHistory = {
+  pagination: {
+    current_page: number;
+    next_page: number;
+    next_page_url: string;
+    prev_page: number;
+    prev_page_url: string;
+    total_pages: number;
+  };
+  records: CreditHistoryItem[];
   total_records: number;
 };
 type TransactionStats = {
@@ -60,8 +84,11 @@ interface CustomButtonProps extends ButtonProps {
   componentConfig?: ComponentsConfig;
 }
 export type {
-  TransactionItem,CustomLinkProps,
+  TransactionItem,
+  CustomLinkProps,
   CustomButtonProps,
   RippleProps,
-  TransactionStats,TransactionHistory,
+  TransactionStats,
+  TransactionHistory,
+  CreditHistory,CreditHistoryItem,
 };

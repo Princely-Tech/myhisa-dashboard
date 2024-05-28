@@ -9,6 +9,7 @@ const routes = {
   dashboard: "/dashboard",
   transactions: "/transactions",
   transactionStats: "/transaction-stats",
+  creditHistory: "/credit-history",
 };
 export default routes;
 export { transactionFilterStr };

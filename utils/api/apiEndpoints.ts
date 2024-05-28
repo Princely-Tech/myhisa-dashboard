@@ -5,6 +5,8 @@ const apiEndpoints = {
   me: "me",
   transactionStats: "transaction-stats",
   transactionHistory: "history",
+  generateAccount:'me/generate-account-number',
+  creditHistory:'me/credit-history',
 };
 export const localApiEndPoints = {
   main: "/api",

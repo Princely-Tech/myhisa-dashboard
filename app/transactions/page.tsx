@@ -37,10 +37,8 @@ const Transactions = () => {
   const pathname = usePathname();
   const router = useRouter();
   const currentDate = new Date();
-  const toDate =
-    searchParams.get(constants.searchParamsKeys.toDate);
-  const fromDate =
-    searchParams.get(constants.searchParamsKeys.fromDate);
+  const toDate = searchParams.get(constants.searchParamsKeys.toDate);
+  const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
   const reference =
     searchParams.get(constants.searchParamsKeys.reference) ?? "";
   const beneficiary =
@@ -53,7 +51,7 @@ const Transactions = () => {
   useEffect(() => {
     process();
   }, [searchParams]);
-
+  const apiService = new AxiosHandler();
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     const paramValues: { key: string; value: string }[] = [];
     paramValues.push({
@@ -103,7 +101,7 @@ const Transactions = () => {
         initialValues={{
           reference: reference,
           beneficiary: beneficiary,
-          dateRange: [fromDate != null ? dayjs(fromDate) : null, toDate != null ? dayjs(toDate) : null],
+          dateRange: fromDate ? [dayjs(fromDate), dayjs(toDate)] : null,
           externalRef: externalRef,
         }}
       >
@@ -169,23 +167,27 @@ const Transactions = () => {
           paramsKey={searchParamKeys.network}
         />
       </div> */}
-      <div className="flex-1 overflow-hidden">
-        <Spin spinning={!data} size="large">
-          <TransactionTable data={data} className="min-h-[400px]" />
-        </Spin>
+      <div className="flex-1 relative overflow-hidden">
+        <TransactionTable
+          data={data}
+          className="min-h-[400px] max-h-full max-w-full"
+        />
+        {!data && (
+          <div className="absolute top-0 bottom-0 left-0 right-0 flex justify-center items-center">
+            <Spin spinning={true} size="large" />
+          </div>
+        )}
       </div>
     </div>
   );
   async function process() {
-    const apiService = new AxiosHandler();
+   
     try {
-
-      const queryFromDate = fromDate ?? ''
-      const queryToDate = toDate ?? ''
+      const queryFromDate = fromDate ?? "";
+      const queryToDate = toDate ?? "";
       const res = await apiService.get({
         endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}&from_date=${queryFromDate}&to_date=${queryToDate}`,
       });
-      console.log(res.data);
       setData(res.data);
     } catch (err) {}
     updateSearchParams({
