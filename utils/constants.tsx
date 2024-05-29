@@ -5,14 +5,17 @@ const antdGlobalConfig = {
   colorTextPlaceholder: "#98A2B3",
 };
 const constants = {
+  messageDelayTime: 5,
   antdGlobalConfig,
   searchParamsKeys: {
+    email:'email',
     toDate: "to_date",
     fromDate: "from_date",
     reference: "reference",
     beneficiary: "beneficiary",
     externalRef: "externalRef",
-    isFiltering:'is-filtering'
+    isFiltering:'is-filtering',
+    isExporting:'is-exporting',
   },
 };
 export default constants;

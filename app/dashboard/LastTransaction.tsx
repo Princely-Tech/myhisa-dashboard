@@ -5,16 +5,18 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import { formatDateSideBySide, formatDateTimeYYYYMMDD } from "@/utils/helperfunctions";
 import { TransactionHistory, TransactionItem } from "@/utils/types";
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 import { useEffect, useState } from "react";
 const LastTransaction = () => {
   const [data, setData] = useState<TransactionHistory | null>(null);
+  const [messageApi, contextHolder] = message.useMessage();
+  const apiService = new AxiosHandler(messageApi);
   useEffect(() => {
     process();
   }, []);
   return (
     <div>
-      <h1 className="text-[30px] font-medium">Latest Transactions Today</h1>
+   {contextHolder}   <h1 className="text-[30px] font-medium">Latest Transactions Today</h1>
       <Spin spinning={!data} size="large">
         <TransactionTable
           data={data}
@@ -24,7 +26,7 @@ const LastTransaction = () => {
     </div>
   );
   async function process() {
-    const apiService = new AxiosHandler();
+  
     const date = formatDateTimeYYYYMMDD(new Date());
     try {
       const res = await apiService.get({

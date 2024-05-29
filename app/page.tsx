@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { type FormProps } from "antd";
+import { message, type FormProps } from "antd";
 import { AuthCard, BlueButton, FormField, InputField } from "@/components";
 import logo from "@/app/icon.png";
 import { useRouter } from "next/navigation";
@@ -17,13 +17,14 @@ type FieldType = {
   password?: string;
 };
 const Login: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const apiService = new AxiosHandler(messageApi);
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const axiosHandler = new AxiosHandler();
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     setIsProcessing(true);
     try {
-      const res = await axiosHandler.post({
+      const res = await apiService.post({
         endPoint: apiEndpoints.login,
         body: {
           email: values.email,
@@ -38,6 +39,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-teal-700 relative">
+      {contextHolder}
       <div className="mt-5 fixed">
         <Image src={logo} alt="myHisa" />
       </div>

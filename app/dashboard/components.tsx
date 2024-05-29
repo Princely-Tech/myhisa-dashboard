@@ -1,5 +1,5 @@
 "use client";
-import { BlueLink, InputField } from "@/components";
+import { BlueButton, BlueLink, FormField, InputField } from "@/components";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import constants from "@/utils/constants";
@@ -11,7 +11,7 @@ import {
 import routes from "@/utils/routes";
 import { TransactionStats } from "@/utils/types";
 import { faker } from "@faker-js/faker";
-import { DatePicker, Spin } from "antd";
+import { DatePicker, Popover, Spin, message } from "antd";
 import dayjs from "dayjs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -38,15 +38,19 @@ const TransactionStatsComponent = ({
   useEffect(() => {
     process();
   }, [searchParams]);
-
+  const [messageApi, contextHolder] = message.useMessage();
+  const apiService = new AxiosHandler(messageApi);
   const dateFormat = "yyyy/mm/dd";
   return (
     <div className="mb-4">
+      {contextHolder}{" "}
       <div className="flex flex-wrap gap-5 justify-between items-center mb-3">
         <h3>
           {title}
           {transactionStats != null && (
-            <span>({transactionStats.date_from} - {transactionStats.date_to})</span>
+            <span>
+              ({transactionStats.date_from} - {transactionStats.date_to})
+            </span>
           )}
         </h3>
         {isMainPage ? (
@@ -116,7 +120,6 @@ const TransactionStatsComponent = ({
     </div>
   );
   async function process() {
-    const apiService = new AxiosHandler();
     try {
       const res = await apiService.post({
         endPoint: `${apiEndpoints.transactionStats}?${constants.searchParamsKeys.fromDate}=${fromDate}&${constants.searchParamsKeys.toDate}=${toDate}`,
@@ -134,19 +137,83 @@ const WalletBalances = () => {
     balance: number;
     commission: number;
     bonus: number;
+    account_number: number | null;
+    account_name: string | null;
+    bank_name: string | null;
   } | null>(null);
   useEffect(() => {
     process();
   }, []);
+  const [generatingAccount, setGeneratingAccount] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const apiService = new AxiosHandler(messageApi);
+
   return (
     <div className="iq-card  iq-card-stretch iq-card-height m-0 lg:col-span-2">
+      {contextHolder}
       <div className="iq-card-body">
         <Spin spinning={!wallet} tip="Loading" size="large">
           {" "}
           <h4 className="text-uppercase text-black mb-0">Main</h4>
-          <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div className="text-[30px] text-black">
-              &#8358; {wallet ? koboToNaira(wallet.balance) : 0}
+          <div className="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div className="">
+              <h2 className="text-[30px] text-black">
+                &#8358; {wallet ? koboToNaira(wallet.balance) : 0}
+              </h2>
+              {wallet?.account_number ? (
+                <div className="flex flex-col">
+                  {" "}
+                  <p className="m-0 p-0 text-black">
+                    A/No. {wallet.account_number} ({wallet.bank_name})
+                  </p>
+                  {/* <p className="m-0 p-0">
+                    {wallet.account_name} 
+                  </p> */}
+                </div>
+              ) : (
+                <Popover
+                  trigger={["click"]}
+                  content={
+                    <FormField
+                      onFinish={(values) => {
+                        generateAccount(values.bvn);
+                      }}
+                    >
+                      <InputField
+                        placeholder="BVN"
+                        type="number"
+                        min={1}
+                        showTitle={false}
+                        name={constants.searchParamsKeys.reference}
+                        formItemProps={{
+                          name: "bvn",
+                          rules: [
+                            {
+                              required: true,
+                              message: "BVN is required to create an account",
+                            },
+                          ],
+                        }}
+                      />
+                      <BlueButton
+                        className="mt-[10px]"
+                        loading={generatingAccount}
+                        htmlType="submit"
+                      >
+                        Create
+                      </BlueButton>
+                    </FormField>
+                  }
+                >
+                  <BlueButton
+                    className={`${!wallet && "hidden"}`}
+                    loading={generatingAccount}
+                  >
+                    Generate account
+                  </BlueButton>
+                </Popover>
+              )}
             </div>
             <div className="text-left grid grid-cols-2 gap-8 sm:block lg:grid xl:grid-cols-3 xl:gap-10">
               {[
@@ -173,8 +240,22 @@ const WalletBalances = () => {
       </div>
     </div>
   );
+  async function generateAccount(bvn: string) {
+    try {
+      setGeneratingAccount(true);
+      const res = await apiService.post({
+        endPoint: apiEndpoints.generateAccount,
+        body: { bvn },
+      });
+      messageApi.open({
+        type: "success",
+        content: "Account was created",
+      });
+      process();
+    } catch (err) {}
+    setGeneratingAccount(false);
+  }
   async function process() {
-    const apiService = new AxiosHandler();
     try {
       const res = await apiService.get({ endPoint: apiEndpoints.me });
       setWallet(res.data.wallet);

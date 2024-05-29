@@ -1,5 +1,7 @@
 import axios from "axios";
 import apiEndpoints from "./apiEndpoints";
+import { MessageInstance } from "antd/es/message/interface";
+import constants from "../constants";
 
 const apiReturnMessages = {
   passwordEmailMismatch:
@@ -15,11 +17,14 @@ interface PostOptions extends FetchOptions {
   body: {};
 }
 class AxiosHandler {
+  private messageApi: MessageInstance | null;
+
+  constructor(messageApi?: MessageInstance) {
+    this.messageApi = messageApi!;
+  }
   getHeader() {
     let userToken = localStorage.getItem(apiEndpoints.tokenSetUrl);
     return {
-      //   next: { revalidate: 0 },
-      //   cache: "no-store",
       Accept: "application/json",
       Authorization: `Bearer ${userToken}`,
     };
@@ -43,7 +48,7 @@ class AxiosHandler {
       console.log(res.data);
       return this.responseHandler(res.data);
     } catch (err) {
-      throw err;
+      return this.errHandler(err);
     }
   }
 
@@ -62,14 +67,27 @@ class AxiosHandler {
       return this.responseHandler(response.data);
     } catch (err) {
       console.error("Error in GET request:", err);
-      throw err;
+      return this.errHandler(err);
     }
   }
-
-  responseHandler(response: any) {
-    if (response.message === apiReturnMessages.passwordEmailMismatch) {
-      // Handle specific response message
+  showError(error: string) {
+    if (this.messageApi) {
+      this.messageApi!.open({
+        type: "error",
+        content: error,
+        duration:constants.messageDelayTime,
+      });
     }
+  }
+  errHandler(error: any) {
+    if (error.response?.data?.message) {
+      this.showError(error.response?.data?.message);
+    } else {
+      this.showError("An error occured. Try again");
+    }
+    throw error;
+  }
+  responseHandler(response: any) {
     return response;
   }
 }

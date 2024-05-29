@@ -7,7 +7,7 @@ const Dashbaord = () => {
   return (
     <div className="px-8 py-4 flex-1 max-h-full overflow-auto">
       <h3 className="">Wallet Balances</h3>
-      <div className="grid sm:grid-cols-2 gap-4 mb-4 lg:grid-cols-3 ">
+      <div className="grid md:grid-cols-2 gap-4 mb-4 lg:grid-cols-3 ">
         <WalletBalances />
         <Clock />
       </div>
