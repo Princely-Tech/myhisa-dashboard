@@ -12,9 +12,13 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import Image from "next/image";
 import constants from "@/utils/constants";
+import { User } from "@/utils/types";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+import apiEndpoints from "@/utils/api/apiEndpoints";
 
-const SidebarTwo = () => {
+const SidebarTwo = ({ user }: { user: User | null }) => {
   const [hide, sethide] = useState(false);
+
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
@@ -153,9 +157,20 @@ const SidebarTwo = () => {
               isActive={pathname == routes.creditHistory}
               icon={<i className="las la-wallet iq-arrow-left"></i>}
             />
+            {user && user?.rank > 0 && (
+              <MenuItem
+                title="Users"
+                route={routes.users}
+                isActive={pathname == routes.users}
+                icon={<i className="fa-solid fa-users"></i>}
+              />
+            )}
             <MenuItem
               onClick={() => {
                 localStorage.clear();
+                const storeUser = fetch(apiEndpoints.cookie, {
+                  method: "DELETE",
+                });
               }}
               title="Logout"
               route={routes.login}

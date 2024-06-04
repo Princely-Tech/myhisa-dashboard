@@ -60,6 +60,19 @@ type CreditHistory = {
   records: CreditHistoryItem[];
   total_records: number;
 };
+
+type UsersList = {
+  pagination: {
+    current_page: number;
+    next_page: number;
+    next_page_url: string;
+    prev_page: number;
+    prev_page_url: string;
+    total_pages: number;
+  };
+  users: User[];
+  total_users: number;
+};
 type TransactionStats = {
   date_from: string;
   date_to: string;
@@ -83,6 +96,29 @@ interface CustomButtonProps extends ButtonProps {
   tokenConfig?: Partial<AliasToken>;
   componentConfig?: ComponentsConfig;
 }
+export interface CookieSetParams {
+  cookie: string;
+}
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  email_verified_at: string;
+  approved_at: string;
+  rank: 1;
+  reporting_emails: string;
+  referral_code: string;
+  created_at: string;
+  wallet: {
+    balance: number;
+    commission: number;
+    bonus: number;
+    account_number: null | number;
+    account_name: null | string;
+    bank_name: null | string;
+  };
+};
 export type {
   TransactionItem,
   CustomLinkProps,
@@ -90,5 +126,6 @@ export type {
   RippleProps,
   TransactionStats,
   TransactionHistory,
-  CreditHistory,CreditHistoryItem,
+  CreditHistory,
+  CreditHistoryItem,UsersList,
 };

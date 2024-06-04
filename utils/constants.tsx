@@ -8,6 +8,7 @@ const constants = {
   messageDelayTime: 5,
   antdGlobalConfig,
   searchParamsKeys: {
+    search:'search',
     email:'email',
     toDate: "to_date",
     fromDate: "from_date",

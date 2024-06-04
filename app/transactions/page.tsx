@@ -37,8 +37,7 @@ const Transactions = () => {
   const pathname = usePathname();
   const router = useRouter();
   const currentDate = new Date();
-  const toDate = searchParams.get(constants.searchParamsKeys.toDate);
-  const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
+ 
   const reference =
     searchParams.get(constants.searchParamsKeys.reference) ?? "";
   const beneficiary =
@@ -47,7 +46,8 @@ const Transactions = () => {
     searchParams.get(constants.searchParamsKeys.externalRef) ?? "";
   const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
   const formKey = Math.random() * 1000000;
-
+  const toDate = searchParams.get(constants.searchParamsKeys.toDate);
+  const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
   useEffect(() => {
     process();
   }, [searchParams]);
@@ -97,7 +97,8 @@ const Transactions = () => {
   };
   return (
     <div className=" flex-1 border px-4 pt-2 pb-5 flex flex-col min-h-screen  overflow-hidden">
-    {contextHolder}  <FormField
+      {contextHolder}{" "}
+      <FormField
         onFinish={onFinish}
         key={formKey}
         initialValues={{
@@ -127,6 +128,7 @@ const Transactions = () => {
           />
           <InputField
             className="max-h-[40px]"
+            inputClassName="w-full"
             type="date-range"
             formItemProps={{ name: "dateRange" }}
             dateRangePickerProps={{
