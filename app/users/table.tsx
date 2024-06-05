@@ -1,3 +1,4 @@
+"use client";
 import { BlueButton, FormField, InputField } from "@/components";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import AxiosHandler from "@/utils/api/axiosHandler";
@@ -11,14 +12,19 @@ import {
 } from "@/utils/types";
 import { Empty, Modal, Spin, message } from "antd";
 import { useForm } from "antd/es/form/Form";
+import { revalidatePath } from "next/cache";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const UsersListTable = ({
   data,
   className,
+  router,
 }: {
   data: UsersList | null;
   className?: string;
+  router: AppRouterInstance;
 }) => {
   let showEmpty = true;
   if (!data) {
@@ -43,9 +49,11 @@ const UsersListTable = ({
   const apiService = new AxiosHandler(messageApi);
   const formKey = Math.random() * 100000000000;
   const creditUser = async (values: any) => {
+   
     setCreditingAccount(true);
+
     try {
-      let amount = Number(values.amount);
+      let amount = Number(values.amount) * 100;
       const res = await apiService.post({
         endPoint: apiEndpoints.creditUser(modalContent!.id),
         body: {
@@ -53,15 +61,16 @@ const UsersListTable = ({
           amount,
         },
       });
-      form.resetFields();
-      setModalContent(null);
+
+      
       messageApi.open({
         content: "User has been credited",
         type: "success",
       });
-    } catch (err) {
-      
-    }
+      location.reload();
+      setModalContent(null);
+      form.resetFields();
+    } catch (err) {}
     setCreditingAccount(false);
   };
   return (
@@ -123,7 +132,7 @@ const UsersListTable = ({
     return (
       <Modal
         key={formKey}
-        title={`Credit User(ID:${modalContent?.id})`}
+        title={`Credit ${modalContent?.name} (${modalContent?.email})`}
         open={true}
         onOk={() => form.submit()}
         okButtonProps={{

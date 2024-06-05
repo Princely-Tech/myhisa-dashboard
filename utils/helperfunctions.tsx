@@ -60,7 +60,8 @@ function formatDateSideBySide(dateTimeString: string) {
   return formattedDate;
 }
 function koboToNaira(kobo: number) {
-  return kobo / 100;
+  const naira = kobo / 100;
+  return naira.toLocaleString();
 }
 const updateSearchParams = ({
   values,

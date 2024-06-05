@@ -17,7 +17,7 @@ import {
 import dayjs from "dayjs";
 import { CustomButton } from "@/components/buttons";
 
-const CreditHistoryPage = () => {
+const UsersListPage = () => {
   const [data, setData] = useState<UsersList | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);
@@ -26,7 +26,7 @@ const CreditHistoryPage = () => {
   const router = useRouter();
   const search = searchParams.get(constants.searchParamsKeys.search) ?? "";
   const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
-  console.log(search);
+
   useEffect(() => {
     process();
   }, [searchParams]);
@@ -41,6 +41,7 @@ const CreditHistoryPage = () => {
       </div>
       <section className="flex flex-1 overflow-hidden">
         <UsersListTable
+          router={router}
           data={data}
           className="min-h-[400px] flex-1 h-full overflow-auto"
         />
@@ -140,4 +141,4 @@ const CreditHistoryPage = () => {
     );
   }
 };
-export default CreditHistoryPage;
+export default UsersListPage;

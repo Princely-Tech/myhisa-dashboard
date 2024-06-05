@@ -169,7 +169,7 @@ const SidebarTwo = () => {
                 title="Users"
                 route={routes.users}
                 isActive={pathname == routes.users}
-                icon={<i className="fa-solid fa-users"></i>}
+                icon={<i className="las la-users iq-arrow-left"></i>}
               />
             )}
             <MenuItem
