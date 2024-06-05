@@ -11,6 +11,7 @@ const routes = {
   transactionStats: "/transaction-stats",
   creditHistory: "/credit-history",
   exportTransacton: "/export-transactions",
+  users: "/users",
 };
 export default routes;
 export { transactionFilterStr };

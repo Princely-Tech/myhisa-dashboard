@@ -9,17 +9,28 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import logo from "@/app/icon.png";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import constants from "@/utils/constants";
+import { User } from "@/utils/types";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+import apiEndpoints from "@/utils/api/apiEndpoints";
 
 const SidebarTwo = () => {
-  const [hide, sethide] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
-  if (pathname == routes.login) {
-    return null;
+  useEffect(() => {
+    let userGet = localStorage.getItem(apiEndpoints.userSetUrl);
+    if (userGet) {
+      const userJson = JSON.parse(userGet) as User;
+      setUser(userJson);
+    }
+  }, [pathname]);
+  if (pathname == routes.login || !user) {
+    return <></>;
   }
   const currentDate = new Date();
   const date = formatDateTimeYYYYMMDD(currentDate);
@@ -153,9 +164,20 @@ const SidebarTwo = () => {
               isActive={pathname == routes.creditHistory}
               icon={<i className="las la-wallet iq-arrow-left"></i>}
             />
+            {user && user?.rank > 0 && (
+              <MenuItem
+                title="Users"
+                route={routes.users}
+                isActive={pathname == routes.users}
+                icon={<i className="las la-users iq-arrow-left"></i>}
+              />
+            )}
             <MenuItem
               onClick={() => {
                 localStorage.clear();
+                const storeUser = fetch(apiEndpoints.cookie, {
+                  method: "DELETE",
+                });
               }}
               title="Logout"
               route={routes.login}

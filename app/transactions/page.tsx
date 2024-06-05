@@ -37,8 +37,7 @@ const Transactions = () => {
   const pathname = usePathname();
   const router = useRouter();
   const currentDate = new Date();
-  const toDate = searchParams.get(constants.searchParamsKeys.toDate);
-  const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
+
   const reference =
     searchParams.get(constants.searchParamsKeys.reference) ?? "";
   const beneficiary =
@@ -47,13 +46,46 @@ const Transactions = () => {
     searchParams.get(constants.searchParamsKeys.externalRef) ?? "";
   const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
   const formKey = Math.random() * 1000000;
+  const toDate = searchParams.get(constants.searchParamsKeys.toDate);
+  const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
+  const [messageApi, contextHolder] = message.useMessage();
+  const process = useCallback(async () => {
+    try {
+      const apiService = new AxiosHandler(messageApi);
+      const queryFromDate = fromDate ?? "";
+      const queryToDate = toDate ?? "";
+      const res = await apiService.get({
+        endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}&from_date=${queryFromDate}&to_date=${queryToDate}`,
+      });
+      setData(res.data);
+    } catch (err) {}
+    updateSearchParams({
+      values: [
+        {
+          key: constants.searchParamsKeys.isFiltering,
+          value: null,
+        },
+      ],
+      pathname: pathname,
+      router: router,
+      searchParams: searchParams,
+    });
+  }, [
+    fromDate,
+    toDate,
+    reference,
+    beneficiary,
+    externalRef,
+    messageApi,
+    pathname,
+    router,
+    searchParams,
+  ]);
 
   useEffect(() => {
     process();
-  }, [searchParams]);
-  const [messageApi, contextHolder] = message.useMessage();
+  }, [searchParams, process]);
 
-  const apiService = new AxiosHandler(messageApi);
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     const paramValues: { key: string; value: string }[] = [];
     paramValues.push({
@@ -97,7 +129,8 @@ const Transactions = () => {
   };
   return (
     <div className=" flex-1 border px-4 pt-2 pb-5 flex flex-col min-h-screen  overflow-hidden">
-    {contextHolder}  <FormField
+      {contextHolder}{" "}
+      <FormField
         onFinish={onFinish}
         key={formKey}
         initialValues={{
@@ -127,6 +160,7 @@ const Transactions = () => {
           />
           <InputField
             className="max-h-[40px]"
+            inputClassName="w-full"
             type="date-range"
             formItemProps={{ name: "dateRange" }}
             dateRangePickerProps={{
@@ -152,23 +186,6 @@ const Transactions = () => {
           </div>
         </div>
       </FormField>
-      {/* <div className="flex flex-wrap gap-5 mb-4 justify-between">
-        <CheckboxSelect
-          checkItems={statusArray}
-          title="Status"
-          paramsKey={searchParamKeys.status}
-        />
-        <CheckboxSelect
-          checkItems={typeArray}
-          title="Type"
-          paramsKey={searchParamKeys.type}
-        />
-        <CheckboxSelect
-          checkItems={networkArray}
-          title="Network"
-          paramsKey={searchParamKeys.network}
-        />
-      </div> */}
       <div className="flex-1 relative overflow-hidden">
         <TransactionTable
           data={data}
@@ -182,87 +199,6 @@ const Transactions = () => {
       </div>
     </div>
   );
-  async function process() {
-    try {
-      const queryFromDate = fromDate ?? "";
-      const queryToDate = toDate ?? "";
-      const res = await apiService.get({
-        endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}&from_date=${queryFromDate}&to_date=${queryToDate}`,
-      });
-      setData(res.data);
-    } catch (err) {}
-    updateSearchParams({
-      values: [
-        {
-          key: constants.searchParamsKeys.isFiltering,
-          value: null,
-        },
-      ],
-      pathname: pathname,
-      router: router,
-      searchParams: searchParams,
-    });
-  }
 };
 
 export default Transactions;
-// const CheckboxSelect = ({
-//   title,
-//   checkItems,
-//   paramsKey,
-// }: {
-//   title: string;
-//   checkItems: string[];
-//   paramsKey: string;
-// }) => {
-//   return (
-//     <Suspense>
-//       <Body />
-//     </Suspense>
-//   );
-//   function Body() {
-//     const searchParams = useSearchParams();
-//     let defaultSelected = searchParams.get(paramsKey);
-//     defaultSelected = defaultSelected
-//       ? JSON.parse(defaultSelected)
-//       : checkItems;
-//     console.log(defaultSelected);
-//     const [selected, setSelected] = useState<string[]>(defaultSelected);
-
-//     const pathname = usePathname();
-//     const router = useRouter();
-
-//     useEffect(() => {
-//       const params = new URLSearchParams(searchParams.toString());
-//       params.set(paramsKey, JSON.stringify(selected));
-//       router.push(`${pathname}?${params}`);
-//       // eslint-disable-next-line react-hooks/exhaustive-deps
-//     }, [selected]);
-//     return (
-//       <div>
-//         <h4 className="">{title}</h4>
-//         <div className="flex">
-//           {checkItems.map((item, index) => (
-//             <Checkbox
-//               key={index}
-//               defaultChecked={selected.includes(item)}
-//               onClick={() => {
-//                 setSelected((prevSelected) => {
-//                   let newArr = prevSelected;
-//                   if (newArr.includes(item)) {
-//                     newArr = newArr.filter((arrItem) => item != arrItem);
-//                   } else {
-//                     newArr.push(item);
-//                   }
-//                   return newArr;
-//                 });
-//               }}
-//             >
-//               {item}
-//             </Checkbox>
-//           ))}
-//         </div>
-//       </div>
-//     );
-//   }
-// };

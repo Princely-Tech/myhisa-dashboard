@@ -12,6 +12,7 @@ import {
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import Image from "next/image";
+import { CookieSetParams } from "@/utils/types";
 type FieldType = {
   email?: string;
   password?: string;
@@ -32,6 +33,26 @@ const Login: React.FC = () => {
         },
       });
       localStorage.setItem(apiEndpoints.tokenSetUrl, res.data.token);
+      localStorage.setItem(apiEndpoints.userSetUrl, JSON.stringify(res.data.user));
+      const expires = new Date(Date.now() + 31536000000);
+      const userBody: CookieSetParams = {
+        cookie: `${apiEndpoints.userSetUrl}=${JSON.stringify(
+          res.data.user
+        )}; Path=/;Expires=${expires.toUTCString()}; HttpOnly; Secure; SameSite=Strict`,
+      };
+      const tokenBody: CookieSetParams = {
+        cookie: `${apiEndpoints.tokenSetUrl}=${
+          res.data.token
+        }; Path=/;Expires=${expires.toUTCString()}; HttpOnly; Secure; SameSite=Strict`,
+      };
+      const storeUser = await fetch(apiEndpoints.cookie, {
+        method: "POST",
+        body: JSON.stringify(userBody),
+      });
+      const storeToken = await fetch(apiEndpoints.cookie, {
+        method: "POST",
+        body: JSON.stringify(tokenBody),
+      });
       router.push(routes.dashboard);
     } catch (err) {}
     setIsProcessing(false);

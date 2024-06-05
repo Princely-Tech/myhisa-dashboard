@@ -50,7 +50,7 @@ const InputField: React.FC<InputFieldProps> = ({
   showTitle = true,
   prefix,
   suffix,
-  inputClassName = "h-full px-[14px] py-[10px]",
+  inputClassName = "h-full px-[14px] py-[10px] w-full",
   className = "",
   required = false,
   ...rest
@@ -134,7 +134,7 @@ const InputField: React.FC<InputFieldProps> = ({
       return (
         <Form.Item label="" {...formItemProps}>
           <DatePicker.RangePicker
-            className="w-full"
+            className={`${inputClassName}`}
             // placeholder={placeholder ?? "DD/MM/YYYY"}
             required={required}
             {...dateRangePickerProps}

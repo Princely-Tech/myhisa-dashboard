@@ -88,7 +88,7 @@ const Transactions = () => {
             }}
           />
           <Form.Item>
-            <BlueButton htmlType="submit" loading={isExporting} block>
+            <BlueButton htmlType="submit" loading={isExporting} block  className=" min-w-[100px] min-h-[44px]">
               Export
             </BlueButton>
           </Form.Item>
