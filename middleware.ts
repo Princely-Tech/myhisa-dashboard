@@ -6,6 +6,12 @@ import routes from "./utils/routes";
 import { User } from "./utils/types";
 
 export function middleware(request: NextRequest) {
+  const token = request.cookies.get(apiEndpoints.tokenSetUrl);
+  if (!token && request.nextUrl.pathname != routes.login) {
+    return NextResponse.redirect(
+      `${request.nextUrl.origin}${routes.login}`
+    );
+  }
   if (request.nextUrl.pathname === routes.users) {
     let user = request.cookies.get(apiEndpoints.userSetUrl);
     if (user) {

@@ -9,21 +9,28 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import logo from "@/app/icon.png";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import constants from "@/utils/constants";
 import { User } from "@/utils/types";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 
-const SidebarTwo = ({ user }: { user: User | null }) => {
-  const [hide, sethide] = useState(false);
+const SidebarTwo = () => {
+  const [user, setUser] = useState<User | null>(null);
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
-  if (pathname == routes.login) {
-    return null;
+  useEffect(() => {
+    let userGet = localStorage.getItem(apiEndpoints.userSetUrl);
+    if (userGet) {
+      const userJson = JSON.parse(userGet) as User;
+      setUser(userJson);
+    }
+  }, [pathname]);
+  if (pathname == routes.login || !user) {
+    return <></>;
   }
   const currentDate = new Date();
   const date = formatDateTimeYYYYMMDD(currentDate);

@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
   const body = (await request.json()) as CookieSetParams;
   const headers = new Headers();
   headers.set("Location", request.nextUrl.href);
+
   headers.set("Set-Cookie", body.cookie);
   return new Response(null, { status: 302, headers });
 }

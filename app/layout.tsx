@@ -23,20 +23,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookie = cookies();
-  const user = cookie.get(apiEndpoints.userSetUrl);
-  let userJSON: User | null = null;
-  if (user) {
-    userJSON = JSON.parse(user.value);
-  }
+  // const cookie = cookies();
+  // const user = cookie.get(apiEndpoints.userSetUrl);
+  // let userJSON: User | null = null;
+  // if (user) {
+  //   userJSON = JSON.parse(user.value);
+  // }
   return (
     <html lang="en">
       <body>
         <AntdRegistry>
           <div className="flex gap-2 overflow-hidden  max-h-full max-w-full">
             <Suspense>
-              {" "}
-              <SidebarTwo user={userJSON} />
+              <SidebarTwo  />
             </Suspense>
             {children}
           </div>
