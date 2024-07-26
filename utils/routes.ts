@@ -11,7 +11,7 @@ const routes = {
   summariesTotal: "/summaries_total",
   summariesUser: "/summaries_user",
   summariesNetwork: "/summaries_network",
-  summariesChannel: "/summaries_channel",
+  summariesChannel: "/summaries_channel", 
   transactionStats: "/transaction_stats",
   creditHistory: "/credit-history",
   exportTransacton: "/export_transactions",

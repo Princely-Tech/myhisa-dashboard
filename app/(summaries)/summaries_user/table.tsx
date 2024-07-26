@@ -26,8 +26,10 @@ const SummariesUserTable = ({
             <th>Name</th>
             <th>Airtime Transactions</th>
             <th>Airtime Amount </th>
-            <th>Network</th>
-            <th>Network</th>
+            <th>Data Transactions</th>
+            <th>Data Amount </th>
+            <th>Total Transactions</th>
+            <th>Total Amount</th>
           </tr>
         </thead>
         <tbody>
@@ -43,11 +45,12 @@ const SummariesUserTable = ({
                 <td>{index + 1}</td>
                 <td>{item.user_id}</td>
                 <td>{item.user_name}</td>
-                <td>{item.network}</td>
-                <td>{item.type}</td>
-                <td>{item.channel}</td>
-                <td>{item.total_transactions}</td>
-                <td>{koboToNaira(item.total_amount)}</td>
+                <td>{item.total_airtime_transactions}</td>
+                <td>{koboToNaira(item.total_airtime_amount)}</td>{" "}
+                <td>{item.total_data_transactions}</td>
+                <td>{koboToNaira(item.total_data_amount)}</td>{" "}
+                <td>{item.grand_total_transactions}</td>
+                <td>{koboToNaira(item.grand_total_amount)}</td>
               </tr>
             ))
           )}

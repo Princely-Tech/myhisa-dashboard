@@ -159,6 +159,7 @@ const SidebarTwo = () => {
                 },
               ]}
             />
+
             <CollapsibleMenuItem
               isActive={
                 pathname == routes.summariesTotal ||
@@ -167,7 +168,7 @@ const SidebarTwo = () => {
                 pathname == routes.summariesUser
               }
               title="Summaries"
-              icon={<i className="las la-list iq-arrow-left"></i>}
+              icon={<i className="las la-chart-bar iq-arrow-left"></i>}
               menuItems={[
                 {
                   title: "Total",
@@ -176,7 +177,7 @@ const SidebarTwo = () => {
                     pathname: routes.summariesTotal,
                     values: [],
                   }).pathname,
-                  icon: <i className="las la-calendar-check iq-arrow-left"></i>,
+                  icon: <i className="las la-check-square iq-arrow-left"></i>,
                   isActive: pathname == routes.summariesTotal,
                 },
                 {
@@ -186,7 +187,7 @@ const SidebarTwo = () => {
                     pathname: routes.summariesUser,
                     values: [],
                   }).pathname,
-                  icon: <i className="las la-calendar-check iq-arrow-left"></i>,
+                  icon: <i className="las la-user iq-arrow-left"></i>,
                   isActive: pathname == routes.summariesUser,
                 },
                 {
@@ -196,7 +197,7 @@ const SidebarTwo = () => {
                     pathname: routes.summariesNetwork,
                     values: [],
                   }).pathname,
-                  icon: <i className="las la-calendar-check iq-arrow-left"></i>,
+                  icon: <i className="las la-network-wired iq-arrow-left"></i>,
                   isActive: pathname == routes.summariesNetwork,
                 },
                 {
@@ -206,11 +207,12 @@ const SidebarTwo = () => {
                     pathname: routes.summariesChannel,
                     values: [],
                   }).pathname,
-                  icon: <i className="las la-calendar-check iq-arrow-left"></i>,
+                  icon: <i className="las la-tv iq-arrow-left"></i>,
                   isActive: pathname == routes.summariesChannel,
                 },
               ]}
             />
+
             <MenuItem
               title="Credit History"
               route={routes.creditHistory}

@@ -52,7 +52,17 @@ export type SummaryUserItem = {
   grand_total_transactions: number;
   grand_total_amount: 50000;
 };
-
+export type SummaryNetwork = {
+  data: SummaryNetworkItem[];
+  message: string;
+};
+export type SummaryNetworkItem = {
+  network: string;
+  channel: number;
+  type: string;
+  total_transactions: number;
+  total_amount: number;
+};
 type TransactionHistory = {
   pagination: {
     current_page: number;
