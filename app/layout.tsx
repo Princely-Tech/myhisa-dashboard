@@ -5,7 +5,7 @@ import "@/css/typography.css";
 import "@/css/variable.css";
 import "@/css/style-customizer.css";
 import "@/css/fontawesome.css";
-import { MyHisaSideBar } from "@/components";
+//import { MyHisaSideBar } from "@/components";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import SidebarTwo from "@/components/SidebarTwo";
 import { Suspense } from "react";
