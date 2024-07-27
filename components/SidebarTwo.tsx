@@ -65,6 +65,7 @@ const SidebarTwo = () => {
               isActive={pathname == routes.dashboard}
               icon={<i className="las la-home iq-arrow-left"></i>}
             />
+
             <CollapsibleMenuItem
               isActive={pathname == routes.transactions}
               title="Transactions"
@@ -157,7 +158,61 @@ const SidebarTwo = () => {
                   icon: <i className="las la-file-export iq-arrow-left"></i>,
                 },
               ]}
-            />{" "}
+            />
+
+            <CollapsibleMenuItem
+              isActive={
+                pathname == routes.summariesTotal ||
+                pathname == routes.summariesChannel ||
+                pathname == routes.summariesNetwork ||
+                pathname == routes.summariesUser
+              }
+              title="Summaries"
+              icon={<i className="las la-chart-bar iq-arrow-left"></i>}
+              menuItems={[
+                {
+                  title: "Total",
+                  route: updateSearchParams({
+                    searchParams,
+                    pathname: routes.summariesTotal,
+                    values: [],
+                  }).pathname,
+                  icon: <i className="las la-check-square iq-arrow-left"></i>,
+                  isActive: pathname == routes.summariesTotal,
+                },
+                {
+                  title: "User",
+                  route: updateSearchParams({
+                    searchParams,
+                    pathname: routes.summariesUser,
+                    values: [],
+                  }).pathname,
+                  icon: <i className="las la-user iq-arrow-left"></i>,
+                  isActive: pathname == routes.summariesUser,
+                },
+                {
+                  title: "Network",
+                  route: updateSearchParams({
+                    searchParams,
+                    pathname: routes.summariesNetwork,
+                    values: [],
+                  }).pathname,
+                  icon: <i className="las la-network-wired iq-arrow-left"></i>,
+                  isActive: pathname == routes.summariesNetwork,
+                },
+                {
+                  title: "Channel",
+                  route: updateSearchParams({
+                    searchParams,
+                    pathname: routes.summariesChannel,
+                    values: [],
+                  }).pathname,
+                  icon: <i className="las la-tv iq-arrow-left"></i>,
+                  isActive: pathname == routes.summariesChannel,
+                },
+              ]}
+            />
+
             <MenuItem
               title="Credit History"
               route={routes.creditHistory}
@@ -225,7 +280,7 @@ const CollapsibleMenuItem = ({
   isActive: boolean;
   menuItems: MenuItemProps[];
 }) => {
-  const [collapse, setCollapse] = useState(false);
+  const [collapse, setCollapse] = useState(!isActive);
   return (
     <li className={`${isActive && "active active-menu"}`}>
       <Link

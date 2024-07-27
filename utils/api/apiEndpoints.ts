@@ -12,6 +12,10 @@ const apiEndpoints = {
   exportTransaction: "export/transaction",
   users: "admin/users",
   creditUser: (id: number) => `admin/user/${id}/credit-balance`,
+  summariesTotal: "admin/reports/transaction-summary",
+  summariesUser: "admin/reports/user-transactions",
+  summariesNetwork: "admin/reports/network-transactions",
+  summariesChannel: "admin/reports/channel-transactions",
 };
 export const localApiEndPoints = {
   main: "/api",

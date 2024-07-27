@@ -25,6 +25,44 @@ type TransactionItem = {
   commission_amount: number;
   created_at: string;
 };
+export type SummaryTotalItem = {
+  user_id: number;
+  user_name: string;
+  network: string;
+  type: string;
+  channel: number;
+  total_transactions: number;
+  total_amount: number;
+};
+export type SummaryTotal = {
+  data: SummaryTotalItem[];
+  message: string;
+};
+export type SummaryUser = {
+  data: SummaryUserItem[];
+  message: string;
+};
+export type SummaryUserItem = {
+  user_id: number;
+  user_name: string;
+  total_airtime_transactions: number;
+  total_airtime_amount: number;
+  total_data_transactions: number;
+  total_data_amount: number;
+  grand_total_transactions: number;
+  grand_total_amount: 50000;
+};
+export type SummaryNetwork = {
+  data: SummaryNetworkItem[];
+  message: string;
+};
+export type SummaryNetworkItem = {
+  network: string;
+  channel: number;
+  type: string;
+  total_transactions: number;
+  total_amount: number;
+};
 type TransactionHistory = {
   pagination: {
     current_page: number;
@@ -127,5 +165,6 @@ export type {
   TransactionStats,
   TransactionHistory,
   CreditHistory,
-  CreditHistoryItem,UsersList,
+  CreditHistoryItem,
+  UsersList,
 };
