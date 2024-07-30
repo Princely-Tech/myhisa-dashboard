@@ -1,6 +1,6 @@
 "use client";
 import AxiosHandler from "@/utils/api/axiosHandler";
-import { CreditHistory } from "@/utils/types";
+import { CreditHistory, CreditHistoryItem } from "@/utils/types";
 import { useEffect, useState } from "react";
 import CreditHistoryTable from "./table";
 import { Form, Spin, message } from "antd";
@@ -13,6 +13,8 @@ import papaparse from "papaparse";
 import constants from "@/utils/constants";
 import {
   formatDateTimeYYYYMMDD,
+  handleDownloadCSV,
+  plainKoboNairaConvert,
   updateSearchParams,
 } from "@/utils/helperfunctions";
 import dayjs from "dayjs";
@@ -104,19 +106,17 @@ const CreditHistoryPage = () => {
       searchParams: searchParams,
     });
   }
-  function handleDownloadCSV() {
-    const csvOptions = {
-      header: true,
-      quotes: true,
-      delimiter: ",",
-      newline: "\r\n",
-      encoding: "utf-8",
-      skipEmptyLines: true,
-      dynamicTyping: false,
-    };
-    const csvData = papaparse.unparse(data!.records, csvOptions);
-    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-    saveAs(blob, "credit_history.csv");
+  function downLoadHandler() {
+    const arr: CreditHistoryItem[] = [];
+    data!.records.forEach((item) => {
+      const newValue: CreditHistoryItem = {
+        ...item,
+        balance_before: plainKoboNairaConvert(item.balance_before),
+        amount: plainKoboNairaConvert(item.amount),
+      };
+      return arr.push(newValue);
+    });
+   handleDownloadCSV(arr,'credit_history');
   }
   function FormComponent() {
     const formKey = Math.random() * 1000000;
@@ -148,7 +148,7 @@ const CreditHistoryPage = () => {
           </BlueButton>
           {data && (
             <CustomButton
-              onClick={handleDownloadCSV}
+              onClick={downLoadHandler}
               className=" min-w-[100px] min-h-[44px]"
             >
               Export

@@ -1,16 +1,19 @@
 "use client";
-import {
-  BlueButton,
-  FormField,
-  InputField,
-} from "@/components";
+import { BlueButton, FormField, InputField } from "@/components";
 import { Form, Spin, message } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { SummaryTotal, SummaryUser, TransactionHistory } from "@/utils/types";
+import {
+  SummaryTotal,
+  SummaryUser,
+  SummaryUserItem,
+  TransactionHistory,
+} from "@/utils/types";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import {
   formatDateTimeYYYYMMDD,
+  handleDownloadCSV,
+  plainKoboNairaConvert,
   updateSearchParams,
 } from "@/utils/helperfunctions";
 import apiEndpoints from "@/utils/api/apiEndpoints";
@@ -19,6 +22,7 @@ import constants from "@/utils/constants";
 import dayjs from "dayjs";
 import SummariesTotalTable from "./table";
 import SummariesUserTable from "./table";
+import { CustomButton } from "@/components/buttons";
 type FieldType = {
   dateRange: [dayjs.Dayjs | null, dayjs.Dayjs | null];
 };
@@ -34,8 +38,8 @@ const Transactions = () => {
   const toDate =
     searchParams.get(constants.searchParamsKeys.toDate) ??
     formatDateTimeYYYYMMDD(currentDate);
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(currentDate.getDate() - 1);
+  const previousDate = new Date(currentDate);
+  previousDate.setDate(currentDate.getDate() - 1);
   const fromDate =
     searchParams.get(constants.searchParamsKeys.fromDate) ??
     formatDateTimeYYYYMMDD(previousDate);
@@ -63,7 +67,7 @@ const Transactions = () => {
 
   useEffect(() => {
     process();
-  }, [ process]);
+  }, [process]);
 
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     const paramValues: { key: string; value: string }[] = [];
@@ -112,12 +116,15 @@ const Transactions = () => {
             }}
           />
 
-          <div className="flex justify-start items-start mb-[10px]">
+          <div className="gap-3 flex justify-start items-start mb-[10px]">
             <Form.Item>
               <BlueButton htmlType="submit" loading={isFiltering}>
                 Filter
               </BlueButton>
             </Form.Item>
+            {data && (
+              <CustomButton onClick={downLoadHandler}>Export</CustomButton>
+            )}
           </div>
         </div>
       </FormField>
@@ -131,6 +138,19 @@ const Transactions = () => {
       </div>
     </div>
   );
+  function downLoadHandler() {
+    const arr: SummaryUserItem[] = [];
+    data!.data.forEach((item) => {
+      const newValue: SummaryUserItem = {
+        ...item,
+        grand_total_amount: plainKoboNairaConvert(item.grand_total_amount),
+        total_data_amount: plainKoboNairaConvert(item.total_data_amount),
+        total_airtime_amount: plainKoboNairaConvert(item.total_airtime_amount),
+      };
+      return arr.push(newValue);
+    });
+    handleDownloadCSV(arr, "summaries_user");
+  }
 };
 
 export default Transactions;

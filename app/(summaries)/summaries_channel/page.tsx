@@ -7,10 +7,12 @@ import {
 import { Form, Spin, message } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { SummaryTotal, SummaryNetwork, TransactionHistory } from "@/utils/types";
+import { SummaryTotal, SummaryNetwork, TransactionHistory, SummaryNetworkItem } from "@/utils/types";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import {
   formatDateTimeYYYYMMDD,
+  handleDownloadCSV,
+  plainKoboNairaConvert,
   updateSearchParams,
 } from "@/utils/helperfunctions";
 import apiEndpoints from "@/utils/api/apiEndpoints";
@@ -18,6 +20,7 @@ import { FormProps } from "antd/lib/form";
 import constants from "@/utils/constants";
 import dayjs from "dayjs";
 import SummariesChannelTable from "./table";
+import { CustomButton } from "@/components/buttons";
 type FieldType = {
   dateRange: [dayjs.Dayjs | null, dayjs.Dayjs | null];
 };
@@ -110,13 +113,15 @@ const Transactions = () => {
               maxDate: dayjs(new Date()),
             }}
           />
-
-          <div className="flex justify-start items-start mb-[10px]">
+          <div className="gap-3 flex justify-start items-start mb-[10px]">
             <Form.Item>
               <BlueButton htmlType="submit" loading={isFiltering}>
                 Filter
               </BlueButton>
             </Form.Item>
+            {data && (
+              <CustomButton onClick={downLoadHandler}>Export</CustomButton>
+            )}
           </div>
         </div>
       </FormField>
@@ -130,6 +135,17 @@ const Transactions = () => {
       </div>
     </div>
   );
+   function downLoadHandler() {
+     const arr: SummaryNetworkItem[] = [];
+     data!.data.forEach((item) => {
+       const newValue: SummaryNetworkItem = {
+         ...item,
+         total_amount: plainKoboNairaConvert(item.total_amount),
+       };
+       return arr.push(newValue);
+     });
+     handleDownloadCSV(arr, "summaries_channel");
+   }
 };
 
 export default Transactions;
