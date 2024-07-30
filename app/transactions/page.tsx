@@ -14,10 +14,12 @@ import tableJson, {
 } from "@/data/tableJson";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { TransactionHistory } from "@/utils/types";
+import { TransactionHistory, TransactionItem } from "@/utils/types";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import {
   formatDateTimeYYYYMMDD,
+  handleDownloadCSV,
+  plainKoboNairaConvert,
   updateSearchParams,
 } from "@/utils/helperfunctions";
 import apiEndpoints from "@/utils/api/apiEndpoints";
@@ -25,6 +27,7 @@ import { FormProps } from "antd/lib/form";
 import constants from "@/utils/constants";
 import dayjs from "dayjs";
 import { revalidatePath } from "next/cache";
+import { CustomButton } from "@/components/buttons";
 type FieldType = {
   dateRange: [dayjs.Dayjs | null, dayjs.Dayjs | null];
   reference: string;
@@ -177,12 +180,15 @@ const Transactions = () => {
             className="max-h-[40px]"
             formItemProps={{ name: constants.searchParamsKeys.externalRef }}
           />
-          <div className="flex justify-start items-start mb-[10px]">
+          <div className="gap-3 flex justify-start items-start mb-[10px]">
             <Form.Item>
               <BlueButton htmlType="submit" loading={isFiltering}>
                 Filter
               </BlueButton>
             </Form.Item>
+            {data && data.records.length != 0 && (
+              <CustomButton onClick={downLoadHandler}>Export</CustomButton>
+            )}
           </div>
         </div>
       </FormField>
@@ -198,7 +204,26 @@ const Transactions = () => {
         )}
       </div>
     </div>
-  );
+  );  function downLoadHandler() {
+    const arr: TransactionItem[] = [];
+    data!.records.forEach((item) => {
+      const newValue: TransactionItem = {
+        ...item,
+
+        amount: plainKoboNairaConvert(item.amount),
+        balance_before: plainKoboNairaConvert(item.balance_before),
+        commission_amount: plainKoboNairaConvert(item.commission_amount),
+      };
+      return arr.push(newValue);
+    });
+    let title = "transactions";
+    if(fromDate){
+      title += `_${fromDate}`
+    }  if (toDate) {
+      title += `_${toDate}`;
+    }
+    handleDownloadCSV(arr, title);
+  }
 };
 
 export default Transactions;

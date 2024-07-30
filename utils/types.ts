@@ -50,7 +50,7 @@ export type SummaryUserItem = {
   total_data_transactions: number;
   total_data_amount: number;
   grand_total_transactions: number;
-  grand_total_amount: 50000;
+  grand_total_amount: number;
 };
 export type SummaryNetwork = {
   data: SummaryNetworkItem[];

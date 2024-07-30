@@ -1,4 +1,6 @@
+import { saveAs } from "file-saver";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import papaparse from "papaparse";
 
 const monthsAbbr = [
   "January",
@@ -60,8 +62,25 @@ function formatDateSideBySide(dateTimeString: string) {
   return formattedDate;
 }
 function koboToNaira(kobo: number) {
-  const naira = kobo / 100;
+  const naira = plainKoboNairaConvert(kobo);
   return naira.toLocaleString();
+}
+export function plainKoboNairaConvert(kobo: number) {
+  return kobo / 100;
+}
+export function handleDownloadCSV(arr: any, fileName: string) {
+  const csvOptions = {
+    header: true,
+    quotes: true,
+    delimiter: ",",
+    newline: "\r\n",
+    encoding: "utf-8",
+    skipEmptyLines: true,
+    dynamicTyping: false,
+  };
+  const csvData = papaparse.unparse(arr, csvOptions);
+  const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+  saveAs(blob, fileName);
 }
 const updateSearchParams = ({
   values,
