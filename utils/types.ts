@@ -157,6 +157,29 @@ export type User = {
     bank_name: null | string;
   };
 };
+export interface QueryGetResponse {
+  data: {
+    telco_log: {
+      error: string;
+      response_http_code: number;
+      response_status_code: string;
+      response_transaction_id: string;
+      status: string;
+      transaction_id: string;
+    };
+    transaction: {
+      transaction_id: string;
+      amount: number;
+      network: string;
+      msisdn: string;
+      type: string;
+      external_ref: string;
+      status: string;
+      created_at: string;
+    };
+  };
+  status: string;
+}
 export type {
   TransactionItem,
   CustomLinkProps,
