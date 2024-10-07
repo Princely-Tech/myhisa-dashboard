@@ -8,8 +8,29 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 
 const QueryBody = ({ id }: { id: string }) => {
   const [data, setData] = useState<QueryGetResponse["data"]>();
+  const [column, setColumn] = useState(2);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1000) {
+        setColumn(1); // Set column to 1 for smaller screens
+      } else {
+        setColumn(2); // Set column to 2 for larger screens
+      }
+    };
+
+    // Set initial column count based on current screen size
+    handleResize();
+
+    // Add event listener to track window resizing
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   useEffect(() => {
     apiService
       .get({
@@ -28,7 +49,7 @@ const QueryBody = ({ id }: { id: string }) => {
         </Card>
       </div>
     );
-  const column = 2;
+
   const telcoLog = data.telco_log;
   const transaction = data.transaction;
   return (
