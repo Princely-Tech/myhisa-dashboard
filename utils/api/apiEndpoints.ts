@@ -16,6 +16,7 @@ const apiEndpoints = {
   summariesUser: "admin/reports/user-transactions",
   summariesNetwork: "admin/reports/network-transactions",
   summariesChannel: "admin/reports/channel-transactions",
+  transactionQuery: (id: string) => `transaction/${id}`,
 };
 export const localApiEndPoints = {
   main: "/api",

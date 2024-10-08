@@ -204,7 +204,8 @@ const Transactions = () => {
         )}
       </div>
     </div>
-  );  function downLoadHandler() {
+  );
+  function downLoadHandler() {
     const arr: TransactionItem[] = [];
     data!.records.forEach((item) => {
       const newValue: TransactionItem = {
@@ -217,9 +218,10 @@ const Transactions = () => {
       return arr.push(newValue);
     });
     let title = "transactions";
-    if(fromDate){
-      title += `_${fromDate}`
-    }  if (toDate) {
+    if (fromDate) {
+      title += `_${fromDate}`;
+    }
+    if (toDate) {
       title += `_${toDate}`;
     }
     handleDownloadCSV(arr, title);

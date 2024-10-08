@@ -2,6 +2,8 @@ import { formatDateSideBySide, koboToNaira } from "@/utils/helperfunctions";
 import { TransactionHistory, TransactionItem } from "@/utils/types";
 import { Empty, Spin } from "antd";
 import React from "react";
+import { BlueButton } from "./buttons";
+import routes from "@/utils/routes";
 
 const TransactionTable = ({
   data,
@@ -29,7 +31,7 @@ const TransactionTable = ({
   return (
     <div className={`table-responsive max-w-full ${className}`}>
       <table id="datatable" className="table table-striped table-bordered ">
-        <thead> 
+        <thead>
           <tr>
             <th>S/N</th>
             <th>Reference</th>
@@ -43,6 +45,7 @@ const TransactionTable = ({
             <th>External Ref</th>
             <th>Status</th>
             <th>Date</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -67,6 +70,13 @@ const TransactionTable = ({
                 <td>{item.external_ref}</td>
                 <td>{item.status}</td>
                 <td>{formatDateSideBySide(item.created_at)}</td>
+                <td>
+                  <div className="flex justify-center items-center">
+                    <BlueButton href={routes.query(item.transaction_id)}> 
+                      Query
+                    </BlueButton>
+                  </div>
+                </td>
               </tr>
             ))
           )}

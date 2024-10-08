@@ -67,7 +67,9 @@ const SidebarTwo = () => {
             />
 
             <CollapsibleMenuItem
-              isActive={pathname == routes.transactions}
+              isActive={
+                pathname == routes.transactions || pathname == routes.queryPlain
+              }
               title="Transactions"
               icon={<i className="las la-list iq-arrow-left"></i>}
               menuItems={[
