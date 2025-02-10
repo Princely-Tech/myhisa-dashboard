@@ -9,6 +9,7 @@ const apiEndpoints = {
   transactionHistory: "history",
   generateAccount: "me/generate-account-number",
   creditHistory: "me/credit-history",
+  walletReconcilation: "admin/reports/wallet-reconciliations",
   exportTransaction: "export/transaction",
   users: "admin/users",
   creditUser: (id: number) => `admin/user/${id}/credit-balance`,
@@ -17,6 +18,7 @@ const apiEndpoints = {
   summariesNetwork: "admin/reports/network-transactions",
   summariesChannel: "admin/reports/channel-transactions",
   transactionQuery: (id: string) => `transaction/${id}`,
+  telcoReconcilation:'admin/reports/telco-reconciliations',
 };
 export const localApiEndPoints = {
   main: "/api",

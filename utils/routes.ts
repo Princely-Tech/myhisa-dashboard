@@ -15,9 +15,11 @@ const routes = {
   transactionStats: "/transaction_stats",
   creditHistory: "/credit-history",
   exportTransacton: "/export_transactions",
+  walletReconcilation: "/wallet_reconcilation",
   users: "/users",
   queryPlain: "/transactions/query",
   query: (id: string) => `${routes.queryPlain}?id=${id}`,
+  telcoReconcilation: "/telco_reconcilation",
 };
 export default routes;
 export { transactionFilterStr };

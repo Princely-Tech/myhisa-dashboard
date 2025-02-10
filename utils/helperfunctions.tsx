@@ -1,5 +1,6 @@
 import { saveAs } from "file-saver";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { ReadonlyURLSearchParams } from "next/navigation";
 import papaparse from "papaparse";
 
 const monthsAbbr = [
@@ -89,7 +90,7 @@ const updateSearchParams = ({
   router,
 }: {
   values: { key: string; value: string | null }[];
-  searchParams: URLSearchParams;
+  searchParams:  ReadonlyURLSearchParams;
   pathname: string;
   router?: AppRouterInstance;
 }) => {

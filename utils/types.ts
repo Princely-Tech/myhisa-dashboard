@@ -99,6 +99,70 @@ type CreditHistory = {
   total_records: number;
 };
 
+export interface WalletReconcilationItem {
+  id: number;
+  wallet_id: number;
+  user_id: number;
+  user: User;
+  // user: {
+  //   id: 8;
+  //   name: "Thompson Onuoha";
+  //   email: "thompsononuoha02@gmail.com";
+  //   phone: "09015695508";
+  //   email_verified_at: null;
+  //   approved_at: null;
+  //   rank: 0;
+  //   reporting_emails: "";
+  //   referral_code: "frRd7Xqt";
+  //   created_at: "2024-05-28T19:06:36.349+01:00";
+  //   wallet: {
+  //     balance: 0;
+  //     commission: 0;
+  //     bonus: 0;
+  //     account_number: null;
+  //     account_name: null;
+  //     bank_name: null;
+  //     first_name: null;
+  //     last_name: null;
+  //     dob: null;
+  //     formatted_dob: null;
+  //   };
+  //   low_balance_threshold: 0;
+  // };
+  reconciliation_date_str: string;
+  reconciliation_date: string;
+  opening_balance: number;
+  closing_balance: number;
+  current_balance: number;
+  inflow: number;
+  outflow: number;
+  total_transaction_count: number;
+  successful_transaction_count: number;
+  created_at: string;
+  updated_at: string;
+}
+export interface TelcoReconcilationItem {
+  id: number;
+  telco:string;
+  channel: string;
+  opening_balance: number;
+  closing_balance: number;
+  reconciliation_date:string;
+  reconciliation_date_str:string;
+  created_at: string;
+  updated_at: string;
+}
+export interface TelcoReconcilationGet {
+  data: TelcoReconcilationItem[];
+  message: string;
+}
+
+
+export interface WalletReconcilationGet {
+  data: WalletReconcilationItem[];
+  message: string;
+}
+
 type UsersList = {
   pagination: {
     current_page: number;
