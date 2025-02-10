@@ -214,13 +214,25 @@ const SidebarTwo = () => {
                 },
               ]}
             />
-
+            <MenuItem
+              title="Wallet Reconcilation"
+              route={routes.walletReconcilation}
+              isActive={pathname == routes.walletReconcilation}
+              icon={<i className="las la-wallet iq-arrow-left"></i>}
+            />
+             <MenuItem
+              title="Telco Reconcilation"
+              route={routes.telcoReconcilation}
+              isActive={pathname == routes.telcoReconcilation}
+              icon={<i className="las la-signal iq-arrow-left"></i>}
+            />
             <MenuItem
               title="Credit History"
               route={routes.creditHistory}
               isActive={pathname == routes.creditHistory}
-              icon={<i className="las la-wallet iq-arrow-left"></i>}
+              icon={<i className="las la-history iq-arrow-left"></i>}
             />
+          
             {user && user?.rank > 0 && (
               <MenuItem
                 title="Users"
