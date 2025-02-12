@@ -23,7 +23,10 @@ const WalletReconcilationTable = ({
       <table id="datatable" className="table table-striped table-bordered ">
         <thead>
           <tr>
-            <th>S/N</th> <th>Date</th>
+            <th>S/N</th> 
+            <th>Username</th>
+            <th>Email</th>
+            <th>Date</th>
             <th>Opening Balance (&#8358;)</th>
             <th>Closing Balance (&#8358;)</th>
             <th>Current Balance (&#8358;)</th>
@@ -44,7 +47,10 @@ const WalletReconcilationTable = ({
             <>
               {data.data.map((item, index) => (
                 <tr key={index}>
-                  <td>{index + 1}</td> <td>{item.reconciliation_date_str}</td>
+                  <td>{index + 1}</td>
+                   <td>{item.user.name}</td>
+                   <td>{item.user.email}</td>
+                   <td>{item.reconciliation_date_str}</td>
                   <td>{koboToNaira(item.opening_balance)}</td>
                   <td>{koboToNaira(item.closing_balance)}</td>
                   <td>{koboToNaira(item.current_balance)}</td>
