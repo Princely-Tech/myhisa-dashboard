@@ -1,13 +1,13 @@
 import { formatDateSideBySide, koboToNaira } from "@/utils/helperfunctions";
-import { WalletReconcilationGet } from "@/utils/types";
+import { WalletReconciliationGet } from "@/utils/types";
 import { Empty, Spin } from "antd";
 import React from "react";
 
-const WalletReconcilationTable = ({
+const WalletReconciliationTable = ({
   data,
   className,
 }: {
-  data: WalletReconcilationGet | null;
+  data: WalletReconciliationGet | null;
   className?: string;
 }) => {
   let showEmpty = true;
@@ -68,4 +68,4 @@ const WalletReconcilationTable = ({
   );
 };
 
-export default WalletReconcilationTable;
+export default WalletReconciliationTable;

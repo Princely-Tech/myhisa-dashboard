@@ -99,7 +99,7 @@ type CreditHistory = {
   total_records: number;
 };
 
-export interface WalletReconcilationItem {
+export interface WalletReconciliationItem {
   id: number;
   wallet_id: number;
   user_id: number;
@@ -141,7 +141,7 @@ export interface WalletReconcilationItem {
   created_at: string;
   updated_at: string;
 }
-export interface TelcoReconcilationItem {
+export interface TelcoReconciliationItem {
   id: number;
   telco:string;
   channel: string;
@@ -152,14 +152,14 @@ export interface TelcoReconcilationItem {
   created_at: string;
   updated_at: string;
 }
-export interface TelcoReconcilationGet {
-  data: TelcoReconcilationItem[];
+export interface TelcoReconciliationGet {
+  data: TelcoReconciliationItem[];
   message: string;
 }
 
 
-export interface WalletReconcilationGet {
-  data: WalletReconcilationItem[];
+export interface WalletReconciliationGet {
+  data: WalletReconciliationItem[];
   message: string;
 }
 

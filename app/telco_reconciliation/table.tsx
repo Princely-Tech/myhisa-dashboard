@@ -1,13 +1,13 @@
 import { formatDateSideBySide, koboToNaira } from "@/utils/helperfunctions";
-import { TelcoReconcilationItem, WalletReconcilationGet } from "@/utils/types";
+import { TelcoReconciliationItem, WalletReconciliationGet } from "@/utils/types";
 import { Empty, Spin } from "antd";
 import React from "react";
 
-const TelcoReconcilationTable = ({
+const TelcoReconciliationTable = ({
   data,
   className,
 }: {
-  data: TelcoReconcilationItem[] | undefined;
+  data: TelcoReconciliationItem[] | undefined;
   className?: string;
 }) => {
   let showEmpty = true;
@@ -58,4 +58,4 @@ const TelcoReconcilationTable = ({
   );
 };
 
-export default TelcoReconcilationTable;
+export default TelcoReconciliationTable;
