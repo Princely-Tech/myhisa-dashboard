@@ -40,10 +40,12 @@ const TransactionTable = ({
             <th>Commissions (&#8358;)</th>
             <th>Amount Before (&#8358;)</th>
             <th>Biller</th>
-            <th>Beneficiary</th>
+            <th>Beneficiary/MSIDN</th>
             <th>Service Type</th>
             <th>External Ref</th>
             <th>Status</th>
+            <th>Token</th>
+            <th>Beneficiary Name</th>
             <th>Date</th>
             <th>Action</th>
           </tr>
@@ -69,10 +71,12 @@ const TransactionTable = ({
                 <td>{item.type}</td>
                 <td>{item.external_ref}</td>
                 <td>{item.status}</td>
+                <td className="min-w-[200px]">{item.token}</td>
+                <td>{item.beneficiary_name}</td>
                 <td>{formatDateSideBySide(item.created_at)}</td>
                 <td>
                   <div className="flex justify-center items-center">
-                    <BlueButton href={routes.query(item.transaction_id)}> 
+                    <BlueButton href={routes.query(item.transaction_id)}>
                       Query
                     </BlueButton>
                   </div>

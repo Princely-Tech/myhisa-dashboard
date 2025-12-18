@@ -2,7 +2,7 @@ const apiEndpoints = {
   cookie: "/api/cookie",
   userSetUrl: "user",
   tokenSetUrl: "token",
-  base: "https://api.airtimereport.com/api/",
+  base: process.env.NEXT_PUBLIC_API_URL,
   login: "auth/login",
   me: "me",
   transactionStats: "transaction-stats",
