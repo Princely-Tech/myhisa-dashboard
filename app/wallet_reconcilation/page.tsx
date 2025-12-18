@@ -3,11 +3,11 @@ import AxiosHandler from "@/utils/api/axiosHandler";
 import {
   CreditHistory,
   CreditHistoryItem,
-  WalletReconcilationGet,
-  WalletReconcilationItem,
+  WalletReconciliationGet,
+  WalletReconciliationItem,
 } from "@/utils/types";
 import { useEffect, useState } from "react";
-import WalletReconcilationTable from "./table";
+import WalletReconciliationTable from "./table";
 import { Form, Spin, message } from "antd";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BlueButton, FormField, InputField } from "@/components";
@@ -23,8 +23,8 @@ import {
 import dayjs from "dayjs";
 import { CustomButton } from "@/components/buttons";
 
-const WalletReconcilation = () => {
-  const [data, setData] = useState<WalletReconcilationGet | null>(null);
+const WalletReconciliation = () => {
+  const [data, setData] = useState<WalletReconciliationGet | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);
   const searchParams = useSearchParams();
@@ -41,12 +41,12 @@ const WalletReconcilation = () => {
       {contextHolder}
       <div className="flex mt-[10px] mb-[30px] flex-col lg:flex-row lg:items-center justify-between gap-x-[20px] gap-y-[10px]">
         <header className="text-[30px] font-medium whitespace-nowrap">
-          Wallet Reconcilation
+          Wallet Reconciliation
         </header>
         <FormComponent />
       </div>
       <section className="flex flex-1 overflow-hidden">
-        <WalletReconcilationTable
+        <WalletReconciliationTable
           data={data}
           className="min-h-[400px] flex-1 h-full overflow-auto"
         />
@@ -91,7 +91,7 @@ const WalletReconcilation = () => {
   async function process() {
     try {
       const res = await apiService.get({
-        endPoint: `${apiEndpoints.walletReconcilation}?from_date=${
+        endPoint: `${apiEndpoints.walletReconciliation}?from_date=${
           fromDate ?? ""
         }&to_date=${toDate ?? ""}`,
       });
@@ -111,9 +111,9 @@ const WalletReconcilation = () => {
     });
   }
   function downLoadHandler() {
-    const arr: WalletReconcilationItem[] = [];
+    const arr: WalletReconciliationItem[] = [];
     data!.data.forEach((item) => {
-      const newValue: WalletReconcilationItem = {
+      const newValue: WalletReconciliationItem = {
         ...item,
         opening_balance: plainKoboNairaConvert(item.opening_balance),
         closing_balance: plainKoboNairaConvert(item.closing_balance),
@@ -121,7 +121,7 @@ const WalletReconcilation = () => {
       };
       return arr.push(newValue);
     });
-    handleDownloadCSV(arr, "wallet_reconcilation");
+    handleDownloadCSV(arr, "wallet_reconciliation");
   }
   function FormComponent() {
     const formKey = Math.random() * 1000000;
@@ -164,4 +164,4 @@ const WalletReconcilation = () => {
     );
   }
 };
-export default WalletReconcilation;
+export default WalletReconciliation;

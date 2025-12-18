@@ -66,7 +66,7 @@ const QueryBody = ({ id }: { id: string }) => {
               <Descriptions.Item label="Network">
                 {transaction.network}
               </Descriptions.Item>
-              <Descriptions.Item label="Phone Number">
+              <Descriptions.Item label="Beneficiary/MSIDN">
                 {transaction.msisdn}
               </Descriptions.Item>
               <Descriptions.Item label="Service Type">
@@ -78,6 +78,23 @@ const QueryBody = ({ id }: { id: string }) => {
               <Descriptions.Item label="Status">
                 {transaction.status}
               </Descriptions.Item>
+
+              {transaction.type === "Electricity" && (
+                <>
+                  <Descriptions.Item label="Token">
+                    {transaction.token}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Beneficiary Name">
+                    {transaction.beneficiary_name}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Address">
+                    {transaction.beneficiary_details}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="unit">
+                    {transaction.unit}
+                  </Descriptions.Item>
+                </>
+              )}
               <Descriptions.Item label="Date">
                 {formatDateSideBySide(transaction.created_at)}
               </Descriptions.Item>

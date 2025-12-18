@@ -1,9 +1,6 @@
 "use client";
 import AxiosHandler from "@/utils/api/axiosHandler";
-import {
-  TelcoReconcilationGet,
-  TelcoReconcilationItem,
-} from "@/utils/types";
+import { TelcoReconciliationGet, TelcoReconciliationItem } from "@/utils/types";
 import { useEffect, useState } from "react";
 import { Form, Spin, message } from "antd";
 import apiEndpoints from "@/utils/api/apiEndpoints";
@@ -19,10 +16,10 @@ import {
 } from "@/utils/helperfunctions";
 import dayjs from "dayjs";
 import { CustomButton } from "@/components/buttons";
-import TelcoReconcilationTable from "./table";
+import TelcoReconciliationTable from "./table";
 
-const TelcoReconcilation = () => {
-  const [data, setData] = useState<TelcoReconcilationGet | null>(null);
+const TelcoReconciliation = () => {
+  const [data, setData] = useState<TelcoReconciliationGet | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);
   const searchParams = useSearchParams();
@@ -39,12 +36,12 @@ const TelcoReconcilation = () => {
       {contextHolder}
       <div className="flex mt-[10px] mb-[30px] flex-col lg:flex-row lg:items-center justify-between gap-x-[20px] gap-y-[10px]">
         <header className="text-[30px] font-medium whitespace-nowrap">
-          Telco Reconcilation
+          Telco Reconciliation
         </header>
         <FormComponent />
       </div>
       <section className="flex flex-1 overflow-hidden">
-        <TelcoReconcilationTable
+        <TelcoReconciliationTable
           data={data?.data}
           className="min-h-[400px] flex-1 h-full overflow-auto"
         />
@@ -90,7 +87,7 @@ const TelcoReconcilation = () => {
     // setData(telcoReconciliationData);
     try {
       const res = await apiService.get({
-        endPoint: `${apiEndpoints.telcoReconcilation}?from_date=${
+        endPoint: `${apiEndpoints.telcoReconciliation}?from_date=${
           fromDate ?? ""
         }&to_date=${toDate ?? ""}`,
       });
@@ -110,16 +107,16 @@ const TelcoReconcilation = () => {
     });
   }
   function downLoadHandler() {
-    const arr: TelcoReconcilationItem[] = [];
+    const arr: TelcoReconciliationItem[] = [];
     data!.data.forEach((item) => {
-      const newValue: TelcoReconcilationItem = {
+      const newValue: TelcoReconciliationItem = {
         ...item,
         opening_balance: plainKoboNairaConvert(item.opening_balance),
         closing_balance: plainKoboNairaConvert(item.closing_balance),
       };
       return arr.push(newValue);
     });
-    handleDownloadCSV(arr, "telco_reconcilation");
+    handleDownloadCSV(arr, "reconciliation");
   }
   function FormComponent() {
     const formKey = Math.random() * 1000000;
@@ -162,7 +159,7 @@ const TelcoReconcilation = () => {
     );
   }
 };
-export default TelcoReconcilation;
+export default TelcoReconciliation;
 // const telcoReconciliationData = [
 //   {
 //     id: 1,

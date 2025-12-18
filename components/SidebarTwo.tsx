@@ -225,15 +225,15 @@ const SidebarTwo = () => {
             {user && user?.rank > 0 && (
               <>
                 <MenuItem
-                  title="Wallet Reconcilation"
-                  route={routes.walletReconcilation}
-                  isActive={pathname == routes.walletReconcilation}
+                  title="Wallet Reconciliation"
+                  route={routes.walletReconciliation}
+                  isActive={pathname == routes.walletReconciliation}
                   icon={<i className="las la-wallet iq-arrow-left"></i>}
                 />
                 <MenuItem
-                  title="Telco Reconcilation"
-                  route={routes.telcoReconcilation}
-                  isActive={pathname == routes.telcoReconcilation}
+                  title="Telco Reconciliation"
+                  route={routes.telcoReconciliation}
+                  isActive={pathname == routes.telcoReconciliation}
                   icon={<i className="las la-signal iq-arrow-left"></i>}
                 />
                 <MenuItem
