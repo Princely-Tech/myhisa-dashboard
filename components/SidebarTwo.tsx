@@ -222,6 +222,36 @@ const SidebarTwo = () => {
               icon={<i className="las la-history iq-arrow-left"></i>}
             />
 
+            <CollapsibleMenuItem
+              isActive={
+                pathname == routes.commissionSummary ||
+                pathname == routes.commissionDetails ||
+                pathname == routes.commissionByNetwork
+              }
+              title="Commission"
+              icon={<i className="las la-coins iq-arrow-left"></i>}
+              menuItems={[
+                {
+                  title: "Summary",
+                  route: routes.commissionSummary,
+                  icon: <i className="las la-chart-pie iq-arrow-left"></i>,
+                  isActive: pathname == routes.commissionSummary,
+                },
+                {
+                  title: "Details",
+                  route: routes.commissionDetails,
+                  icon: <i className="las la-list-ul iq-arrow-left"></i>,
+                  isActive: pathname == routes.commissionDetails,
+                },
+                {
+                  title: "By Network",
+                  route: routes.commissionByNetwork,
+                  icon: <i className="las la-network-wired iq-arrow-left"></i>,
+                  isActive: pathname == routes.commissionByNetwork,
+                },
+              ]}
+            />
+
             {user && user?.rank > 0 && (
               <>
                 <MenuItem
