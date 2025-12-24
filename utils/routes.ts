@@ -20,6 +20,9 @@ const routes = {
   queryPlain: "/transactions/query",
   query: (id: string) => `${routes.queryPlain}?id=${id}`,
   telcoReconciliation: "/reconciliation",
+  commissionSummary: "/commission/summary",
+  commissionDetails: "/commission/details",
+  commissionByNetwork: "/commission/by-network",
 };
 export default routes;
 export { transactionFilterStr };
