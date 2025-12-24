@@ -13,6 +13,8 @@ import {
   CommissionByNetworkData,
 } from "@/utils/commissionHelpers";
 import { BlueButton } from "@/components";
+import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
+import { CustomButton } from "@/components/buttons";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -124,6 +126,22 @@ const CommissionByNetwork = () => {
   const totalTransactions = data?.data?.reduce((sum, item) => sum + item.total_transactions, 0) || 0;
   const totalAmount = data?.data?.reduce((sum, item) => sum + item.total_amount, 0) || 0;
 
+  const handleExport = () => {
+    if (!data || !data.data) return;
+    
+    const exportData = data.data.map((item) => ({
+      Type: item.type,
+      Network: item.network.toUpperCase(),
+      "Total Transactions": item.total_transactions,
+      "Total Amount (₦)": plainKoboNairaConvert(item.total_amount),
+      "Total Commission (₦)": plainKoboNairaConvert(item.total_commission),
+      "Average Commission (₦)": plainKoboNairaConvert(item.average_commission),
+    }));
+    
+    const fileName = `commission_by_network_${dateRange[0].format("YYYY-MM-DD")}_to_${dateRange[1].format("YYYY-MM-DD")}.csv`;
+    handleDownloadCSV(exportData, fileName);
+  };
+
   return (
     <div className="px-8 py-4 flex-1 max-h-full overflow-auto">
       {contextHolder}
@@ -158,10 +176,15 @@ const CommissionByNetwork = () => {
               ))}
             </Select>
           </div>
-          <div className="flex items-end">
+          <div className="flex items-end gap-3">
             <BlueButton onClick={fetchCommissionByNetwork} loading={loading}>
               Apply Filters
             </BlueButton>
+            {data && data.data && data.data.length > 0 && (
+              <CustomButton onClick={handleExport}>
+                Export CSV
+              </CustomButton>
+            )}
           </div>
         </div>
       </Card>

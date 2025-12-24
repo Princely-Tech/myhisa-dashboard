@@ -13,6 +13,8 @@ import {
   CommissionSummaryData,
 } from "@/utils/commissionHelpers";
 import { BlueButton } from "@/components";
+import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
+import { CustomButton } from "@/components/buttons";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -99,6 +101,21 @@ const CommissionSummary = () => {
     },
   ];
 
+  const handleExport = () => {
+    if (!data || !data.summaries) return;
+    
+    const exportData = data.summaries.map((item) => ({
+      Type: item.type,
+      "Total Transactions": item.total_transactions,
+      "Total Amount (₦)": plainKoboNairaConvert(item.total_amount),
+      "Total Commission (₦)": plainKoboNairaConvert(item.total_commission),
+      "Average Commission (₦)": plainKoboNairaConvert(item.average_commission),
+    }));
+    
+    const fileName = `commission_summary_${dateRange[0].format("YYYY-MM-DD")}_to_${dateRange[1].format("YYYY-MM-DD")}.csv`;
+    handleDownloadCSV(exportData, fileName);
+  };
+
   return (
     <div className="px-8 py-4 flex-1 max-h-full overflow-auto">
       {contextHolder}
@@ -133,10 +150,15 @@ const CommissionSummary = () => {
               ))}
             </Select>
           </div>
-          <div className="flex items-end">
+          <div className="flex items-end gap-3">
             <BlueButton onClick={fetchCommissionData} loading={loading}>
               Apply Filters
             </BlueButton>
+            {data && data.summaries && data.summaries.length > 0 && (
+              <CustomButton onClick={handleExport}>
+                Export CSV
+              </CustomButton>
+            )}
           </div>
         </div>
       </Card>
