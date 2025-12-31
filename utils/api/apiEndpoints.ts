@@ -22,6 +22,11 @@ const apiEndpoints = {
   commissionSummary: "commission/summary",
   commissionDetails: "commission/details",
   commissionByNetwork: "commission/by-network",
+  adminUserCreditHistory: (userId: number) => `admin/user/${userId}/credit-history`,
+  adminTransactions: "admin/transactions",
+  adminCommissionSummary: "admin/commissions/summary",
+  adminCommissionDetails: "admin/commissions/details",
+  adminCommissionByBiller: "admin/commissions/by-biller",
 };
 export const localApiEndPoints = {
   main: "/api",

@@ -23,6 +23,9 @@ const routes = {
   commissionSummary: "/commission/summary",
   commissionDetails: "/commission/details",
   commissionByNetwork: "/commission/by-network",
+  adminUserCreditHistory: "/admin/user-credit-history",
+  adminTransactions: "/admin/transactions",
+  adminCommissions: "/admin/commissions",
 };
 export default routes;
 export { transactionFilterStr };

@@ -81,6 +81,7 @@ type CreditHistoryItem = {
   amount: number;
   action: string;
   provider: string;
+  ref: string;
   description: string;
   balance_before: number;
   created_at: string;
@@ -244,6 +245,115 @@ export interface QueryGetResponse {
   };
   status: string;
 }
+export interface AdminCreditHistoryItem extends CreditHistoryItem {
+  credited_by?: string;
+}
+
+export interface AdminCreditHistory {
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  total_records: number;
+  records: AdminCreditHistoryItem[];
+  pagination: {
+    current_page: number;
+    total_pages: number;
+    next_page: number;
+    prev_page: number;
+    next_page_url: string;
+    prev_page_url: string;
+  };
+}
+
+export interface AdminTransactionItem extends TransactionItem {
+  user_id: number;
+  user_name: string;
+  user_email: string;
+}
+
+export interface AdminTransactionHistory {
+  total_records: number;
+  records: AdminTransactionItem[];
+  pagination: {
+    current_page: number;
+    total_pages: number;
+    next_page: number;
+    prev_page: number;
+    next_page_url: string;
+    prev_page_url: string;
+  };
+}
+
+export interface AdminCommissionSummaryItem {
+  user_id: number;
+  user_name: string;
+  user_email: string;
+  total_transactions: number;
+  total_amount: number;
+  total_commission: number;
+  average_commission: number;
+}
+
+export interface AdminCommissionSummary {
+  summaries: AdminCommissionSummaryItem[];
+  totals: {
+    total_transactions: number;
+    total_amount: number;
+    total_commission: number;
+  };
+  period: {
+    from: string;
+    to: string;
+  };
+}
+
+export interface AdminCommissionDetailItem {
+  transaction_id: string;
+  user_id: number;
+  user_name: string;
+  user_email: string;
+  type: string;
+  network: string;
+  amount: number;
+  commission_amount: number;
+  status: string;
+  created_at: string;
+}
+
+export interface AdminCommissionDetails {
+  data: AdminCommissionDetailItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
+  };
+}
+
+export interface AdminCommissionByBillerItem {
+  biller: string;
+  type: string;
+  total_transactions: number;
+  total_amount: number;
+  total_commission: number;
+  average_commission: number;
+}
+
+export interface AdminCommissionByBiller {
+  summaries: AdminCommissionByBillerItem[];
+  totals: {
+    total_transactions: number;
+    total_amount: number;
+    total_commission: number;
+  };
+  period: {
+    from: string;
+    to: string;
+  };
+}
+
 export type {
   TransactionItem,
   CustomLinkProps,

@@ -272,6 +272,35 @@ const SidebarTwo = () => {
                   isActive={pathname == routes.users}
                   icon={<i className="las la-users iq-arrow-left"></i>}
                 />
+                <CollapsibleMenuItem
+                  isActive={
+                    pathname == routes.adminUserCreditHistory ||
+                    pathname == routes.adminTransactions ||
+                    pathname == routes.adminCommissions
+                  }
+                  title="Admin Tools"
+                  icon={<i className="las la-user-shield iq-arrow-left"></i>}
+                  menuItems={[
+                    {
+                      title: "User Credit History",
+                      route: routes.adminUserCreditHistory,
+                      icon: <i className="las la-history iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminUserCreditHistory,
+                    },
+                    {
+                      title: "Transactions",
+                      route: routes.adminTransactions,
+                      icon: <i className="las la-exchange-alt iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminTransactions,
+                    },
+                    {
+                      title: "Commissions",
+                      route: routes.adminCommissions,
+                      icon: <i className="las la-coins iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminCommissions,
+                    },
+                  ]}
+                />
               </>
             )}
             <MenuItem
