@@ -224,7 +224,9 @@ const SidebarTwo = () => {
                   isActive={
                     pathname == routes.adminUserCreditHistory ||
                     pathname == routes.adminTransactions ||
-                    pathname == routes.adminCommissions
+                    pathname == routes.adminCommissions ||
+                    pathname == routes.adminPendingTransactions ||
+                    pathname == routes.adminTransactionLookup
                   }
                   title="Admin Tools"
                   icon={<i className="las la-user-shield iq-arrow-left"></i>}
@@ -240,6 +242,18 @@ const SidebarTwo = () => {
                       route: routes.adminTransactions,
                       icon: <i className="las la-exchange-alt iq-arrow-left"></i>,
                       isActive: pathname == routes.adminTransactions,
+                    },
+                    {
+                      title: "Pending Transactions",
+                      route: routes.adminPendingTransactions,
+                      icon: <i className="las la-clock iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminPendingTransactions,
+                    },
+                    {
+                      title: "Transaction Lookup",
+                      route: routes.adminTransactionLookup,
+                      icon: <i className="las la-search iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminTransactionLookup,
                     },
                     {
                       title: "Commissions",

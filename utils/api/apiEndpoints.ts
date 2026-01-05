@@ -27,6 +27,10 @@ const apiEndpoints = {
   adminCommissionSummary: "admin/commissions/summary",
   adminCommissionDetails: "admin/commissions/details",
   adminCommissionByBiller: "admin/commissions/by-biller",
+  adminPendingTransactions: "admin/transactions/pending",
+  adminTransactionsByRefs: "admin/transactions/by-refs",
+  adminQueryAndUpdateStatus: "admin/transactions/query-and-update-status",
+  adminReverseTransactions: "admin/transactions/reverse",
 };
 export const localApiEndPoints = {
   main: "/api",

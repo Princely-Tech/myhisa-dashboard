@@ -26,6 +26,8 @@ const routes = {
   adminUserCreditHistory: "/admin/user-credit-history",
   adminTransactions: "/admin/transactions",
   adminCommissions: "/admin/commissions",
+  adminPendingTransactions: "/admin/pending-transactions",
+  adminTransactionLookup: "/admin/transaction-lookup",
 };
 export default routes;
 export { transactionFilterStr };
