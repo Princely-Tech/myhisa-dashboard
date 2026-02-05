@@ -170,6 +170,20 @@ const SidebarTwo = () => {
               icon={<i className="las la-history iq-arrow-left"></i>}
             />
 
+            <MenuItem
+              title="Service Availability"
+              route={routes.availability}
+              isActive={pathname == routes.availability}
+              icon={<i className="las la-server iq-arrow-left"></i>}
+            />
+
+            <MenuItem
+              title="Webhooks"
+              route={routes.webhooks}
+              isActive={pathname == routes.webhooks}
+              icon={<i className="las la-webhook iq-arrow-left"></i>}
+            />
+
             <CollapsibleMenuItem
               isActive={
                 pathname == routes.commissionSummary ||
@@ -226,7 +240,9 @@ const SidebarTwo = () => {
                     pathname == routes.adminTransactions ||
                     pathname == routes.adminCommissions ||
                     pathname == routes.adminPendingTransactions ||
-                    pathname == routes.adminTransactionLookup
+                    pathname == routes.adminTransactionLookup ||
+                    pathname == routes.adminAvailability ||
+                    pathname == routes.adminWebhookDeliveries
                   }
                   title="Admin Tools"
                   icon={<i className="las la-user-shield iq-arrow-left"></i>}
@@ -260,6 +276,18 @@ const SidebarTwo = () => {
                       route: routes.adminCommissions,
                       icon: <i className="las la-coins iq-arrow-left"></i>,
                       isActive: pathname == routes.adminCommissions,
+                    },
+                    {
+                      title: "Update Availability",
+                      route: routes.adminAvailability,
+                      icon: <i className="las la-server iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminAvailability,
+                    },
+                    {
+                      title: "Webhook Deliveries",
+                      route: routes.adminWebhookDeliveries,
+                      icon: <i className="las la-paper-plane iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminWebhookDeliveries,
                     },
                   ]}
                 />

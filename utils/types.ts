@@ -354,6 +354,69 @@ export interface AdminCommissionByBiller {
   };
 }
 
+export interface AvailabilityItem {
+  service: string;
+  provider: string;
+  percent: number;
+}
+
+export interface AvailabilityResponse {
+  count?: number;
+  data: AvailabilityItem[];
+}
+
+export interface WebhookItem {
+  id: number;
+  user_id: number;
+  webhook_url: string;
+  is_active: boolean;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WebhookResponse {
+  data: WebhookItem[] | WebhookItem;
+}
+
+export interface WebhookDeliveryItem {
+  id: number;
+  partner_webhook_id: number;
+  event_id: number;
+  status: string;
+  response_code: number;
+  response_body: string;
+  error_message: string;
+  attempt_count: number;
+  created_at: string;
+  event: {
+    service: string;
+    provider: string;
+    event_type: string;
+    previous_state: number;
+    new_state: number;
+  };
+}
+
+export interface WebhookDeliveryResponse {
+  data: WebhookDeliveryItem[];
+}
+
+export interface AdminWebhookDeliveryItem extends WebhookDeliveryItem {
+  user_email: string;
+  user_id: number;
+  webhook_url: string;
+}
+
+export interface AdminWebhookDeliveryResponse {
+  data: AdminWebhookDeliveryItem[];
+  pagination?: {
+    current_page: number;
+    total_pages: number;
+    total_records: number;
+  };
+}
+
 export type {
   TransactionItem,
   CustomLinkProps,

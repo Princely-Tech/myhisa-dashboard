@@ -31,6 +31,13 @@ const apiEndpoints = {
   adminTransactionsByRefs: "admin/transactions/by-refs",
   adminQueryAndUpdateStatus: "admin/transactions/query-and-update-status",
   adminReverseTransactions: "admin/transactions/reverse",
+  availabilityAll: "availability/all",
+  availabilityByService: (service: string) => `availability/${service}`,
+  webhooks: "webhooks",
+  webhookById: (id: number) => `webhooks/${id}`,
+  webhookDeliveries: (id: number) => `webhooks/${id}/deliveries`,
+  adminAvailability: "admin/availability",
+  adminWebhookDeliveries: "admin/webhook-deliveries",
 };
 export const localApiEndPoints = {
   main: "/api",

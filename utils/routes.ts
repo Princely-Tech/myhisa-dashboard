@@ -28,6 +28,11 @@ const routes = {
   adminCommissions: "/admin/commissions",
   adminPendingTransactions: "/admin/pending-transactions",
   adminTransactionLookup: "/admin/transaction-lookup",
+  availability: "/availability",
+  webhooks: "/settings/webhooks",
+  webhookDeliveries: (id: string) => `/webhooks/${id}/deliveries`,
+  adminAvailability: "/admin/availability",
+  adminWebhookDeliveries: "/admin/webhook-deliveries",
 };
 export default routes;
 export { transactionFilterStr };
