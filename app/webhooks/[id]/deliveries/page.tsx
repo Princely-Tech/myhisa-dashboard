@@ -21,7 +21,7 @@ const WebhookDeliveriesPage = () => {
       setError(null);
       const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
       const response = await fetch(
-        `${apiEndpoints.base}/${apiEndpoints.webhookDeliveries(parseInt(webhookId))}`,
+        `${apiEndpoints.base}${apiEndpoints.webhookDeliveries(parseInt(webhookId))}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

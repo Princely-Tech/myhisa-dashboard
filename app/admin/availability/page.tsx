@@ -43,7 +43,7 @@ const AdminAvailabilityPage = () => {
       setError(null);
       const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
       const response = await fetch(
-        `${apiEndpoints.base}/${apiEndpoints.availabilityByService(serviceType)}?provider=${provider}`,
+        `${apiEndpoints.base}${apiEndpoints.availabilityByService(serviceType)}?provider=${provider}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -98,7 +98,7 @@ const AdminAvailabilityPage = () => {
       setSuccess(null);
       const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
       const response = await fetch(
-        `${apiEndpoints.base}/${apiEndpoints.adminAvailability}`,
+        `${apiEndpoints.base}${apiEndpoints.adminAvailability}`,
         {
           method: "POST",
           headers: {

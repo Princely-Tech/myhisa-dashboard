@@ -170,19 +170,7 @@ const SidebarTwo = () => {
               icon={<i className="las la-history iq-arrow-left"></i>}
             />
 
-            <MenuItem
-              title="Service Availability"
-              route={routes.availability}
-              isActive={pathname == routes.availability}
-              icon={<i className="las la-server iq-arrow-left"></i>}
-            />
-
-            <MenuItem
-              title="Webhooks"
-              route={routes.webhooks}
-              isActive={pathname == routes.webhooks}
-              icon={<i className="las la-webhook iq-arrow-left"></i>}
-            />
+          
 
             <CollapsibleMenuItem
               isActive={
@@ -213,6 +201,21 @@ const SidebarTwo = () => {
                 },
               ]}
             />
+
+              <MenuItem
+              title="Service Availability"
+              route={routes.availability}
+              isActive={pathname == routes.availability}
+              icon={<i className="las la-server iq-arrow-left"></i>}
+            />
+
+            <MenuItem
+              title="Webhooks"
+              route={routes.webhooks}
+              isActive={pathname == routes.webhooks}
+              icon={<i className="las la-bell iq-arrow-left"></i>}
+            />
+            
 
             {user && user?.rank > 0 && (
               <>
@@ -293,6 +296,8 @@ const SidebarTwo = () => {
                 />
               </>
             )}
+
+
             <MenuItem
               onClick={() => {
                 localStorage.clear();

@@ -15,7 +15,7 @@ const AvailabilityPage = () => {
       setError(null);
       const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
       const response = await fetch(
-        `${apiEndpoints.base}/${apiEndpoints.availabilityAll}`,
+        `${apiEndpoints.base}${apiEndpoints.availabilityAll}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

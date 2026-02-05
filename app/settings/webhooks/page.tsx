@@ -24,7 +24,7 @@ const WebhooksPage = () => {
       setError(null);
       const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
       const response = await fetch(
-        `${apiEndpoints.base}/${apiEndpoints.webhooks}`,
+        `${apiEndpoints.base}${apiEndpoints.webhooks}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -57,8 +57,8 @@ const WebhooksPage = () => {
     try {
       const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
       const url = editingWebhook
-        ? `${apiEndpoints.base}/${apiEndpoints.webhookById(editingWebhook.id)}`
-        : `${apiEndpoints.base}/${apiEndpoints.webhooks}`;
+        ? `${apiEndpoints.base}${apiEndpoints.webhookById(editingWebhook.id)}`
+        : `${apiEndpoints.base}${apiEndpoints.webhooks}`;
       
       const method = editingWebhook ? "PUT" : "POST";
 
@@ -93,7 +93,7 @@ const WebhooksPage = () => {
     try {
       const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
       const response = await fetch(
-        `${apiEndpoints.base}/${apiEndpoints.webhookById(id)}`,
+        `${apiEndpoints.base}${apiEndpoints.webhookById(id)}`,
         {
           method: "DELETE",
           headers: {
@@ -126,7 +126,7 @@ const WebhooksPage = () => {
     try {
       const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
       const response = await fetch(
-        `${apiEndpoints.base}/${apiEndpoints.webhookById(webhook.id)}`,
+        `${apiEndpoints.base}${apiEndpoints.webhookById(webhook.id)}`,
         {
           method: "PUT",
           headers: {

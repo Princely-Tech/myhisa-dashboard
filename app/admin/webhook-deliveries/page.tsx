@@ -25,7 +25,7 @@ const AdminWebhookDeliveriesPage = () => {
       if (filters.service) queryParams.append("service", filters.service);
       if (filters.user_id) queryParams.append("user_id", filters.user_id);
 
-      const url = `${apiEndpoints.base}/${apiEndpoints.adminWebhookDeliveries}${
+      const url = `${apiEndpoints.base}${apiEndpoints.adminWebhookDeliveries}${
         queryParams.toString() ? `?${queryParams.toString()}` : ""
       }`;
 
