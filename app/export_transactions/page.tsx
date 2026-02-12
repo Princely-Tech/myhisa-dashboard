@@ -24,7 +24,6 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 import { FormProps } from "antd/lib/form";
 import constants from "@/utils/constants";
 import dayjs from "dayjs";
-import { revalidatePath } from "next/cache";
 type FieldType = {
   dateRange: [dayjs.Dayjs, dayjs.Dayjs];
   email: string;

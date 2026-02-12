@@ -12,7 +12,6 @@ import {
 } from "@/utils/types";
 import { Empty, Modal, Spin, message } from "antd";
 import { useForm } from "antd/es/form/Form";
-import { revalidatePath } from "next/cache";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";

@@ -26,7 +26,6 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 import { FormProps } from "antd/lib/form";
 import constants from "@/utils/constants";
 import dayjs from "dayjs";
-import { revalidatePath } from "next/cache";
 import { CustomButton } from "@/components/buttons";
 type FieldType = {
   dateRange: [dayjs.Dayjs | null, dayjs.Dayjs | null];
