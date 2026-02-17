@@ -33,6 +33,8 @@ const routes = {
   webhookDeliveries: (id: string) => `/webhooks/${id}/deliveries`,
   adminAvailability: "/admin/availability",
   adminWebhookDeliveries: "/admin/webhook-deliveries",
+  pendingTransactions: "/pending-transactions",
+  transactionLookup: "/transaction-lookup",
 };
 export default routes;
 export { transactionFilterStr };

@@ -38,6 +38,9 @@ const apiEndpoints = {
   webhookDeliveries: (id: number) => `webhooks/${id}/deliveries`,
   adminAvailability: "admin/availability",
   adminWebhookDeliveries: "admin/webhook-deliveries",
+  selfServicePendingTransactions: "self-service/transactions/pending",
+  selfServiceTransactionsByRefs: "self-service/transactions/by-refs",
+  selfServiceQueryAndUpdateStatus: "self-service/transactions/query-and-update-status",
 };
 export const localApiEndPoints = {
   main: "/api",

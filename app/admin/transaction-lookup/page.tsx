@@ -6,6 +6,7 @@ import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BlueButton, CustomButton, RedButton } from "@/components/buttons";
 import { formatCurrency } from "@/utils/commissionHelpers";
+import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
 
 const { TextArea } = Input;
 
@@ -74,6 +75,7 @@ const AdminTransactionLookup = () => {
   const [showQueryResultsModal, setShowQueryResultsModal] = useState(false);
   const [reversalResults, setReversalResults] = useState<ReversalResult[] | null>(null);
   const [showReversalResultsModal, setShowReversalResultsModal] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleLookup = async () => {
@@ -176,6 +178,37 @@ const AdminTransactionLookup = () => {
     } finally {
       setReversalLoading(false);
     }
+  };
+
+  const handleExport = () => {
+    if (!lookupResults || lookupResults.length === 0) {
+      messageApi.warning("No transactions to export");
+      return;
+    }
+
+    const exportData = lookupResults
+      .filter(result => result.status === "found" && result.transaction)
+      .map((result) => ({
+        Date: dayjs(result.transaction!.created_at).format("YYYY-MM-DD HH:mm:ss"),
+        "Transaction ID": result.transaction!.transaction_id,
+        "External Ref": result.transaction!.external_ref,
+        "User ID": result.transaction!.user_id,
+        Type: result.transaction!.type,
+        Network: result.transaction!.network,
+        Beneficiary: result.transaction!.msisdn,
+        "Amount (₦)": plainKoboNairaConvert(result.transaction!.amount),
+        Status: result.transaction!.status,
+        "Status Code": result.transaction!.status_code,
+        "Balance Before (₦)": plainKoboNairaConvert(result.transaction!.balance_before),
+        "Commission (₦)": plainKoboNairaConvert(result.transaction!.commission_amount),
+        Refunded: result.transaction!.refunded_at ? "Yes" : "No",
+        "Refunded At": result.transaction!.refunded_at ? dayjs(result.transaction!.refunded_at).format("YYYY-MM-DD HH:mm:ss") : "",
+        Remark: result.transaction!.remark || "",
+      }));
+
+    const fileName = `transaction_lookup_${dayjs().format("YYYY-MM-DD_HHmmss")}.csv`;
+    handleDownloadCSV(exportData, fileName);
+    messageApi.success(`Exported ${exportData.length} transactions`);
   };
 
   const columns = [
@@ -569,6 +602,9 @@ const AdminTransactionLookup = () => {
                 <RedButton onClick={() => setShowReversalModal(true)}>
                   Reverse Transactions
                 </RedButton>
+                <CustomButton onClick={handleExport} loading={exportLoading}>
+                  Export to CSV
+                </CustomButton>
               </>
             )}
             <CustomButton onClick={() => {

@@ -170,7 +170,33 @@ const SidebarTwo = () => {
               icon={<i className="las la-history iq-arrow-left"></i>}
             />
 
-          
+            <MenuItem
+              title="Pending Transactions"
+              route={routes.pendingTransactions}
+              isActive={pathname == routes.pendingTransactions}
+              icon={<i className="las la-clock iq-arrow-left"></i>}
+            />
+
+            <MenuItem
+              title="Transaction Lookup"
+              route={routes.transactionLookup}
+              isActive={pathname == routes.transactionLookup}
+              icon={<i className="las la-search iq-arrow-left"></i>}
+            />
+
+            <MenuItem
+              title="Service Availability"
+              route={routes.availability}
+              isActive={pathname == routes.availability}
+              icon={<i className="las la-server iq-arrow-left"></i>}
+            />
+
+            <MenuItem
+              title="Webhooks"
+              route={routes.webhooks}
+              isActive={pathname == routes.webhooks}
+              icon={<i className="las la-webhook iq-arrow-left"></i>}
+            />
 
             <CollapsibleMenuItem
               isActive={

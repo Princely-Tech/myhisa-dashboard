@@ -84,6 +84,7 @@ const AdminPendingTransactions = () => {
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryResults, setQueryResults] = useState<QueryUpdateResult[] | null>(null);
   const [showResultsModal, setShowResultsModal] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
@@ -284,25 +285,54 @@ const AdminPendingTransactions = () => {
     },
   ];
 
-  const handleExport = () => {
-    if (!data || !data.records) return;
+  const handleExport = async () => {
+    if (!data) return;
     
-    const exportData = data.records.map((item) => ({
-      Date: dayjs(item.created_at).format("YYYY-MM-DD HH:mm:ss"),
-      "Transaction ID": item.transaction_id,
-      "External Ref": item.external_ref,
-      "User ID": item.user_id,
-      Type: item.type,
-      Network: item.network,
-      Beneficiary: item.msisdn,
-      "Amount (₦)": plainKoboNairaConvert(item.amount),
-      Status: item.status,
-      "Status Code": item.status_code,
-      Remark: item.remark,
-    }));
-    
-    const fileName = `pending_transactions_${dayjs().format("YYYY-MM-DD")}.csv`;
-    handleDownloadCSV(exportData, fileName);
+    setExportLoading(true);
+    try {
+      const apiService = new AxiosHandler(messageApi);
+      const params = new URLSearchParams();
+      
+      if (selectedUserId) params.append("user_id", selectedUserId.toString());
+      if (selectedType) params.append("type", selectedType);
+      if (selectedNetwork) params.append("network", selectedNetwork);
+      if (dateRange) {
+        params.append("from", dateRange[0].format("YYYY-MM-DD"));
+        params.append("to", dateRange[1].format("YYYY-MM-DD"));
+      }
+      params.append("limit", "10000");
+      params.append("offset", "0");
+      
+      const endpoint = `${apiEndpoints.adminPendingTransactions}?${params.toString()}`;
+      const response = await apiService.get({
+        endPoint: endpoint,
+      });
+      
+      const allRecords = response.data.records || [];
+      
+      const exportData = allRecords.map((item: PendingTransaction) => ({
+        Date: dayjs(item.created_at).format("YYYY-MM-DD HH:mm:ss"),
+        "Transaction ID": item.transaction_id,
+        "External Ref": item.external_ref,
+        "User ID": item.user_id,
+        Type: item.type,
+        Network: item.network,
+        Beneficiary: item.msisdn,
+        "Amount (₦)": plainKoboNairaConvert(item.amount),
+        Status: item.status,
+        "Status Code": item.status_code,
+        Remark: item.remark,
+      }));
+      
+      const fileName = `pending_transactions_${dayjs().format("YYYY-MM-DD")}.csv`;
+      handleDownloadCSV(exportData, fileName);
+      messageApi.success(`Exported ${exportData.length} records`);
+    } catch (error) {
+      console.error("Error exporting transactions:", error);
+      messageApi.error("Failed to export transactions");
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   const handleClearFilters = () => {
@@ -493,8 +523,8 @@ const AdminPendingTransactions = () => {
               >
                 Query & Update Selected ({selectedTransactions.length})
               </BlueButton>
-              <CustomButton onClick={handleExport}>
-                Export CSV
+              <CustomButton onClick={handleExport} loading={exportLoading}>
+                Export All to CSV
               </CustomButton>
             </>
           )}
