@@ -35,6 +35,8 @@ const routes = {
   adminWebhookDeliveries: "/admin/webhook-deliveries",
   pendingTransactions: "/pending-transactions",
   transactionLookup: "/transaction-lookup",
+  adminCommissionDailySummary: "/admin/commissions/daily-summary",
+  adminCommissionDailyDetails: "/admin/commissions/daily-details",
 };
 export default routes;
 export { transactionFilterStr };

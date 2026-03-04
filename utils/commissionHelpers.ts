@@ -89,3 +89,39 @@ export interface CommissionByNetworkData {
     to: string;
   };
 }
+
+export interface AdminCommissionDailySummaryItem {
+  type: string;
+  total_amount: number;
+  total_commission_amount: number;
+  total_log_amount: number;
+  transaction_count: number;
+  log_record_count: number;
+}
+
+export interface AdminCommissionDailySummaryData {
+  user_id: string;
+  date: string;
+  summaries: AdminCommissionDailySummaryItem[];
+}
+
+export interface AdminCommissionDailyDetailsTransaction {
+  transaction_id: string;
+  type: string;
+  amount: number;
+  commission_amount: number;
+  commission_to: string;
+  log_id: number | null;
+  log_amount: number | null;
+  log_account: string | null;
+  log_description: string | null;
+  transaction_status: string;
+  created_at: string;
+}
+
+export interface AdminCommissionDailyDetailsData {
+  user_id: string;
+  date: string;
+  record_count: number;
+  transactions: AdminCommissionDailyDetailsTransaction[];
+}

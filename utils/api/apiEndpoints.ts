@@ -41,6 +41,8 @@ const apiEndpoints = {
   selfServicePendingTransactions: "self-service/transactions/pending",
   selfServiceTransactionsByRefs: "self-service/transactions/by-refs",
   selfServiceQueryAndUpdateStatus: "self-service/transactions/query-and-update-status",
+  adminCommissionDailySummary: "admin/commissions/daily-summary",
+  adminCommissionDailyDetails: "admin/commissions/daily-details",
 };
 export const localApiEndPoints = {
   main: "/api",

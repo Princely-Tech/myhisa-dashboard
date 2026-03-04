@@ -271,7 +271,9 @@ const SidebarTwo = () => {
                     pathname == routes.adminPendingTransactions ||
                     pathname == routes.adminTransactionLookup ||
                     pathname == routes.adminAvailability ||
-                    pathname == routes.adminWebhookDeliveries
+                    pathname == routes.adminWebhookDeliveries ||
+                    pathname == routes.adminCommissionDailySummary ||
+                    pathname == routes.adminCommissionDailyDetails
                   }
                   title="Admin Tools"
                   icon={<i className="las la-user-shield iq-arrow-left"></i>}
@@ -305,6 +307,18 @@ const SidebarTwo = () => {
                       route: routes.adminCommissions,
                       icon: <i className="las la-coins iq-arrow-left"></i>,
                       isActive: pathname == routes.adminCommissions,
+                    },
+                    {
+                      title: "Commission Daily Summary",
+                      route: routes.adminCommissionDailySummary,
+                      icon: <i className="las la-calendar-check iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminCommissionDailySummary,
+                    },
+                    {
+                      title: "Commission Daily Details",
+                      route: routes.adminCommissionDailyDetails,
+                      icon: <i className="las la-list-alt iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminCommissionDailyDetails,
                     },
                     {
                       title: "Update Availability",
