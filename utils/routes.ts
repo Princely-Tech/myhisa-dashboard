@@ -14,6 +14,7 @@ const routes = {
   summariesChannel: "/summaries_channel",
   transactionStats: "/transaction_stats",
   creditHistory: "/credit-history",
+  commissionCreditHistory: "/commission-credit-history",
   exportTransacton: "/export_transactions",
   walletReconciliation: "/wallet_reconcilation",
   users: "/users",
@@ -37,6 +38,8 @@ const routes = {
   transactionLookup: "/transaction-lookup",
   adminCommissionDailySummary: "/admin/commissions/daily-summary",
   adminCommissionDailyDetails: "/admin/commissions/daily-details",
+  exportWalletLogs: "/export-wallet-logs",
+  adminExportWalletLogs: "/admin/export-wallet-logs",
 };
 export default routes;
 export { transactionFilterStr };

@@ -94,17 +94,6 @@ const CreditHistoryPage = () => {
       });
       setData(res.data);
     } catch (err) {}
-    updateSearchParams({
-      values: [
-        {
-          key: constants.searchParamsKeys.isFiltering,
-          value: null,
-        },
-      ],
-      pathname: pathname,
-      router: router,
-      searchParams: searchParams,
-    });
   }
   function downLoadHandler() {
     const arr: CreditHistoryItem[] = [];

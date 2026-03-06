@@ -42,6 +42,7 @@ const UsersListTable = ({
     };
   }
   const [modalContent, setModalContent] = useState<User | null>(null);
+  const [modalAction, setModalAction] = useState<'credit' | 'creditCommission' | 'transfer'>('credit');
   const [creditingAccount, setCreditingAccount] = useState(false);
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
@@ -63,12 +64,55 @@ const UsersListTable = ({
 
       
       messageApi.open({
-        content: "User has been credited",
+        content: "User balance has been credited",
         type: "success",
       });
       location.reload();
       setModalContent(null);
       form.resetFields();
+    } catch (err) {}
+    setCreditingAccount(false);
+  };
+
+  const creditCommission = async (values: any) => {
+    setCreditingAccount(true);
+
+    try {
+      let amount = Number(values.amount) * 100;
+      const res = await apiService.post({
+        endPoint: apiEndpoints.creditCommission(modalContent!.id),
+        body: {
+          ...values,
+          amount,
+        },
+      });
+
+      messageApi.open({
+        content: "User commission wallet has been credited",
+        type: "success",
+      });
+      location.reload();
+      setModalContent(null);
+      form.resetFields();
+    } catch (err) {}
+    setCreditingAccount(false);
+  };
+
+  const transferCommissionToBalance = async () => {
+    setCreditingAccount(true);
+
+    try {
+      const res = await apiService.post({
+        endPoint: apiEndpoints.transferCommissionToBalance(modalContent!.id),
+        body: {},
+      });
+
+      messageApi.open({
+        content: res.message || "Commission transferred to balance successfully",
+        type: "success",
+      });
+      location.reload();
+      setModalContent(null);
     } catch (err) {}
     setCreditingAccount(false);
   };
@@ -108,16 +152,40 @@ const UsersListTable = ({
                   <td>{item.email}</td>
                   <td>{item.phone}</td>
                   <td>{koboToNaira(item.wallet.balance)}</td>
-                  <td>{koboToNaira(item.wallet.balance)}</td>
+                  <td>{koboToNaira(item.wallet.commission)}</td>
                   <td>{formatDateSideBySide(item.created_at)}</td>
                   <td>
-                    {" "}
-                    <BlueButton
-                      className=" min-w-[100px] min-h-[44px]"
-                      onClick={() => setModalContent(item)}
-                    >
-                      Credit
-                    </BlueButton>
+                    <div className="flex gap-2 flex-wrap">
+                      <BlueButton
+                        className="min-w-[100px] min-h-[44px]"
+                        onClick={() => {
+                          setModalAction('credit');
+                          setModalContent(item);
+                        }}
+                      >
+                        Credit Balance
+                      </BlueButton>
+                      <BlueButton
+                        className="min-w-[100px] min-h-[44px] bg-purple-600 hover:bg-purple-700"
+                        onClick={() => {
+                          setModalAction('creditCommission');
+                          setModalContent(item);
+                        }}
+                      >
+                        Credit Commission
+                      </BlueButton>
+                      {item.wallet.commission > 0 && (
+                        <BlueButton
+                          className="min-w-[100px] min-h-[44px] bg-green-600 hover:bg-green-700"
+                          onClick={() => {
+                            setModalAction('transfer');
+                            setModalContent(item);
+                          }}
+                        >
+                          Transfer to Balance
+                        </BlueButton>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -128,32 +196,42 @@ const UsersListTable = ({
     </div>
   );
   function CustomModal() {
-    return (
-      <Modal
-        key={formKey}
-        title={`Credit ${modalContent?.name} (${modalContent?.email})`}
-        open={true}
-        onOk={() => form.submit()}
-        okButtonProps={{
-          children: "Credit",
-          loading: creditingAccount,
-          className: "h-[44px] w-[80px]",
-        }}
-        cancelButtonProps={{
-          className:
-            "h-[44px] w-[100px] hover:border-red-500 hover:text-red-500",
-        }}
-        onCancel={() => {
-          setModalContent(null);
-          form.resetFields();
-        }}
-      >
+    const getModalTitle = () => {
+      if (modalAction === 'credit') return `Credit Balance - ${modalContent?.name} (${modalContent?.email})`;
+      if (modalAction === 'creditCommission') return `Credit Commission - ${modalContent?.name} (${modalContent?.email})`;
+      return `Transfer Commission to Balance - ${modalContent?.name} (${modalContent?.email})`;
+    };
+
+    const getModalContent = () => {
+      if (modalAction === 'transfer') {
+        return (
+          <div className="py-4">
+            <p className="mb-4">Are you sure you want to transfer all commission balance to main wallet?</p>
+            <div className="bg-gray-100 p-3 rounded">
+              <div className="flex justify-between mb-2">
+                <span className="font-semibold">Current Commission:</span>
+                <span className="text-lg font-bold text-purple-600">{koboToNaira(modalContent?.wallet.commission || 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Current Balance:</span>
+                <span className="text-lg font-bold text-blue-600">{koboToNaira(modalContent?.wallet.balance || 0)}</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
         <FormField
           form={form}
           key={formKey}
           name="credit user"
           onFinish={(values) => {
-            creditUser(values);
+            if (modalAction === 'credit') {
+              creditUser(values);
+            } else {
+              creditCommission(values);
+            }
           }}
         >
           <InputField
@@ -200,6 +278,36 @@ const UsersListTable = ({
             }}
           />
         </FormField>
+      );
+    };
+
+    return (
+      <Modal
+        key={formKey}
+        title={getModalTitle()}
+        open={true}
+        onOk={() => {
+          if (modalAction === 'transfer') {
+            transferCommissionToBalance();
+          } else {
+            form.submit();
+          }
+        }}
+        okButtonProps={{
+          children: modalAction === 'transfer' ? 'Transfer' : 'Credit',
+          loading: creditingAccount,
+          className: "h-[44px] w-[100px]",
+        }}
+        cancelButtonProps={{
+          className:
+            "h-[44px] w-[100px] hover:border-red-500 hover:text-red-500",
+        }}
+        onCancel={() => {
+          setModalContent(null);
+          form.resetFields();
+        }}
+      >
+        {getModalContent()}
       </Modal>
     );
   }

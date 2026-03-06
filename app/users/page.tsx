@@ -77,17 +77,6 @@ const UsersListPage = () => {
       });
       setData(res.data);
     } catch (err) {}
-    updateSearchParams({
-      values: [
-        {
-          key: constants.searchParamsKeys.isFiltering,
-          value: null,
-        },
-      ],
-      pathname: pathname,
-      router: router,
-      searchParams: searchParams,
-    });
   }
   function handleDownloadCSV() {
     const csvOptions = {

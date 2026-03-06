@@ -171,6 +171,20 @@ const SidebarTwo = () => {
             />
 
             <MenuItem
+              title="Commission Credit History"
+              route={routes.commissionCreditHistory}
+              isActive={pathname == routes.commissionCreditHistory}
+              icon={<i className="las la-coins iq-arrow-left"></i>}
+            />
+
+            <MenuItem
+              title="Export Wallet Logs"
+              route={routes.exportWalletLogs}
+              isActive={pathname == routes.exportWalletLogs}
+              icon={<i className="las la-file-download iq-arrow-left"></i>}
+            />
+
+            <MenuItem
               title="Pending Transactions"
               route={routes.pendingTransactions}
               isActive={pathname == routes.pendingTransactions}
@@ -273,7 +287,8 @@ const SidebarTwo = () => {
                     pathname == routes.adminAvailability ||
                     pathname == routes.adminWebhookDeliveries ||
                     pathname == routes.adminCommissionDailySummary ||
-                    pathname == routes.adminCommissionDailyDetails
+                    pathname == routes.adminCommissionDailyDetails ||
+                    pathname == routes.adminExportWalletLogs
                   }
                   title="Admin Tools"
                   icon={<i className="las la-user-shield iq-arrow-left"></i>}
@@ -283,6 +298,12 @@ const SidebarTwo = () => {
                       route: routes.adminUserCreditHistory,
                       icon: <i className="las la-history iq-arrow-left"></i>,
                       isActive: pathname == routes.adminUserCreditHistory,
+                    },
+                    {
+                      title: "Export Wallet Logs",
+                      route: routes.adminExportWalletLogs,
+                      icon: <i className="las la-file-download iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminExportWalletLogs,
                     },
                     {
                       title: "Transactions",

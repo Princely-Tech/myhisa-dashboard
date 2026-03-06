@@ -9,10 +9,13 @@ const apiEndpoints = {
   transactionHistory: "history",
   generateAccount: "me/generate-account-number",
   creditHistory: "me/credit-history",
+  commissionCreditHistory: "me/commission-credit-history",
   walletReconciliation: "admin/reports/wallet-reconciliations",
   exportTransaction: "export/transaction",
   users: "admin/users",
   creditUser: (id: number) => `admin/user/${id}/credit-balance`,
+  creditCommission: (id: number) => `admin/user/${id}/credit-commission`,
+  transferCommissionToBalance: (id: number) => `admin/user/${id}/transfer-commission-to-balance`,
   summariesTotal: "admin/reports/transaction-summary",
   summariesUser: "admin/reports/user-transactions",
   summariesNetwork: "admin/reports/network-transactions",
@@ -43,6 +46,7 @@ const apiEndpoints = {
   selfServiceQueryAndUpdateStatus: "self-service/transactions/query-and-update-status",
   adminCommissionDailySummary: "admin/commissions/daily-summary",
   adminCommissionDailyDetails: "admin/commissions/daily-details",
+  exportWalletLogs: "export/wallet-logs",
 };
 export const localApiEndPoints = {
   main: "/api",
