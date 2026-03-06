@@ -67,7 +67,9 @@ const UsersListTable = ({
         content: "User balance has been credited",
         type: "success",
       });
-      location.reload();
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
       setModalContent(null);
       form.resetFields();
     } catch (err) {}
@@ -91,28 +93,38 @@ const UsersListTable = ({
         content: "User commission wallet has been credited",
         type: "success",
       });
-      location.reload();
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
       setModalContent(null);
       form.resetFields();
     } catch (err) {}
     setCreditingAccount(false);
   };
 
-  const transferCommissionToBalance = async () => {
+  const transferCommissionToBalance = async (values?: any) => {
     setCreditingAccount(true);
 
     try {
+      const body: any = {};
+      if (values?.amount) {
+        body.amount = Number(values.amount) * 100;
+      }
+      
       const res = await apiService.post({
         endPoint: apiEndpoints.transferCommissionToBalance(modalContent!.id),
-        body: {},
+        body,
       });
 
       messageApi.open({
         content: res.message || "Commission transferred to balance successfully",
         type: "success",
       });
-      location.reload();
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
       setModalContent(null);
+      form.resetFields();
     } catch (err) {}
     setCreditingAccount(false);
   };
@@ -205,19 +217,38 @@ const UsersListTable = ({
     const getModalContent = () => {
       if (modalAction === 'transfer') {
         return (
-          <div className="py-4">
-            <p className="mb-4">Are you sure you want to transfer all commission balance to main wallet?</p>
-            <div className="bg-gray-100 p-3 rounded">
-              <div className="flex justify-between mb-2">
-                <span className="font-semibold">Current Commission:</span>
-                <span className="text-lg font-bold text-purple-600">{koboToNaira(modalContent?.wallet.commission || 0)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold">Current Balance:</span>
-                <span className="text-lg font-bold text-blue-600">{koboToNaira(modalContent?.wallet.balance || 0)}</span>
+          <FormField
+            form={form}
+            key={formKey}
+            name="transfer commission"
+            onFinish={(values) => {
+              transferCommissionToBalance(values);
+            }}
+          >
+            <div className="mb-4">
+              <p className="mb-3">Transfer commission balance to main wallet</p>
+              <div className="bg-gray-100 p-3 rounded mb-4">
+                <div className="flex justify-between mb-2">
+                  <span className="font-semibold">Current Commission:</span>
+                  <span className="text-lg font-bold text-purple-600">{koboToNaira(modalContent?.wallet.commission || 0)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Current Balance:</span>
+                  <span className="text-lg font-bold text-blue-600">{koboToNaira(modalContent?.wallet.balance || 0)}</span>
+                </div>
               </div>
             </div>
-          </div>
+            <InputField
+              placeholder="Amount (Optional - Leave empty to transfer all)"
+              type="number"
+              min={1}
+              max={modalContent?.wallet.commission ? modalContent.wallet.commission / 100 : undefined}
+              showTitle={false}
+              formItemProps={{
+                name: "amount",
+              }}
+            />
+          </FormField>
         );
       }
 
@@ -287,11 +318,7 @@ const UsersListTable = ({
         title={getModalTitle()}
         open={true}
         onOk={() => {
-          if (modalAction === 'transfer') {
-            transferCommissionToBalance();
-          } else {
-            form.submit();
-          }
+          form.submit();
         }}
         okButtonProps={{
           children: modalAction === 'transfer' ? 'Transfer' : 'Credit',
