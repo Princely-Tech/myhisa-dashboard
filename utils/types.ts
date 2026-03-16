@@ -417,6 +417,107 @@ export interface AdminWebhookDeliveryResponse {
   };
 }
 
+export interface BulkCampaignItem {
+  id: number;
+  campaign_id: string;
+  row_number: number;
+  sn: string;
+  name: string;
+  phone: string;
+  amount: number;
+  network: string;
+  message: string;
+  status: string;
+  transaction_id?: string;
+  sms_transaction_id?: string;
+  processed_at?: string;
+  RowNumber?: number;
+  SN?: string;
+  Name?: string;
+  Phone?: string;
+  Amount?: number;
+  Network?: string;
+  Message?: string;
+}
+
+export interface BulkCampaign {
+  id: number;
+  campaign_id: string;
+  user_id: number;
+  file_name: string;
+  file_hash: string;
+  total_rows: number;
+  total_amount: number;
+  total_sms_cost: number;
+  message_template: string;
+  status: string;
+  status_code: string;
+  processed_count: number;
+  success_count: number;
+  failed_count: number;
+  otp_verified_at?: string;
+  otp_expires_at?: string;
+  amount_debited: number;
+  balance_before: number;
+  started_at?: string;
+  completed_at?: string;
+  paused_at?: string;
+  cancelled_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BulkUploadResponse {
+  message: string;
+  campaign_id: string;
+  summary: {
+    total_rows: number;
+    total_amount: number;
+    total_amount_kobo: number;
+    total_sms_cost: number;
+    total_cost: number;
+    message_template: string;
+  };
+  preview: BulkCampaignItem[];
+  next_step: string;
+  warning?: string;
+  duplicate_info?: {
+    file_name: string;
+    uploaded_at: string;
+    total_rows: number;
+  };
+}
+
+export interface BulkCampaignStatusResponse {
+  campaign: BulkCampaign;
+  summary: {
+    total_items: number;
+    processed_count: number;
+    success_count: number;
+    failed_count: number;
+    pending_count: number;
+  };
+  items: BulkCampaignItem[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total_items: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  };
+}
+
+export interface BulkCampaignsListResponse {
+  data: BulkCampaign[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    total_pages: number;
+  };
+}
+
 export type {
   TransactionItem,
   CustomLinkProps,

@@ -63,8 +63,9 @@ const TransactionStatsComponent = ({
                 defaultValue: [dayjs(fromDate), dayjs(toDate)],
                 placeholder: ["From Date", "To Date"],
                 onChange: (input) => {
-                  const fromDateDate = input[0]!.toDate();
-                  const toDateDate = input[1]!.toDate();
+                  if (!input || !input[0] || !input[1]) return;
+                  const fromDateDate = input[0].toDate();
+                  const toDateDate = input[1].toDate();
                   const dates: { key: string; value: string }[] = [];
                   if (fromDateDate) {
                     dates.push({
@@ -153,7 +154,7 @@ const WalletBalances = () => {
     <div className="iq-card  iq-card-stretch iq-card-height m-0 lg:col-span-2">
       {contextHolder}
       <div className="iq-card-body">
-        <Spin spinning={!wallet} tip="Loading" size="large">
+        <Spin spinning={!wallet} description="Loading" size="large">
           {" "}
           <h4 className="text-uppercase text-black mb-0">Main</h4>
           <div className="d-flex justify-content-between align-items-start flex-wrap gap-3">

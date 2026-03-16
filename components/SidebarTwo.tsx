@@ -255,10 +255,35 @@ const SidebarTwo = () => {
               isActive={pathname == routes.webhooks}
               icon={<i className="las la-bell iq-arrow-left"></i>}
             />
+
             
 
             {user && user?.rank > 0 && (
               <>
+              <CollapsibleMenuItem
+                isActive={
+                  pathname == routes.bulkAirtimeUpload ||
+                  pathname == routes.bulkAirtimeCampaigns ||
+                  pathname.startsWith("/bulk-airtime/")
+                }
+                title="Bulk Airtime"
+                icon={<i className="las la-broadcast-tower iq-arrow-left"></i>}
+                menuItems={[
+                  {
+                    title: "Upload",
+                    route: routes.bulkAirtimeUpload,
+                    icon: <i className="las la-upload iq-arrow-left"></i>,
+                    isActive: pathname == routes.bulkAirtimeUpload,
+                  },
+                  {
+                    title: "Campaigns",
+                    route: routes.bulkAirtimeCampaigns,
+                    icon: <i className="las la-list iq-arrow-left"></i>,
+                    isActive: pathname == routes.bulkAirtimeCampaigns,
+                  },
+                ]}
+              />
+
                 <MenuItem
                   title="Wallet Reconciliation"
                   route={routes.walletReconciliation}

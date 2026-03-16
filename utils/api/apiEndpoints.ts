@@ -47,6 +47,14 @@ const apiEndpoints = {
   adminCommissionDailySummary: "admin/commissions/daily-summary",
   adminCommissionDailyDetails: "admin/commissions/daily-details",
   exportWalletLogs: "export/wallet-logs",
+  bulkAirtimeUpload: "bulk/airtime/upload",
+  bulkAirtimeCampaigns: "bulk/airtime/campaigns",
+  bulkAirtimeCampaignById: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}`,
+  bulkAirtimeRequestOtp: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}/request-otp`,
+  bulkAirtimeConfirm: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}/confirm`,
+  bulkAirtimePause: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}/pause`,
+  bulkAirtimeResume: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}/resume`,
+  bulkAirtimeCancel: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}/cancel`,
 };
 export const localApiEndPoints = {
   main: "/api",

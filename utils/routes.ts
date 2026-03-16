@@ -40,6 +40,10 @@ const routes = {
   adminCommissionDailyDetails: "/admin/commissions/daily-details",
   exportWalletLogs: "/export-wallet-logs",
   adminExportWalletLogs: "/admin/export-wallet-logs",
+  bulkAirtimeUpload: "/bulk-airtime/upload",
+  bulkAirtimeReview: (campaignId: string) => `/bulk-airtime/review/${campaignId}`,
+  bulkAirtimeStatus: (campaignId: string) => `/bulk-airtime/status/${campaignId}`,
+  bulkAirtimeCampaigns: "/bulk-airtime/campaigns",
 };
 export default routes;
 export { transactionFilterStr };

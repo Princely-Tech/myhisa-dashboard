@@ -2,8 +2,8 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 interface RippleContainerProps {
-  duration: number;
-  color: string;
+  $duration: number;
+  $color: string;
 }
 
 export const RippleContainer = styled.div<RippleContainerProps>`
@@ -18,9 +18,9 @@ export const RippleContainer = styled.div<RippleContainerProps>`
     border-radius: 100%;
     position: absolute;
     opacity: 0.75;
-    background-color: ${(props) => props.color};
+    background-color: ${(props) => props.$color};
     animation-name: ripple;
-    animation-duration: ${(props) => props.duration}ms;
+    animation-duration: ${(props) => props.$duration}ms;
   }
 
   @keyframes ripple {
@@ -30,9 +30,3 @@ export const RippleContainer = styled.div<RippleContainerProps>`
     }
   }
 `;
-
-// Define PropTypes for RippleContainer
-RippleContainer.propTypes = {
-  duration: PropTypes.number.isRequired,
-  color: PropTypes.string.isRequired,
-};
