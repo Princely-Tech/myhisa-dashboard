@@ -1,14 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, Upload, message, Button, Alert } from "antd";
+import { Card, Upload, message, Button, Alert, Select } from "antd";
 import { InboxOutlined, DownloadOutlined } from "@ant-design/icons";
 import { InputField, BlueButton } from "@/components";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import routes from "@/utils/routes";
-import { BulkUploadResponse } from "@/utils/types";
+import { BulkUploadResponse, SenderID, SenderIDListResponse } from "@/utils/types";
 import type { UploadProps } from "antd";
+import Link from "next/link";
 
 const { Dragger } = Upload;
 
@@ -16,9 +17,34 @@ const BulkAirtimeUpload = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [file, setFile] = useState<File | null>(null);
   const [messageTemplate, setMessageTemplate] = useState("");
+  const [selectedSenderId, setSelectedSenderId] = useState<string>("");
+  const [senderIds, setSenderIds] = useState<SenderID[]>([]);
+  const [loadingSenderIds, setLoadingSenderIds] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [duplicateWarning, setDuplicateWarning] = useState<any>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    fetchSenderIds();
+  }, []);
+
+  const fetchSenderIds = async () => {
+    try {
+      const apiService = new AxiosHandler(messageApi);
+      const res: SenderIDListResponse = await apiService.get({
+        endPoint: apiEndpoints.senderIds,
+      });
+      setSenderIds(res.sender_ids);
+      const defaultSender = res.sender_ids.find((s) => s.is_default);
+      if (defaultSender) {
+        setSelectedSenderId(defaultSender.sender_id);
+      }
+    } catch (err) {
+      console.error("Failed to load sender IDs");
+    } finally {
+      setLoadingSenderIds(false);
+    }
+  };
 
   const uploadProps: UploadProps = {
     name: "file",
@@ -68,6 +94,9 @@ const BulkAirtimeUpload = () => {
       if (messageTemplate) {
         formData.append("message_template", messageTemplate);
       }
+      if (selectedSenderId) {
+        formData.append("sender_id", selectedSenderId);
+      }
 
       const apiService = new AxiosHandler(messageApi);
       const response = await fetch(
@@ -104,7 +133,7 @@ const BulkAirtimeUpload = () => {
   };
 
   return (
-    <div className="flex-1 border px-4 pt-2 pb-5 flex flex-col min-h-screen overflow-hidden">
+    <div className="flex-1 border px-4 pt-2 pb-5 flex flex-col min-h-screen overflow-auto">
       {contextHolder}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
@@ -161,27 +190,76 @@ const BulkAirtimeUpload = () => {
             </Dragger>
           </div>
 
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">
-              Message Template (Optional)
+          <Card className="mb-6">
+            <h3 className="text-lg font-semibold mb-4">
+              SMS Settings (Optional)
             </h3>
-            <InputField
-              type="textArea"
-              placeholder="Hello {{name}}, you have received NGN {{amount}} airtime on {{phone}}. Thank you!"
-              value={messageTemplate}
-              onChange={(e) => setMessageTemplate(e.target.value)}
-              formItemProps={{}}
-              showTitle={false}
-            />
-            <p className="text-sm text-gray-500 mt-2">
-              Available placeholders: {"{"}
-              {"{"}name{"}"}{"}"}
-              , {"{"}{"{"}phone{"}"}{"}"}
-              , {"{"}{"{"}amount{"}"}{"}"}
-              , {"{"}{"{"}sn{"}"}
-              {"}"}
-            </p>
-          </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sender ID
+              </label>
+              <Select
+                style={{ width: "100%" }}
+                placeholder="Select sender ID"
+                value={selectedSenderId || undefined}
+                onChange={(value) => setSelectedSenderId(value)}
+                loading={loadingSenderIds}
+                allowClear
+              >
+                {senderIds.map((sender) => (
+                  <Select.Option key={sender.id} value={sender.sender_id}>
+                    {sender.sender_id} ({sender.type})
+                    {sender.is_default && " - Default"}
+                  </Select.Option>
+                ))}
+              </Select>
+              <div className="mt-2">
+                <Link
+                  href={routes.senderIds}
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                >
+                  Manage Sender IDs →
+                </Link>
+              </div>
+            </div>
+
+            <div className="mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Message Template
+              </label>
+              <InputField
+                type="textArea"
+                placeholder="Enter your message template"
+                value={messageTemplate}
+                onChange={(e: any) => setMessageTemplate(e.target.value)}
+                showTitle={false}
+              />
+            </div>
+            <div className="mt-2 text-sm text-gray-600">
+              <p className="font-semibold mb-1">Available placeholders:</p>
+              <ul className="list-disc list-inside">
+                <li>
+                  <code className="bg-gray-100 px-1 rounded">{"{{name}}"}</code> -
+                  Recipient&apos;s name
+                </li>
+                <li>
+                  <code className="bg-gray-100 px-1 rounded">{"{{phone}}"}</code>{" "}
+                  - Phone number
+                </li>
+                <li>
+                  <code className="bg-gray-100 px-1 rounded">
+                    {"{{amount}}"}
+                  </code>{" "}
+                  - Airtime amount
+                </li>
+                <li>
+                  <code className="bg-gray-100 px-1 rounded">{"{{sn}}"}</code> -
+                  Serial number
+                </li>
+              </ul>
+            </div>
+          </Card>
 
           {duplicateWarning && (
             <Alert

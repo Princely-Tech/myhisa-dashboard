@@ -44,6 +44,7 @@ const routes = {
   bulkAirtimeReview: (campaignId: string) => `/bulk-airtime/review/${campaignId}`,
   bulkAirtimeStatus: (campaignId: string) => `/bulk-airtime/status/${campaignId}`,
   bulkAirtimeCampaigns: "/bulk-airtime/campaigns",
+  senderIds: "/settings/sender-ids",
 };
 export default routes;
 export { transactionFilterStr };

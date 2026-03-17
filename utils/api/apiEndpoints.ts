@@ -55,6 +55,9 @@ const apiEndpoints = {
   bulkAirtimePause: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}/pause`,
   bulkAirtimeResume: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}/resume`,
   bulkAirtimeCancel: (campaignId: string) => `bulk/airtime/campaigns/${campaignId}/cancel`,
+  senderIds: "sender-ids",
+  senderIdSetDefault: (id: number) => `sender-ids/${id}/set-default`,
+  senderIdDelete: (id: number) => `sender-ids/${id}`,
 };
 export const localApiEndPoints = {
   main: "/api",

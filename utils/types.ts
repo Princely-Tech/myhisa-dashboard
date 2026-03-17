@@ -518,6 +518,26 @@ export interface BulkCampaignsListResponse {
   };
 }
 
+export interface SenderID {
+  id: number;
+  user_id: number;
+  sender_id: string;
+  type: "transactional" | "promotional";
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SenderIDListResponse {
+  sender_ids: SenderID[];
+  total: number;
+}
+
+export interface SenderIDResponse {
+  message: string;
+  sender_id: SenderID;
+}
+
 export type {
   TransactionItem,
   CustomLinkProps,

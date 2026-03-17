@@ -56,8 +56,8 @@ const SidebarTwo = () => {
       <div className="mt-4 ">
         <Image src={logo} alt="myHisa" />
       </div>
-      <div id="sidebar-scrollbar" className="">
-        <nav className="iq-sidebar-menu">
+      <div id="sidebar-scrollbar" className="overflow-auto pb-20">
+        <nav className="iq-sidebar-menu pb-8">
           <ul id="iq-sidebar-toggle" className="iq-menu">
             <MenuItem
               title="Dashboard"
@@ -163,6 +163,30 @@ const SidebarTwo = () => {
             />
 
            
+           <CollapsibleMenuItem
+                isActive={
+                  pathname == routes.bulkAirtimeUpload ||
+                  pathname == routes.bulkAirtimeCampaigns ||
+                  pathname.startsWith("/bulk-airtime/")
+                }
+                title="Bulk Airtime"
+                icon={<i className="las la-broadcast-tower iq-arrow-left"></i>}
+                menuItems={[
+                  {
+                    title: "Upload",
+                    route: routes.bulkAirtimeUpload,
+                    icon: <i className="las la-upload iq-arrow-left"></i>,
+                    isActive: pathname == routes.bulkAirtimeUpload,
+                  },
+                  {
+                    title: "Campaigns",
+                    route: routes.bulkAirtimeCampaigns,
+                    icon: <i className="las la-list iq-arrow-left"></i>,
+                    isActive: pathname == routes.bulkAirtimeCampaigns,
+                  },
+                ]}
+              />
+              
             <MenuItem
               title="Credit History"
               route={routes.creditHistory}
@@ -256,33 +280,18 @@ const SidebarTwo = () => {
               icon={<i className="las la-bell iq-arrow-left"></i>}
             />
 
+            <MenuItem
+              title="SMS Sender IDs"
+              route={routes.senderIds}
+              isActive={pathname == routes.senderIds}
+              icon={<i className="las la-sms iq-arrow-left"></i>}
+            />
+
             
 
             {user && user?.rank > 0 && (
               <>
-              <CollapsibleMenuItem
-                isActive={
-                  pathname == routes.bulkAirtimeUpload ||
-                  pathname == routes.bulkAirtimeCampaigns ||
-                  pathname.startsWith("/bulk-airtime/")
-                }
-                title="Bulk Airtime"
-                icon={<i className="las la-broadcast-tower iq-arrow-left"></i>}
-                menuItems={[
-                  {
-                    title: "Upload",
-                    route: routes.bulkAirtimeUpload,
-                    icon: <i className="las la-upload iq-arrow-left"></i>,
-                    isActive: pathname == routes.bulkAirtimeUpload,
-                  },
-                  {
-                    title: "Campaigns",
-                    route: routes.bulkAirtimeCampaigns,
-                    icon: <i className="las la-list iq-arrow-left"></i>,
-                    isActive: pathname == routes.bulkAirtimeCampaigns,
-                  },
-                ]}
-              />
+              
 
                 <MenuItem
                   title="Wallet Reconciliation"
