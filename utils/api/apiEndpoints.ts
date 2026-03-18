@@ -34,6 +34,7 @@ const apiEndpoints = {
   adminTransactionsByRefs: "admin/transactions/by-refs",
   adminQueryAndUpdateStatus: "admin/transactions/query-and-update-status",
   adminReverseTransactions: "admin/transactions/reverse",
+  adminMarkTransactionsSuccessful: "admin/transactions/mark-successful",
   availabilityAll: "availability/all",
   availabilityByService: (service: string) => `availability/${service}`,
   webhooks: "webhooks",

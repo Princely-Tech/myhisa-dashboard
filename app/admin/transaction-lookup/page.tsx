@@ -76,6 +76,11 @@ const AdminTransactionLookup = () => {
   const [reversalResults, setReversalResults] = useState<ReversalResult[] | null>(null);
   const [showReversalResultsModal, setShowReversalResultsModal] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [markSuccessLoading, setMarkSuccessLoading] = useState(false);
+  const [showMarkSuccessModal, setShowMarkSuccessModal] = useState(false);
+  const [markSuccessReason, setMarkSuccessReason] = useState<string>("");
+  const [markSuccessResults, setMarkSuccessResults] = useState<ReversalResult[] | null>(null);
+  const [showMarkSuccessResultsModal, setShowMarkSuccessResultsModal] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleLookup = async () => {
@@ -177,6 +182,42 @@ const AdminTransactionLookup = () => {
       messageApi.error("Failed to reverse transactions");
     } finally {
       setReversalLoading(false);
+    }
+  };
+
+  const handleMarkAsSuccessful = async () => {
+    if (!markSuccessReason.trim()) {
+      messageApi.warning("Please provide a reason for marking as successful");
+      return;
+    }
+
+    setMarkSuccessLoading(true);
+    try {
+      const apiService = new AxiosHandler(messageApi);
+      const cleanedRefs = transactionRefs
+        .split(/[\n,;]/)
+        .map(ref => ref.trim())
+        .filter(ref => ref.length > 0)
+        .join(",");
+      
+      const endpoint = `${apiEndpoints.adminMarkTransactionsSuccessful}?transaction_refs=${encodeURIComponent(cleanedRefs)}&reason=${encodeURIComponent(markSuccessReason)}`;
+      const response = await apiService.post({
+        endPoint: endpoint,
+        body: {},
+      });
+      
+      setMarkSuccessResults(response.data || []);
+      setShowMarkSuccessResultsModal(true);
+      setShowMarkSuccessModal(false);
+      setMarkSuccessReason("");
+      messageApi.success(`Processed ${response.count} transaction(s)`);
+      
+      handleLookup();
+    } catch (error) {
+      console.error("Error marking transactions as successful:", error);
+      messageApi.error("Failed to mark transactions as successful");
+    } finally {
+      setMarkSuccessLoading(false);
     }
   };
 
@@ -512,6 +553,131 @@ const AdminTransactionLookup = () => {
     );
   };
 
+  const renderMarkSuccessModal = () => {
+    return (
+      <Modal
+        title="Confirm Mark Transaction as Successful"
+        open={showMarkSuccessModal}
+        onCancel={() => {
+          setShowMarkSuccessModal(false);
+          setMarkSuccessReason("");
+        }}
+        footer={[
+          <CustomButton 
+            key="cancel" 
+            onClick={() => {
+              setShowMarkSuccessModal(false);
+              setMarkSuccessReason("");
+            }}
+          >
+            Cancel
+          </CustomButton>,
+          <BlueButton 
+            key="confirm" 
+            onClick={handleMarkAsSuccessful}
+            loading={markSuccessLoading}
+            disabled={!markSuccessReason.trim()}
+          >
+            Confirm Mark as Successful
+          </BlueButton>
+        ]}
+        width={600}
+      >
+        <div className="space-y-4">
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded">
+            <p className="text-blue-800 font-medium">⚠️ Warning: This action cannot be undone!</p>
+            <p className="text-blue-600 text-sm mt-2">
+              This will mark pending transaction(s) as Successful WITHOUT verifying with the provider.
+              Only use this when you have confirmed the transaction was successful through other means.
+            </p>
+          </div>
+
+          <div>
+            <label className="block mb-2 font-medium">Reason for Marking as Successful (Required)</label>
+            <TextArea
+              value={markSuccessReason}
+              onChange={(e) => setMarkSuccessReason(e.target.value)}
+              placeholder="Enter reason for marking as successful (e.g., Verified with provider - transaction completed successfully)"
+              rows={4}
+              maxLength={500}
+              showCount
+            />
+          </div>
+        </div>
+      </Modal>
+    );
+  };
+
+  const renderMarkSuccessResultsModal = () => {
+    if (!markSuccessResults) return null;
+
+    const success = markSuccessResults.filter(r => r.status === "success");
+    const skipped = markSuccessResults.filter(r => r.status === "skipped");
+    const errors = markSuccessResults.filter(r => r.status === "error");
+
+    return (
+      <Modal
+        title="Mark as Successful Results"
+        open={showMarkSuccessResultsModal}
+        onCancel={() => setShowMarkSuccessResultsModal(false)}
+        footer={[
+          <CustomButton key="close" onClick={() => setShowMarkSuccessResultsModal(false)}>
+            Close
+          </CustomButton>
+        ]}
+        width={800}
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-3 gap-4">
+            <Card className="bg-green-50">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{success.length}</div>
+                <div className="text-sm text-gray-600">Marked Successful</div>
+              </div>
+            </Card>
+            <Card className="bg-yellow-50">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-600">{skipped.length}</div>
+                <div className="text-sm text-gray-600">Skipped</div>
+              </div>
+            </Card>
+            <Card className="bg-red-50">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600">{errors.length}</div>
+                <div className="text-sm text-gray-600">Errors</div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="max-h-96 overflow-y-auto">
+            {markSuccessResults.map((result, index) => (
+              <Card key={index} className="mb-2" size="small">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium">
+                      {result.transaction_id || result.external_ref}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    {result.status === "success" && (
+                      <Tag color="green">{result.message}</Tag>
+                    )}
+                    {result.status === "skipped" && (
+                      <Tag color="orange">{result.message}</Tag>
+                    )}
+                    {result.status === "error" && (
+                      <Tag color="red">{result.message}</Tag>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </Modal>
+    );
+  };
+
   const renderReversalModal = () => {
     return (
       <Modal
@@ -602,6 +768,9 @@ const AdminTransactionLookup = () => {
                 <RedButton onClick={() => setShowReversalModal(true)}>
                   Reverse Transactions
                 </RedButton>
+                <BlueButton onClick={() => setShowMarkSuccessModal(true)}>
+                  Mark as Successful
+                </BlueButton>
                 <CustomButton onClick={handleExport} loading={exportLoading}>
                   Export to CSV
                 </CustomButton>
@@ -651,6 +820,8 @@ const AdminTransactionLookup = () => {
       {renderQueryResultsModal()}
       {renderReversalModal()}
       {renderReversalResultsModal()}
+      {renderMarkSuccessModal()}
+      {renderMarkSuccessResultsModal()}
     </div>
   );
 };
