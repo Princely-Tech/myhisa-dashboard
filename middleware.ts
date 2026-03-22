@@ -7,7 +7,8 @@ import { User } from "./utils/types";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get(apiEndpoints.tokenSetUrl);
-  if (!token && request.nextUrl.pathname != routes.login) {
+  const publicRoutes = [routes.login, routes.register];
+  if (!token && !publicRoutes.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(
       `${request.nextUrl.origin}${routes.login}`
     );

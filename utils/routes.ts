@@ -6,6 +6,7 @@ const transactionFilterStr = {
 };
 const routes = {
   login: "/",
+  register: "/register",
   dashboard: "/dashboard",
   transactions: "/transactions",
   summariesTotal: "/summaries_total",
@@ -38,6 +39,7 @@ const routes = {
   transactionLookup: "/transaction-lookup",
   adminCommissionDailySummary: "/admin/commissions/daily-summary",
   adminCommissionDailyDetails: "/admin/commissions/daily-details",
+  adminCommissionRates: "/admin/commission-rates",
   exportWalletLogs: "/export-wallet-logs",
   adminExportWalletLogs: "/admin/export-wallet-logs",
   bulkAirtimeUpload: "/bulk-airtime/upload",

@@ -29,7 +29,7 @@ const SidebarTwo = () => {
       setUser(userJson);
     }
   }, [pathname]);
-  if (pathname == routes.login || !user) {
+  if (pathname == routes.login || pathname == routes.register || !user) {
     return <></>;
   }
   const currentDate = new Date();
@@ -322,6 +322,7 @@ const SidebarTwo = () => {
                     pathname == routes.adminWebhookDeliveries ||
                     pathname == routes.adminCommissionDailySummary ||
                     pathname == routes.adminCommissionDailyDetails ||
+                    pathname == routes.adminCommissionRates ||
                     pathname == routes.adminExportWalletLogs
                   }
                   title="Admin Tools"
@@ -374,6 +375,12 @@ const SidebarTwo = () => {
                       route: routes.adminCommissionDailyDetails,
                       icon: <i className="las la-list-alt iq-arrow-left"></i>,
                       isActive: pathname == routes.adminCommissionDailyDetails,
+                    },
+                    {
+                      title: "Manage Commission Rates",
+                      route: routes.adminCommissionRates,
+                      icon: <i className="las la-percentage iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminCommissionRates,
                     },
                     {
                       title: "Update Availability",

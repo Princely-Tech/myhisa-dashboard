@@ -207,8 +207,8 @@ export type User = {
   name: string;
   email: string;
   phone: string;
-  email_verified_at: string;
-  approved_at: string;
+  email_verified_at: string | null;
+  approved_at: string | null;
   rank: 1;
   reporting_emails: string;
   referral_code: string;
@@ -220,6 +220,9 @@ export type User = {
     account_number: null | number;
     account_name: null | string;
     bank_name: null | string;
+    is_account_active: boolean;
+    block_reason?: string | null;
+    blocked_at?: string | null;
   };
 };
 export interface QueryGetResponse {

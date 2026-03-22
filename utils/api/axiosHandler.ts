@@ -70,6 +70,51 @@ class AxiosHandler {
       return this.errHandler(err);
     }
   }
+
+  async put(options: PostOptions) {
+    let url = apiEndpoints.base + options.endPoint;
+    const headers = options.header ?? this.getHeader();
+    console.log("Started PUT request to", url);
+    console.log("headers");
+    console.log(headers);
+    console.log("data");
+    console.log(options.body);
+
+    try {
+      const res = await axios.put(url, options.body, {
+        headers: headers,
+      });
+
+      console.log("PUT request to", url, "successful");
+      console.log(res.data);
+      return this.responseHandler(res.data);
+    } catch (err) {
+      return this.errHandler(err);
+    }
+  }
+
+  async delete(options: PostOptions) {
+    let url = apiEndpoints.base + options.endPoint;
+    const headers = options.header ?? this.getHeader();
+    console.log("Started DELETE request to", url);
+    console.log("headers");
+    console.log(headers);
+    console.log("data");
+    console.log(options.body);
+
+    try {
+      const res = await axios.delete(url, {
+        headers: headers,
+        data: options.body,
+      });
+
+      console.log("DELETE request to", url, "successful");
+      console.log(res.data);
+      return this.responseHandler(res.data);
+    } catch (err) {
+      return this.errHandler(err);
+    }
+  }
   showError(error: string) {
     if (this.messageApi) {
       this.messageApi!.open({

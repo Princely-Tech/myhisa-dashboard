@@ -12,6 +12,7 @@ import {
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import Image from "next/image";
+import Link from "next/link";
 import { CookieSetParams } from "@/utils/types";
 type FieldType = {
   email?: string;
@@ -82,6 +83,15 @@ const Login: React.FC = () => {
             </BlueButton>
           </FormField>
         </AuthCard>
+        
+        <div className="mt-4 text-center">
+          <p className="text-sm text-white">
+            Don&apos;t have an account?{" "}
+            <Link href={routes.register} className="text-white font-semibold hover:underline cursor-pointer">
+              Register here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
