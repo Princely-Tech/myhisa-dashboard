@@ -12,6 +12,7 @@ import {
   Button,
   Tag,
   Space,
+  Tabs,
 } from "antd";
 import {
   ReloadOutlined,
@@ -23,6 +24,7 @@ import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BulkCampaignStatusResponse } from "@/utils/types";
 import { plainKoboNairaConvert } from "@/utils/helperfunctions";
+import SMSDetails from "./sms-details";
 
 const BulkAirtimeStatus = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -353,29 +355,33 @@ const BulkAirtimeStatus = () => {
           </Card>
         )}
 
-        <Card>
-          <h3 className="text-lg font-semibold mb-4">
-            Campaign Items
-          </h3>
-          <Table
-            columns={columns}
-            dataSource={data.items}
-            rowKey="id"
-            pagination={{
-              current: currentPage,
-              pageSize: pageSize,
-              total: data.pagination.total_items,
-              showSizeChanger: true,
-              showTotal: (total) => `Total ${total} items`,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              onChange: (page, size) => {
-                setCurrentPage(page);
-                setPageSize(size || 10);
-              },
-            }}
-            scroll={{ x: 1200 }}
-          />
-        </Card>
+        <Tabs defaultActiveKey="items" className="mt-6">
+          <Tabs.TabPane tab="Campaign Items" key="items">
+            <Card>
+              <Table
+                columns={columns}
+                dataSource={data.items}
+                rowKey="id"
+                pagination={{
+                  current: currentPage,
+                  pageSize: pageSize,
+                  total: data.pagination.total_items,
+                  showSizeChanger: true,
+                  showTotal: (total) => `Total ${total} items`,
+                  pageSizeOptions: ["10", "20", "50", "100"],
+                  onChange: (page, size) => {
+                    setCurrentPage(page);
+                    setPageSize(size || 10);
+                  },
+                }}
+                scroll={{ x: 1200 }}
+              />
+            </Card>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="SMS Details" key="sms">
+            <SMSDetails campaignId={campaignId} />
+          </Tabs.TabPane>
+        </Tabs>
       </div>
     </div>
   );

@@ -81,6 +81,10 @@ const BulkAirtimeReview = () => {
             errorData.current_balance * 100
           )}`
         );
+      } else if (err?.response?.data?.error) {
+        messageApi.error(err.response.data.error);
+      } else if (err?.response?.data?.message) {
+        messageApi.error(err.response.data.message);
       } else {
         messageApi.error("Failed to confirm campaign");
       }
