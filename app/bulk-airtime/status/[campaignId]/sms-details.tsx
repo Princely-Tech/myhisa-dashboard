@@ -111,6 +111,7 @@ const SMSDetails: React.FC<SMSDetailsProps> = ({ campaignId }) => {
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       success: "green",
+      successful: "green",
       failed: "red",
       pending: "blue",
     };
