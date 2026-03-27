@@ -47,6 +47,10 @@ const routes = {
   bulkAirtimeStatus: (campaignId: string) => `/bulk-airtime/status/${campaignId}`,
   bulkAirtimeCampaigns: "/bulk-airtime/campaigns",
   senderIds: "/settings/sender-ids",
+  testBeneficiaries: "/test/beneficiaries",
+  testTransactions: "/test/transactions",
+  dataPlans: "/resources/data-plans",
+  electricityBillers: "/resources/electricity-billers",
 };
 export default routes;
 export { transactionFilterStr };

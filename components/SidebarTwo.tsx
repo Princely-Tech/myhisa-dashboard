@@ -287,7 +287,40 @@ const SidebarTwo = () => {
               icon={<i className="las la-sms iq-arrow-left"></i>}
             />
 
-            
+            <CollapsibleMenuItem
+              isActive={
+                pathname == routes.testBeneficiaries ||
+                pathname == routes.testTransactions
+              }
+              title="Perform Transactions"
+              icon={<i className="las la-flask iq-arrow-left"></i>}
+              menuItems={[
+                {
+                  title: "Beneficiaries",
+                  route: routes.testBeneficiaries,
+                  icon: <i className="las la-users iq-arrow-left"></i>,
+                  isActive: pathname == routes.testBeneficiaries,
+                },
+                {
+                  title: "New Transactions",
+                  route: routes.testTransactions,
+                  icon: <i className="las la-bolt iq-arrow-left"></i>,
+                  isActive: pathname == routes.testTransactions,
+                },
+                {
+                  title: "Data Plans",
+                  route: routes.dataPlans,
+                  icon: <i className="las la-database iq-arrow-left"></i>,
+                  isActive: pathname == routes.dataPlans,
+                },
+                {
+                  title: "Electricity Billers",
+                  route: routes.electricityBillers,
+                  icon: <i className="las la-bolt iq-arrow-left"></i>,
+                  isActive: pathname == routes.electricityBillers,
+                },
+              ]}
+            />
 
             {user && user?.rank > 0 && (
               <>

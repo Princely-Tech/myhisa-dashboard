@@ -1,2 +1,7 @@
 AUTH_SECRET=qulBkVWD8iwzGnyeAdn8EmWJlptjF0GFJep2RDJbJKc=
 PostmanUrl=https://documenter.getpostman.com/view/14135488/2sA3JRXe6J
+
+npm run build
+
+
+pm2 restart airtimereporting
