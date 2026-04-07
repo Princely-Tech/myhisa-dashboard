@@ -98,7 +98,8 @@ const AIChat: React.FC = () => {
   return (
     <>
       {contextHolder}
-      <div className="flex flex-col h-full w-full bg-gradient-to-b from-gray-50 to-white">
+      <div className="flex flex-col flex-1 max-h-full overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+        {/* Fixed Header */}
         <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-5 px-6 text-center shadow-xl relative flex-shrink-0">
           <div className="absolute inset-0 bg-white opacity-10 animate-pulse-slow"></div>
           <div className="relative z-10">
@@ -112,7 +113,8 @@ const AIChat: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 bg-white min-h-0">
+        {/* Scrollable Messages Area */}
+        <div className="flex-1 overflow-y-auto p-4 bg-white">
           {messages.length === 0 ? (
             <QuickActions onActionClick={handleQuickAction} />
           ) : (
@@ -127,6 +129,7 @@ const AIChat: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Fixed Input at Bottom */}
         <div className="flex-shrink-0">
           <MessageInput
             value={input}

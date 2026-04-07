@@ -78,9 +78,16 @@ export interface TicketListParams {
   limit?: number;
 }
 
+export interface CreateTicketRequest {
+  subject: string;
+  description: string;
+  category: 'ai_query' | 'transaction_issue' | 'data_plan_issue' | 'payment_issue' | 'general';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+}
+
 export const aiService = {
-  chat: async (request: ChatRequest): Promise<ChatResponse> => {
-    const response = await aiApi.post<ChatResponse>('/ai/chat', request);
+  chat: async (data: ChatRequest): Promise<ChatResponse> => {
+    const response = await aiApi.post('/ai/chat', data);
     return response.data;
   },
 
@@ -89,13 +96,18 @@ export const aiService = {
     return response.data;
   },
 
+  createTicket: async (data: CreateTicketRequest) => {
+    const response = await aiApi.post('/tickets', data);
+    return response.data;
+  },
+
   getTickets: async (params?: TicketListParams) => {
     const response = await aiApi.get('/tickets', { params });
     return response.data;
   },
 
-  getTicket: async (ticketCode: string) => {
-    const response = await aiApi.get(`/tickets/${ticketCode}`);
+  getTicket: async (code: string) => {
+    const response = await aiApi.get(`/tickets/${code}`);
     return response.data;
   },
 
