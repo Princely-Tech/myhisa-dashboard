@@ -51,6 +51,9 @@ const routes = {
   testTransactions: "/test/transactions",
   dataPlans: "/resources/data-plans",
   electricityBillers: "/resources/electricity-billers",
+  aiAssistant: "/ai-assistant",
+  tickets: "/tickets",
+  ticketDetail: (code: string) => `/tickets/${code}`,
 };
 export default routes;
 export { transactionFilterStr };

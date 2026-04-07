@@ -287,6 +287,20 @@ const SidebarTwo = () => {
               icon={<i className="las la-sms iq-arrow-left"></i>}
             />
 
+            <MenuItem
+              title="AI Assistant"
+              route={routes.aiAssistant}
+              isActive={pathname == routes.aiAssistant}
+              icon={<i className="las la-robot iq-arrow-left"></i>}
+            />
+
+            <MenuItem
+              title="Support Tickets"
+              route={routes.tickets}
+              isActive={pathname == routes.tickets}
+              icon={<i className="las la-ticket-alt iq-arrow-left"></i>}
+            />
+
             <CollapsibleMenuItem
               isActive={
                 pathname == routes.testBeneficiaries ||
