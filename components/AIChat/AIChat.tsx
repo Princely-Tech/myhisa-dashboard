@@ -1,54 +1,67 @@
-'use client';
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { message as antMessage } from 'antd';
-import { aiService, ChatMessage } from '@/utils/api/aiService';
-import MessageList, { Message } from './MessageList';
-import MessageInput from './MessageInput';
-import DataDisplay from './DataDisplay';
-import TypingIndicator from './TypingIndicator';
-import QuickActions from './QuickActions';
-import ErrorMessage from './ErrorMessage';
+import React, { useState, useRef, useEffect } from "react";
+import { message as antMessage } from "antd";
+import { aiService, ChatMessage } from "@/utils/api/aiService";
+import MessageList, { Message } from "./MessageList";
+import MessageInput from "./MessageInput";
+import DataDisplay from "./DataDisplay";
+import TypingIndicator from "./TypingIndicator";
+import QuickActions from "./QuickActions";
+import ErrorMessage from "./ErrorMessage";
 
 const AIChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [displayData, setDisplayData] = useState<any[]>([]);
-  const [conversationHistory, setConversationHistory] = useState<ChatMessage[]>([]);
-  const [lastFailedMessage, setLastFailedMessage] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [conversationHistory, setConversationHistory] = useState<ChatMessage[]>(
+    [],
+  );
+  const [lastFailedMessage, setLastFailedMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
   const [messageApi, contextHolder] = antMessage.useMessage();
 
+  const messagesContainerRef = useRef<HTMLDivElement>(null); // Add this
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages, isLoading, errorMessage]);
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Scroll the container instead of using scrollIntoView
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
   }, [messages, isLoading, errorMessage]);
 
   const sendMessage = async (messageText?: string) => {
     const textToSend = messageText || input;
     if (!textToSend.trim() || isLoading) return;
 
-    setErrorMessage('');
-    setLastFailedMessage('');
+    setErrorMessage("");
+    setLastFailedMessage("");
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
+      role: "user",
       content: textToSend,
       timestamp: new Date(),
       isSending: true,
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setInput("");
     setIsLoading(true);
 
     setTimeout(() => {
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === userMessage.id ? { ...msg, isSending: false } : msg
-        )
+          msg.id === userMessage.id ? { ...msg, isSending: false } : msg,
+        ),
       );
     }, 500);
 
@@ -60,7 +73,7 @@ const AIChat: React.FC = () => {
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant',
+        role: "assistant",
         content: response.data.message,
         timestamp: new Date(),
         data: response.data.data,
@@ -70,7 +83,9 @@ const AIChat: React.FC = () => {
       setConversationHistory(response.data.metadata.conversation_history);
     } catch (error: any) {
       setLastFailedMessage(textToSend);
-      const errorMsg = error.response?.data?.error || 'Sorry, I encountered an error. Please try again.';
+      const errorMsg =
+        error.response?.data?.error ||
+        "Sorry, I encountered an error. Please try again.";
       setErrorMessage(errorMsg);
       messageApi.error(errorMsg);
     } finally {
@@ -89,59 +104,62 @@ const AIChat: React.FC = () => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   };
 
   return (
-    <>
+    <div className="flex flex-col flex-1 h-screen overflow-hidden">
       {contextHolder}
-      <div className="flex flex-col flex-1 max-h-full overflow-hidden bg-gradient-to-b from-gray-50 to-white">
-        {/* Fixed Header */}
-        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-5 px-6 text-center shadow-xl relative flex-shrink-0">
-          <div className="absolute inset-0 bg-white opacity-10 animate-pulse-slow"></div>
-          <div className="relative z-10">
-            <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-2">
-              <span className="text-2xl">🤖</span>
-              HISA AI Assistant
-            </h2>
-            <p className="text-xs opacity-90 leading-relaxed">
-              Your intelligent companion for transactions, balance, data plans, and more!
-            </p>
-          </div>
-        </div>
-
-        {/* Scrollable Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 bg-white">
-          {messages.length === 0 ? (
-            <QuickActions onActionClick={handleQuickAction} />
-          ) : (
-            <>
-              <MessageList messages={messages} />
-              {isLoading && <TypingIndicator />}
-              {errorMessage && !isLoading && (
-                <ErrorMessage message={errorMessage} onRetry={handleRetry} />
-              )}
-            </>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Fixed Input at Bottom */}
-        <div className="flex-shrink-0">
-          <MessageInput
-            value={input}
-            onChange={setInput}
-            onSend={() => sendMessage()}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
-          />
-        </div>
+      <Header />
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 bg-white"
+      >
+        {messages.length === 0 ? (
+          <QuickActions onActionClick={handleQuickAction} />
+        ) : (
+          <>
+            <MessageList messages={messages} />
+            {isLoading && <TypingIndicator />}
+            {errorMessage && !isLoading && (
+              <ErrorMessage message={errorMessage} onRetry={handleRetry} />
+            )}
+          </>
+        )}
+        <div ref={messagesEndRef} />
       </div>
-    </>
+      <div className="flex-shrink-0">
+        <MessageInput
+          value={input}
+          onChange={setInput}
+          onSend={() => sendMessage()}
+          onKeyPress={handleKeyPress}
+          disabled={isLoading}
+        />
+      </div>
+    </div>
   );
 };
 
 export default AIChat;
+
+const Header = () => {
+  return (
+    <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-5 px-6 text-center shadow-xl relative flex-shrink-0">
+      <div className="absolute inset-0 bg-white opacity-10 animate-pulse-slow"></div>
+      <div className="relative z-10">
+        <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-2">
+          <span className="text-2xl">🤖</span>
+          HISA AI Assistant
+        </h2>
+        <p className="text-xs opacity-90 leading-relaxed">
+          Your intelligent companion for transactions, balance, data plans, and
+          more!
+        </p>
+      </div>
+    </div>
+  );
+};

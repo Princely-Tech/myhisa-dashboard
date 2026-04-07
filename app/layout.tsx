@@ -33,9 +33,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AntdRegistry>
-          <div className="flex gap-2 overflow-hidden  max-h-full max-w-full">
+          <div className="flex gap-2 overflow-hidden max-h-full max-w-full">
             <Suspense>
-              <SidebarTwo  />
+              <SidebarTwo />
             </Suspense>
             {children}
           </div>
