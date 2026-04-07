@@ -148,10 +148,10 @@ export default AIChat;
 
 const Header = () => {
   return (
-    <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-5 px-6 text-center shadow-xl relative flex-shrink-0">
+    <div className="bg-gradient-to-r bg-[#00acf8] rounded-b-[15px] text-white py-5 px-6 text-center shadow-xl relative flex-shrink-0">
       <div className="absolute inset-0 bg-white opacity-10 animate-pulse-slow"></div>
       <div className="relative z-10">
-        <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-2">
+        <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-2 text-white">
           <span className="text-2xl">🤖</span>
           HISA AI Assistant
         </h2>
