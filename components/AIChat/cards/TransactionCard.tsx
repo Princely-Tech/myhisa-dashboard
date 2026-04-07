@@ -52,7 +52,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50">
+      <div className="flex items-center justify-between p-4 bg-blue-50">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{getTypeIcon(transaction.type)}</span>
           <span className="font-semibold text-gray-900 uppercase">
@@ -115,7 +115,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
       <div className="px-4 pb-4">
         <Link
           href={routes.query(transaction.transaction_id)}
-          className="w-full py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium transition-colors flex transactions-center justify-center gap-2"
+          className="w-full py-2 bg-[#4e37b2] hover:bg-[#452abb] text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
         >
           <EyeOutlined /> View Details
         </Link>

@@ -19,7 +19,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   return (
     <div className="flex gap-3 p-4 bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
       <textarea
-        className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl text-base resize-none focus:outline-none focus:border-[#4e37b2] disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors"
+        className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl text-base resize-none focus:outline-none focus:border-[#00acf8] disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyPress={onKeyPress}
@@ -28,7 +28,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         rows={2}
       />
       <button
-        className="w-12 h-12 border-none rounded-full bg-gradient-to-br from-[#4e37b2] to-[#5a42c7] text-white text-xl cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        className="w-12 h-12 border-none rounded-full bg-[#4e37b2] text-white text-xl cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         onClick={onSend}
         disabled={disabled || !value.trim()}
       >
