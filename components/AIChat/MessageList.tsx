@@ -4,6 +4,8 @@ import DataDisplay from "./DataDisplay";
 
 const normalizeMessageContent = (content: string): string => {
   return content
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "\t")
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/\u003cbr\u003e/gi, "\n");
 };
@@ -110,8 +112,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           >
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0 shadow-md transition-all duration-300 ${message.role === "user"
-                  ? "bg-gray-200"
-                  : "bg-[#00acf8] text-white"
+                ? "bg-gray-200"
+                : "bg-[#00acf8] text-white"
                 } ${message.isSending ? "animate-pulse" : ""}`}
             >
               {message.role === "user" ? "👨‍" : "🤖"}
@@ -119,8 +121,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
             <div className="flex-1 flex flex-col gap-1">
               <div
                 className={`px-4 py-3 rounded-2xl break-words shadow-sm transition-all duration-300 hover:shadow-md ${message.role === "user"
-                    ? "bg-[#4e37b2] text-white rounded-br-sm"
-                    : "bg-gray-100 text-gray-900 rounded-bl-sm border border-gray-200"
+                  ? "bg-[#4e37b2] text-white rounded-br-sm"
+                  : "bg-gray-100 text-gray-900 rounded-bl-sm border border-gray-200"
                   } ${message.isSending ? "opacity-70 animate-pulse" : ""}`}
               >
                 <p className="leading-6 whitespace-pre-wrap">

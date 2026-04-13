@@ -1,8 +1,12 @@
 import React from "react";
 import {
   ApiOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
   LockOutlined,
+  MobileOutlined,
   PhoneOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
 
 interface QuickAction {
@@ -28,6 +32,24 @@ const QuickActions: React.FC<QuickActionsProps> = ({ onActionClick }) => {
       icon: <LockOutlined />,
       text: "How do I authenticate API requests",
     },
+
+    {
+      icon: <WalletOutlined />,
+      text: "What's my balance?",
+    },
+    {
+      icon: <MobileOutlined />,
+      text: "Find MTN data plans under 2000 naira",
+    },
+    {
+      icon: <CheckCircleOutlined />,
+      text: "Is the data service available?",
+    },
+    {
+      icon: <ExclamationCircleOutlined />,
+      text: "I need a refund for a transaction",
+    },
+
   ];
 
   return (
