@@ -72,7 +72,10 @@ const AIChat: React.FC = () => {
       });
 
       const responseData = response.data.data;
-      const toolCallResults = response.data.tool_calls?.map((t) => t.result) ?? [];
+      const toolCallResults =
+        response.data.tool_calls
+          ?.filter((t) => t.tool_name !== "search_knowledge_base")
+          .map((t) => t.result) ?? [];
       const dataToDisplay =
         responseData && responseData.length > 0 ? responseData : toolCallResults;
 
