@@ -1,6 +1,9 @@
 import React from "react";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import DataDisplay from "./DataDisplay";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
 
 const normalizeMessageContent = (content: string): string => {
   return content
@@ -10,81 +13,42 @@ const normalizeMessageContent = (content: string): string => {
     .replace(/\u003cbr\u003e/gi, "\n");
 };
 
-const renderInlineBold = (content: string): React.ReactNode => {
-  const parts: React.ReactNode[] = [];
-  const regex = /(\*\*|__)(.+?)\1/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = regex.exec(content)) !== null) {
-    const matchIndex = match.index;
-    const fullMatch = match[0];
-    const boldText = match[2] ?? "";
-
-    if (matchIndex > lastIndex) {
-      parts.push(content.slice(lastIndex, matchIndex));
-    }
-
-    parts.push(
-      <strong key={`b-${matchIndex}`} className="font-semibold">
-        {boldText}
-      </strong>,
-    );
-
-    lastIndex = matchIndex + fullMatch.length;
-  }
-
-  if (lastIndex < content.length) {
-    parts.push(content.slice(lastIndex));
-  }
-
-  return parts.length > 0 ? parts : content;
-};
-
-const renderMarkdownLite = (rawContent: string): React.ReactNode => {
-  // Supports:
-  // - bold via **text** or __text__
-  // - fenced code blocks ```lang ...```
-  // - line breaks via \n (including converted <br>)
-  // Intentionally does NOT render HTML.
+const renderMarkdown = (rawContent: string): React.ReactNode => {
   const content = normalizeMessageContent(rawContent);
-  const nodes: React.ReactNode[] = [];
 
-  const fenceRegex = /```([a-zA-Z0-9_-]+)?\n([\s\S]*?)```/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  const pushText = (text: string, keyPrefix: string) => {
-    if (!text) return;
-    nodes.push(
-      <span key={`${keyPrefix}-${nodes.length}`} className="whitespace-pre-wrap">
-        {renderInlineBold(text)}
-      </span>,
-    );
-  };
-
-  while ((match = fenceRegex.exec(content)) !== null) {
-    const matchIndex = match.index;
-    const lang = (match[1] ?? "").trim();
-    const code = match[2] ?? "";
-
-    pushText(content.slice(lastIndex, matchIndex), `t-${matchIndex}`);
-
-    nodes.push(
-      <pre
-        key={`c-${matchIndex}`}
-        className="mt-3 mb-1 p-3 rounded-lg bg-gray-900 text-gray-100 text-xs overflow-auto"
+  return (
+    <div className="prose prose-sm max-w-none prose-p:my-1 prose-ol:my-1 prose-ul:my-1 prose-li:my-0 prose-pre:my-2 prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-3 prose-pre:rounded-lg prose-code:before:content-none prose-code:after:content-none prose-table:my-2 prose-th:py-2 prose-td:py-2">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeSanitize]}
+        components={{
+          p: ({ children }: { children?: React.ReactNode }) => (
+            <p className="my-1 whitespace-pre-wrap">{children}</p>
+          ),
+          pre: ({ children }: { children?: React.ReactNode }) => (
+            <pre className="overflow-auto">{children}</pre>
+          ),
+          table: ({ children }: { children?: React.ReactNode }) => (
+            <div className="overflow-auto">
+              <table className="w-full border-collapse">{children}</table>
+            </div>
+          ),
+          th: ({ children }: { children?: React.ReactNode }) => (
+            <th className="border border-gray-200 bg-gray-50 px-2 text-left text-xs font-semibold text-gray-700">
+              {children}
+            </th>
+          ),
+          td: ({ children }: { children?: React.ReactNode }) => (
+            <td className="border border-gray-200 px-2 text-xs text-gray-800 align-top">
+              {children}
+            </td>
+          ),
+        }}
       >
-        <code className={lang ? `language-${lang}` : undefined}>{code}</code>
-      </pre>,
-    );
-
-    lastIndex = matchIndex + match[0].length;
-  }
-
-  pushText(content.slice(lastIndex), "t-end");
-
-  return nodes.length > 0 ? nodes : renderInlineBold(content);
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
 };
 
 export interface Message {
@@ -125,9 +89,9 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                   : "bg-gray-100 text-gray-900 rounded-bl-sm border border-gray-200"
                   } ${message.isSending ? "opacity-70 animate-pulse" : ""}`}
               >
-                <p className="leading-6 whitespace-pre-wrap">
-                  {renderMarkdownLite(message.content)}
-                </p>
+                <div className="leading-6">
+                  {renderMarkdown(message.content)}
+                </div>
                 {message.isSending && (
                   <div className="flex items-center gap-2 mt-2 text-xs opacity-75">
                     <div className="flex gap-1">
