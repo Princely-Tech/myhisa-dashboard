@@ -2,6 +2,39 @@ import React from "react";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import DataDisplay from "./DataDisplay";
 
+const renderMarkdownLite = (content: string): React.ReactNode => {
+  // Supports bold via **text** or __text__.
+  // Intentionally avoids HTML rendering for safety.
+  const parts: React.ReactNode[] = [];
+  const regex = /(\*\*|__)(.+?)\1/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(content)) !== null) {
+    const matchIndex = match.index;
+    const fullMatch = match[0];
+    const boldText = match[2] ?? "";
+
+    if (matchIndex > lastIndex) {
+      parts.push(content.slice(lastIndex, matchIndex));
+    }
+
+    parts.push(
+      <strong key={`b-${matchIndex}`} className="font-semibold">
+        {boldText}
+      </strong>,
+    );
+
+    lastIndex = matchIndex + fullMatch.length;
+  }
+
+  if (lastIndex < content.length) {
+    parts.push(content.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : content;
+};
+
 export interface Message {
   id: string;
   role: "user" | "assistant";
@@ -44,7 +77,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                 } ${message.isSending ? "opacity-70 animate-pulse" : ""}`}
               >
                 <p className="leading-6 whitespace-pre-wrap">
-                  {message.content}
+                  {renderMarkdownLite(message.content)}
                 </p>
                 {message.isSending && (
                   <div className="flex items-center gap-2 mt-2 text-xs opacity-75">

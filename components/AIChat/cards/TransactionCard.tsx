@@ -9,12 +9,17 @@ interface Transaction {
   type: string;
   amount: number;
   fee: number;
+  commission?: number;
   network: string;
   msisdn: string;
   status: string;
   created_at: string;
   external_ref?: string;
   description?: string;
+  bundle_code?: string;
+  remark?: string;
+  balance_before?: number;
+  balance_after?: number;
 }
 
 interface TransactionCardProps {
@@ -22,8 +27,11 @@ interface TransactionCardProps {
 }
 
 const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
+  const formatCurrency = (value: number) => `₦${value.toLocaleString()}`;
+
   const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
+    const normalized = status.toLowerCase();
+    switch (normalized) {
       case "successful":
         return "bg-green-100 text-green-800";
       case "pending":
@@ -31,6 +39,9 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
       case "failed":
         return "bg-red-100 text-red-800";
       default:
+        if (normalized.includes("error") || normalized.includes("fail")) {
+          return "bg-red-100 text-red-800";
+        }
         return "bg-gray-100 text-gray-800";
     }
   };
@@ -70,9 +81,27 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
         <div className="flex justify-between items-center">
           <span className="text-gray-600 text-sm">Amount:</span>
           <span className="font-bold text-lg text-gray-900">
-            ₦{transaction.amount.toLocaleString()}
+            {formatCurrency(transaction.amount)}
           </span>
         </div>
+
+        {(transaction.fee ?? 0) > 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600 text-sm">Fee:</span>
+            <span className="font-medium text-gray-900">
+              {formatCurrency(transaction.fee)}
+            </span>
+          </div>
+        )}
+
+        {(transaction.commission ?? 0) > 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600 text-sm">Commission:</span>
+            <span className="font-medium text-gray-900">
+              {formatCurrency(transaction.commission ?? 0)}
+            </span>
+          </div>
+        )}
 
         <div className="flex justify-between items-center">
           <span className="text-gray-600 text-sm">Network:</span>
@@ -96,6 +125,55 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
             </span>
           </div>
         )}
+
+        {transaction.bundle_code && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600 text-sm">Bundle Code:</span>
+            <span className="font-mono text-sm text-gray-900">
+              {transaction.bundle_code}
+            </span>
+          </div>
+        )}
+
+        {transaction.external_ref && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600 text-sm">External Ref:</span>
+            <span className="font-mono text-sm text-gray-900">
+              {transaction.external_ref}
+            </span>
+          </div>
+        )}
+
+        {transaction.remark && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600 text-sm">Remark:</span>
+            <span className="font-medium text-gray-900 text-right">
+              {transaction.remark}
+            </span>
+          </div>
+        )}
+
+        {(transaction.balance_before !== undefined ||
+          transaction.balance_after !== undefined) && (
+            <div className="pt-2 border-t border-gray-100 space-y-2">
+              {transaction.balance_before !== undefined && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 text-sm">Balance Before:</span>
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency(transaction.balance_before)}
+                  </span>
+                </div>
+              )}
+              {transaction.balance_after !== undefined && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 text-sm">Balance After:</span>
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency(transaction.balance_after)}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
         <div className="flex justify-between items-center">
           <span className="text-gray-600 text-sm">Date:</span>
