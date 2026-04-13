@@ -71,12 +71,17 @@ const AIChat: React.FC = () => {
         history: conversationHistory,
       });
 
+      const responseData = response.data.data;
+      const toolCallResults = response.data.tool_calls?.map((t) => t.result) ?? [];
+      const dataToDisplay =
+        responseData && responseData.length > 0 ? responseData : toolCallResults;
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: response.data.message,
         timestamp: new Date(),
-        data: response.data.data,
+        data: dataToDisplay,
       };
 
       setMessages((prev) => [...prev, aiMessage]);

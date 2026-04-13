@@ -31,6 +31,34 @@ const DataDisplay: React.FC<DataDisplayProps> = ({ data }) => {
       return <StatsCard key={index} stats={item} />;
     }
 
+    if (Array.isArray(item.plans)) {
+      return (
+        <div
+          key={index}
+          className="bg-white rounded-lg shadow-md p-4 border border-gray-200"
+        >
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <h4 className="font-semibold text-gray-900">Data Plans</h4>
+            {typeof item.count === "number" && (
+              <span className="text-xs text-gray-600">{item.count} found</span>
+            )}
+          </div>
+
+          {item.message && (
+            <div className="text-sm text-gray-700 mb-3">{item.message}</div>
+          )}
+
+          {item.plans.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {item.plans.map((plan: any, planIndex: number) => (
+                <DataPlanCard key={planIndex} plan={plan} />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
     if (Array.isArray(item.services) && item.services.length > 0) {
       return (
         <div
