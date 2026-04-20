@@ -7,7 +7,7 @@ const QueryStatusPage = ({
 }: {
   searchParams: { id: string };
 }) => {
-  return <QueryBody id={searchParams.id} />;
+  return <QueryBody id={searchParams.id} />; //Pushing my own commit
 };
 
 export default QueryStatusPage;
