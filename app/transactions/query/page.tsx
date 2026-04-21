@@ -1,13 +1,14 @@
-"use client";
 import React from "react";
 import QueryBody from "./QueryBody";
 
 const QueryStatusPage = ({
   searchParams,
 }: {
-  searchParams: { id: string };
+  searchParams: Promise<{ id: string }>;
 }) => {
-  return <QueryBody id={searchParams.id} />; //Pushing my own commit
+  const params = React.use(searchParams); // unwrap the Promise
+
+  return <QueryBody id={params.id} />;
 };
 
 export default QueryStatusPage;
