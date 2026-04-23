@@ -44,24 +44,30 @@ const AvailabilityPage = () => {
   }, []);
 
   const getStatusColor = (percent: number) => {
-    if (percent >= 100) return "bg-green-500";
-    if (percent >= 80) return "bg-yellow-500";
-    if (percent >= 50) return "bg-orange-500";
-    return "bg-red-500";
+    if (percent >= 71) return "bg-green-500";
+    if (percent >= 51) return "bg-blue-500";
+    if (percent >= 31) return "bg-purple-500";
+    if (percent >= 11) return "bg-orange-500";
+    if (percent >= 1) return "bg-red-500";
+    return "bg-gray-500";
   };
 
   const getStatusText = (percent: number) => {
-    if (percent >= 100) return "Available";
-    if (percent >= 80) return "Degraded";
-    if (percent >= 50) return "Limited";
+    if (percent >= 71) return "Healthy";
+    if (percent >= 51) return "Acceptable";
+    if (percent >= 31) return "Unstable";
+    if (percent >= 11) return "Degraded";
+    if (percent >= 1) return "Critical";
     return "Down";
   };
 
   const getStatusIcon = (percent: number) => {
-    if (percent >= 100) return "🟢";
-    if (percent >= 80) return "🟡";
-    if (percent >= 50) return "🟠";
-    return "🔴";
+    if (percent >= 71) return "🟢";
+    if (percent >= 51) return "🔵";
+    if (percent >= 31) return "�";
+    if (percent >= 11) return "🟠";
+    if (percent >= 1) return "🔴";
+    return "⚫";
   };
 
   const groupedServices = services.reduce((acc, service) => {
@@ -135,7 +141,7 @@ const AvailabilityPage = () => {
                         {provider.percent}%
                       </span>
                     </div>
-                    {provider.percent < 80 && (
+                    {provider.percent < 51 && (
                       <div className="mt-2 text-xs text-orange-600 flex items-center gap-1">
                         <i className="las la-exclamation-triangle"></i>
                         Service temporarily unavailable

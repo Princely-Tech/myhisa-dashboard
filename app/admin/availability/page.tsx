@@ -79,9 +79,17 @@ const AdminAvailabilityPage = () => {
       return;
     }
 
+    const getBand = (percent: number) => {
+      if (percent === 0) return "down";
+      if (percent <= 10) return "critical";
+      if (percent <= 30) return "degraded";
+      if (percent <= 50) return "unstable";
+      if (percent <= 70) return "acceptable";
+      return "healthy";
+    };
+
     const willTriggerWebhook =
-      (currentStatus && currentStatus.percent >= 80 && availability < 80) ||
-      (currentStatus && currentStatus.percent < 80 && availability >= 80);
+      currentStatus && getBand(currentStatus.percent) !== getBand(availability);
 
     if (
       willTriggerWebhook &&
@@ -132,16 +140,20 @@ const AdminAvailabilityPage = () => {
   };
 
   const getStatusColor = (percent: number) => {
-    if (percent >= 100) return "text-green-600";
-    if (percent >= 80) return "text-yellow-600";
-    if (percent >= 50) return "text-orange-600";
-    return "text-red-600";
+    if (percent >= 71) return "text-green-600";
+    if (percent >= 51) return "text-blue-600";
+    if (percent >= 31) return "text-purple-600";
+    if (percent >= 11) return "text-orange-600";
+    if (percent >= 1) return "text-red-600";
+    return "text-gray-600";
   };
 
   const getStatusText = (percent: number) => {
-    if (percent >= 100) return "Available";
-    if (percent >= 80) return "Degraded";
-    if (percent >= 50) return "Limited";
+    if (percent >= 71) return "Healthy";
+    if (percent >= 51) return "Acceptable";
+    if (percent >= 31) return "Unstable";
+    if (percent >= 11) return "Degraded";
+    if (percent >= 1) return "Critical";
     return "Down";
   };
 
@@ -274,26 +286,31 @@ const AdminAvailabilityPage = () => {
 
           {currentStatus && (
             <div>
-              {currentStatus.percent >= 80 && availability < 80 && (
-                <div className="p-3 bg-yellow-50 border border-yellow-300 rounded flex items-start gap-2">
-                  <i className="las la-exclamation-triangle text-yellow-600 text-xl"></i>
-                  <div className="text-sm text-yellow-800">
-                    <strong>Warning:</strong> This change will trigger{" "}
-                    <strong>service_down</strong> webhook notifications to all
-                    partners.
-                  </div>
-                </div>
-              )}
-              {currentStatus.percent < 80 && availability >= 80 && (
-                <div className="p-3 bg-green-50 border border-green-300 rounded flex items-start gap-2">
-                  <i className="las la-check-circle text-green-600 text-xl"></i>
-                  <div className="text-sm text-green-800">
-                    <strong>Info:</strong> This change will trigger{" "}
-                    <strong>service_restored</strong> webhook notifications to all
-                    partners.
-                  </div>
-                </div>
-              )}
+              {(() => {
+                const getBand = (percent: number) => {
+                  if (percent === 0) return "down";
+                  if (percent <= 10) return "critical";
+                  if (percent <= 30) return "degraded";
+                  if (percent <= 50) return "unstable";
+                  if (percent <= 70) return "acceptable";
+                  return "healthy";
+                };
+                const currentBand = getBand(currentStatus.percent);
+                const newBand = getBand(availability);
+                if (currentBand !== newBand) {
+                  return (
+                    <div className="p-3 bg-yellow-50 border border-yellow-300 rounded flex items-start gap-2">
+                      <i className="las la-exclamation-triangle text-yellow-600 text-xl"></i>
+                      <div className="text-sm text-yellow-800">
+                        <strong>Warning:</strong> This change will trigger{" "}
+                        <strong>service_{newBand}</strong> webhook notifications to all
+                        partners (band change: {currentBand} → {newBand}).
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </div>
           )}
 
