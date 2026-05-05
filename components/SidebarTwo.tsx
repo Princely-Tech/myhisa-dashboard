@@ -229,13 +229,6 @@ const SidebarTwo = () => {
               icon={<i className="las la-server iq-arrow-left"></i>}
             />
 
-            <MenuItem
-              title="Webhooks"
-              route={routes.webhooks}
-              isActive={pathname == routes.webhooks}
-              icon={<i className="las la-webhook iq-arrow-left"></i>}
-            />
-
             <CollapsibleMenuItem
               isActive={
                 pathname == routes.commissionSummary ||
@@ -370,7 +363,8 @@ const SidebarTwo = () => {
                     pathname == routes.adminCommissionDailySummary ||
                     pathname == routes.adminCommissionDailyDetails ||
                     pathname == routes.adminCommissionRates ||
-                    pathname == routes.adminExportWalletLogs
+                    pathname == routes.adminExportWalletLogs ||
+                    pathname == routes.adminDataBundles
                   }
                   title="Admin Tools"
                   icon={<i className="las la-user-shield iq-arrow-left"></i>}
@@ -440,6 +434,12 @@ const SidebarTwo = () => {
                       route: routes.adminWebhookDeliveries,
                       icon: <i className="las la-paper-plane iq-arrow-left"></i>,
                       isActive: pathname == routes.adminWebhookDeliveries,
+                    },
+                    {
+                      title: "Data Bundles",
+                      route: routes.adminDataBundles,
+                      icon: <i className="las la-database iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminDataBundles,
                     },
                   ]}
                 />

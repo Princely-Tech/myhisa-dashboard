@@ -42,6 +42,7 @@ const routes = {
   adminCommissionRates: "/admin/commission-rates",
   exportWalletLogs: "/export-wallet-logs",
   adminExportWalletLogs: "/admin/export-wallet-logs",
+  adminDataBundles: "/admin/data-bundles",
   bulkAirtimeUpload: "/bulk-airtime/upload",
   bulkAirtimeReview: (campaignId: string) => `/bulk-airtime/review/${campaignId}`,
   bulkAirtimeStatus: (campaignId: string) => `/bulk-airtime/status/${campaignId}`,
