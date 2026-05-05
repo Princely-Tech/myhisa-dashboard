@@ -200,22 +200,23 @@ const AdminDataBundlesPage = () => {
   };
 
   // ---- Bundle CRUD ----
-  const openCreateBundle = (typeId: number) => {
+  const openCreateBundle = (typeId: number, typeName: string) => {
     bundleForm.resetFields();
+    bundleForm.setFieldsValue({ bundle_type: typeName });
     setBundleModalMode("create");
     setBundleModalTarget(null);
     setBundleModalTypeId(typeId);
     setBundleModalOpen(true);
   };
 
-  const openEditBundle = (bundle: Bundle, typeId: number) => {
+  const openEditBundle = (bundle: Bundle, typeId: number, typeName: string) => {
     bundleForm.setFieldsValue({
       code: bundle.code,
       network_identifier: bundle.network_identifier,
       description: bundle.description,
       cost: bundle.cost,
       validity: bundle.validity,
-      bundle_type: bundle.bundle_type,
+      bundle_type: typeName,
     });
     // amount derived from cost — not collected separately
     setBundleModalMode("edit");
@@ -274,7 +275,7 @@ const AdminDataBundlesPage = () => {
   };
 
   // ---- Bundle table columns ----
-  const bundleColumns = (typeId: number) => [
+  const bundleColumns = (typeId: number, typeName: string) => [
     {
       title: "Code",
       dataIndex: "code",
@@ -318,7 +319,7 @@ const AdminDataBundlesPage = () => {
         <div className="flex gap-2">
           <Tooltip title="Edit bundle">
             <button
-              onClick={() => openEditBundle(record, typeId)}
+              onClick={() => openEditBundle(record, typeId, typeName)}
               className="text-blue-500 hover:text-blue-700"
             >
               <EditOutlined />
@@ -360,7 +361,7 @@ const AdminDataBundlesPage = () => {
         >
           <Tooltip title="Add bundle">
             <button
-              onClick={() => openCreateBundle(bt.id)}
+              onClick={() => openCreateBundle(bt.id, bt.name)}
               className="text-green-600 hover:text-green-800 text-sm px-2 py-0.5 border border-green-300 rounded"
             >
               <PlusOutlined /> Bundle
@@ -401,7 +402,7 @@ const AdminDataBundlesPage = () => {
         className="py-4"
       >
         <button
-          onClick={() => openCreateBundle(bt.id)}
+          onClick={() => openCreateBundle(bt.id, bt.name)}
           className="text-blue-500 text-sm underline"
         >
           Add the first bundle
@@ -410,7 +411,7 @@ const AdminDataBundlesPage = () => {
     ) : (
       <Table
         dataSource={bundlesMap[bt.id]}
-        columns={bundleColumns(bt.id)}
+        columns={bundleColumns(bt.id, bt.name)}
         rowKey="id"
         size="small"
         pagination={false}
@@ -577,8 +578,8 @@ const AdminDataBundlesPage = () => {
             >
               <Input placeholder="e.g. 1day, 7days, 30days" />
             </Form.Item>
-            <Form.Item name="bundle_type" label="Bundle Type Label">
-              <Input placeholder="e.g. Daily Bundle" />
+            <Form.Item name="bundle_type" label="Bundle Type">
+              <Input readOnly className="bg-gray-50 cursor-not-allowed" />
             </Form.Item>
           </div>
         </Form>
