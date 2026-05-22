@@ -1,0 +1,76 @@
+Verify:
+POST {{host}}/bills/electricity/verify
+
+{
+    "amount":100000, // in kobo. Optional.
+    "meter": "45701129061",
+    "product": "Prepaid", // must be either Prepaid or Postpaid
+    "biller": "AEDC_PREPAID" // disco
+}
+
+Response:
+{
+    "data": {
+        "reference_id": "3602804885318012928",
+        "type": "Electricity",
+        "amount": 100000,
+        "total_amount": 105000,
+        "fee": 5000,
+        "biller": "Eco",
+        "biller_product": "Prepaid",
+        "biller_product_name": null,
+        "beneficiary_number": "1234567890",
+        "beneficiary_name": "Jon Doe",
+        "beneficiary_details": "Jon Doe Address"
+    },
+    "message": "Successful"
+}
+
+
+
+Vend:
+POST {{host}}/bills/electricity/vend
+{
+   "amount":5000000, // in kobo
+    "biller": "EKEDC_PREPAID", // gotten from verify
+    "meter": "0101150481949",
+    "product": "Prepaid", // must be either Prepaid or Postpaid
+    "name": "ORITSE EBINEMI", // the beneficiary_name returned from the verified endpoint
+    "address": "ALHAJI MARUFU ALI OWE STREET, PLT8B, Agungi ,Lekki", // the beneficiary_details returned from the verified endpoint
+    "ref": "123456789000"
+}
+
+Response:
+{
+    "data": {
+        "user_id": 1,
+        "transaction_id": "3602817395572084736",
+        "amount": 100000,
+        "fee": 0,
+        "network": "EKO",
+        "msisdn": "0123456789000",
+        "type": "Electricity",
+        "volume": 1,
+        "data_bundle_code": "",
+        "data_bundle_desc": "Prepaid",
+        "external_ref": null,
+        "ref_to_telco": "3602817395572084736",
+        "status": "Successful",
+        "status_code": "00",
+        "created_at": "2025-07-22T12:01:06.914+01:00",
+        "balance_before": 548625,
+        "commission_amount": 0,
+        "commission_to": "",
+        "remark": null,
+        "connection": 0,
+        "beneficiary_name": "Jon Doe",
+        "beneficiary_details": "Jon Doe Address",
+        "token": "0028-7952-0226-6061-7666",
+        "unit": "",
+        "instruction": "",
+        "refunded_at": null
+    },
+    "message": "Transaction Successful",
+    "status": "Successful",
+    "status_code": "00"
+}

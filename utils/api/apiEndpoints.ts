@@ -84,11 +84,16 @@ const apiEndpoints = {
   cableBillers: "bills/cable/billers",
   cableBillerProducts: (biller: string) => `bills/cable/biller-products?biller=${biller}`,
   electricityBillers: "bills/electricity/billers",
+  electricityVerify: "bills/electricity/verify",
   adminDataBundleTypes: (network: string) => `admin/data-bundles/${network}/types`,
   adminDataBundleType: (network: string, typeId: number) => `admin/data-bundles/${network}/types/${typeId}`,
   adminDataBundles: (network: string, typeId: number) => `admin/data-bundles/${network}/types/${typeId}/bundles`,
   adminDataBundle: (network: string, typeId: number, bundleId: number) => `admin/data-bundles/${network}/types/${typeId}/bundles/${bundleId}`,
   electricityBillerProducts: (biller: string) => `bills/electricity/biller-products?biller=${biller}`,
+  hourlyStatsUser: "self-service/transactions/hourly-stats",
+  hourlyStatsGlobal: "admin/transactions/hourly-stats/global",
+  hourlyStatsForUser: (userId: number) => `admin/transactions/hourly-stats/user/${userId}`,
+  adminAuditLogs: "admin/audit-logs",
 };
 export const localApiEndPoints = {
   main: "/api",

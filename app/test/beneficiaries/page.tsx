@@ -36,7 +36,9 @@ interface Beneficiary {
   identifier: string;
   network: string;
   biller_code: string;
+  product: string;
   name: string;
+  address: string;
   is_verified: boolean;
   verified_at?: string;
   last_used_at?: string;
@@ -64,6 +66,11 @@ const TestBeneficiaries = () => {
   const [cableBillers, setCableBillers] = useState<Biller[]>([]);
   const [electricityBillers, setElectricityBillers] = useState<Biller[]>([]);
   const [billersLoading, setBillersLoading] = useState(false);
+  const [verifyingMeter, setVerifyingMeter] = useState(false);
+  const [verifiedMeterData, setVerifiedMeterData] = useState<{
+    name: string;
+    address: string;
+  } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -114,6 +121,45 @@ const TestBeneficiaries = () => {
     }
   };
 
+  const handleVerifyMeter = async () => {
+    const identifier = addForm.getFieldValue("identifier");
+    const billerCode = addForm.getFieldValue("biller_code");
+    const product = addForm.getFieldValue("product");
+
+    if (!identifier || !billerCode || !product) {
+      messageApi.error("Please fill in meter number, provider, and meter type first");
+      return;
+    }
+
+    setVerifyingMeter(true);
+    setVerifiedMeterData(null);
+
+    try {
+      const apiService = new AxiosHandler(messageApi);
+      const res = await apiService.post({
+        endPoint: apiEndpoints.electricityVerify,
+        body: {
+          meter: identifier,
+          biller: billerCode,
+          product: product,
+        },
+      });
+
+      if (res.data) {
+        setVerifiedMeterData({
+          name: res.data.beneficiary_name || "",
+          address: res.data.beneficiary_details || "",
+        });
+        messageApi.success("Meter verified successfully!");
+      }
+    } catch (err: any) {
+      messageApi.error(err?.response?.data?.error || "Failed to verify meter");
+      setVerifiedMeterData(null);
+    } finally {
+      setVerifyingMeter(false);
+    }
+  };
+
   const handleAddBeneficiary = async (values: any) => {
     try {
       const apiService = new AxiosHandler(messageApi);
@@ -126,6 +172,7 @@ const TestBeneficiaries = () => {
       // Close add modal and reset form
       setShowAddModal(false);
       addForm.resetFields();
+      setVerifiedMeterData(null);
       
       // Open verify modal if beneficiary needs verification
       if (res.beneficiary && !res.beneficiary.is_verified) {
@@ -444,6 +491,7 @@ const TestBeneficiaries = () => {
         onCancel={() => {
           setShowAddModal(false);
           addForm.resetFields();
+          setVerifiedMeterData(null);
         }}
         footer={null}
         width={600}
@@ -558,7 +606,10 @@ const TestBeneficiaries = () => {
                         { required: true, message: "Please enter meter number" },
                       ]}
                     >
-                      <Input placeholder="12345678901234" />
+                      <Input 
+                        placeholder="12345678901234" 
+                        onChange={() => setVerifiedMeterData(null)}
+                      />
                     </Form.Item>
                     <Form.Item
                       name="biller_code"
@@ -571,6 +622,7 @@ const TestBeneficiaries = () => {
                         disabled={billersLoading}
                         showSearch
                         optionFilterProp="children"
+                        onChange={() => setVerifiedMeterData(null)}
                       >
                         {electricityBillers.map((biller) => (
                           <Option key={biller.code} value={biller.code}>
@@ -579,6 +631,55 @@ const TestBeneficiaries = () => {
                         ))}
                       </Select>
                     </Form.Item>
+                    <Form.Item
+                      name="product"
+                      label="Meter Type"
+                      rules={[{ required: true, message: "Please select meter type" }]}
+                      initialValue="Prepaid"
+                    >
+                      <Select 
+                        placeholder="Select meter type"
+                        onChange={() => setVerifiedMeterData(null)}
+                      >
+                        <Option value="Prepaid">Prepaid</Option>
+                        <Option value="Postpaid">Postpaid</Option>
+                      </Select>
+                    </Form.Item>
+
+                    <div className="mb-4">
+                      <Button
+                        type="default"
+                        onClick={handleVerifyMeter}
+                        loading={verifyingMeter}
+                        block
+                      >
+                        {verifyingMeter ? "Verifying Meter..." : "Verify Meter"}
+                      </Button>
+                    </div>
+
+                    {verifiedMeterData && (
+                      <div className="p-4 bg-green-50 border border-green-300 rounded mb-4">
+                        <p className="text-sm font-semibold text-green-900 mb-2">
+                          ✓ Meter Verified Successfully!
+                        </p>
+                        <div className="space-y-1">
+                          <p className="text-sm text-green-800">
+                            <strong>Customer Name:</strong> {verifiedMeterData.name}
+                          </p>
+                          <p className="text-sm text-green-800">
+                            <strong>Address:</strong> {verifiedMeterData.address}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {!verifiedMeterData && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded mb-4">
+                        <p className="text-sm text-blue-800">
+                          <strong>ℹ️ Note:</strong> Click "Verify Meter" to fetch customer name and address from the electricity provider before proceeding.
+                        </p>
+                      </div>
+                    )}
                   </>
                 );
               }
@@ -587,8 +688,26 @@ const TestBeneficiaries = () => {
             }}
           </Form.Item>
 
-          <Form.Item name="name" label="Beneficiary Name (Optional)">
-            <Input placeholder="e.g., My Test Number" />
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues.type !== currentValues.type
+            }
+          >
+            {({ getFieldValue }) => {
+              const type = getFieldValue("type");
+              
+              // Only show name field for non-electricity types
+              if (type && type !== "electricity") {
+                return (
+                  <Form.Item name="name" label="Beneficiary Name (Optional)">
+                    <Input placeholder="e.g., My Test Number" />
+                  </Form.Item>
+                );
+              }
+              
+              return null;
+            }}
           </Form.Item>
 
           <div className="p-4 bg-blue-50 border border-blue-200 rounded mb-4">

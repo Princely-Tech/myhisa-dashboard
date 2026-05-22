@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import LastTransaction from "./LastTransaction";
 import Clock from "./clock";
 import { TransactionStatsComponent, WalletBalances } from "./components";
+import TransactionGraph from "./TransactionGraph";
 
 const Dashbaord = () => {
   return (
@@ -13,7 +14,11 @@ const Dashbaord = () => {
       </div>
    
       <Suspense>
-      <TransactionStatsComponent />
+        <TransactionGraph isAdmin={false} />
+      </Suspense>
+
+      <Suspense>
+        <TransactionStatsComponent />
       </Suspense>
       <LastTransaction />
     </div>

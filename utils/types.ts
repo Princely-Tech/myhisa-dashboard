@@ -541,6 +541,45 @@ export interface SenderIDResponse {
   sender_id: SenderID;
 }
 
+export interface AdminAuditLog {
+  id: number;
+  admin_user_id: number;
+  admin_name: string;
+  admin_email: string;
+  admin_rank: number;
+  auth_type: string;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  method: string;
+  path: string;
+  route: string;
+  query_params: string;
+  route_params: string;
+  ip_address: string;
+  user_agent: string;
+  request_body: string;
+  response_body: string | null;
+  status_code: number;
+  latency_ms: number;
+  reason: string | null;
+  metadata: string | null;
+  created_at: string;
+}
+
+export interface AdminAuditLogsResponse {
+  message: string;
+  data: {
+    logs: AdminAuditLog[];
+    pagination: {
+      current_page: number;
+      per_page: number;
+      total_pages: number;
+      total_records: number;
+    };
+  };
+}
+
 export type {
   TransactionItem,
   CustomLinkProps,

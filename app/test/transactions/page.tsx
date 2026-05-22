@@ -758,9 +758,11 @@ const TestTransactions = () => {
                 </Select>
               </Form.Item>
 
-              <Form.Item name="address" label="Address (Optional)">
-                <Input placeholder="Enter address" />
-              </Form.Item>
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded mb-4">
+                <p className="text-sm text-blue-800">
+                  <strong>ℹ️ Note:</strong> Customer name and address will be automatically retrieved from the beneficiary record (verified during beneficiary creation).
+                </p>
+              </div>
             </>
           )}
 

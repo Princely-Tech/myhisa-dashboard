@@ -364,7 +364,8 @@ const SidebarTwo = () => {
                     pathname == routes.adminCommissionDailyDetails ||
                     pathname == routes.adminCommissionRates ||
                     pathname == routes.adminExportWalletLogs ||
-                    pathname == routes.adminDataBundles
+                    pathname == routes.adminDataBundles ||
+                    pathname == routes.adminAuditLogs
                   }
                   title="Admin Tools"
                   icon={<i className="las la-user-shield iq-arrow-left"></i>}
@@ -440,6 +441,12 @@ const SidebarTwo = () => {
                       route: routes.adminDataBundles,
                       icon: <i className="las la-database iq-arrow-left"></i>,
                       isActive: pathname == routes.adminDataBundles,
+                    },
+                    {
+                      title: "Audit Logs",
+                      route: routes.adminAuditLogs,
+                      icon: <i className="las la-clipboard-list iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminAuditLogs,
                     },
                   ]}
                 />
