@@ -144,18 +144,30 @@ const HourlyStatsGraph = ({ isAdmin = false }: { isAdmin?: boolean }) => {
   };
 
   // Transform data for chart
-  const chartData = stats.map((stat) => ({
-    time: dayjs(stat.hour_start).format("HH:00"),
-    "Airtime Success": stat.airtime_successful,
-    "Airtime Failed": stat.airtime_failed,
-    "Airtime Others": stat.airtime_others,
-    "Data Success": stat.data_successful,
-    "Data Failed": stat.data_failed,
-    "Data Others": stat.data_others,
-    "Utilities Success": stat.utilities_successful,
-    "Utilities Failed": stat.utilities_failed,
-    "Utilities Others": stat.utilities_others,
-  }));
+  const chartData = stats.map((stat, index) => {
+    const isFirstHour = index === 0;
+    const isLastHour = index === stats.length - 1;
+    const date = dayjs(stat.hour_start);
+    
+    // Show date + time for first and last labels, otherwise just time
+    let label = date.format("HH:00");
+    if (isFirstHour || isLastHour) {
+      label = date.format("MMM DD, HH:00");
+    }
+    
+    return {
+      time: label,
+      "Airtime Success": stat.airtime_successful,
+      "Airtime Failed": stat.airtime_failed,
+      "Airtime Others": stat.airtime_others,
+      "Data Success": stat.data_successful,
+      "Data Failed": stat.data_failed,
+      "Data Others": stat.data_others,
+      "Utilities Success": stat.utilities_successful,
+      "Utilities Failed": stat.utilities_failed,
+      "Utilities Others": stat.utilities_others,
+    };
+  });
 
   console.log("chartData length:", chartData.length);
   console.log("chartData sample:", chartData.slice(0, 3));

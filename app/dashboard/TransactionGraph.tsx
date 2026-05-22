@@ -70,12 +70,21 @@ const TransactionGraph = ({ isAdmin = false }: { isAdmin?: boolean }) => {
       let current = new Date(yesterday);
       current.setMinutes(0, 0, 0);
 
+      let hourIndex = 0;
       while (current <= now) {
         const hourKey = dayjs(current).format("YYYY-MM-DD HH:00:00");
         const stat = statsMap[hourKey];
+        const isFirstHour = hourIndex === 0;
+        const date = dayjs(current);
+        
+        // Show date + time for first label, otherwise just time
+        let label = date.format("HH:00");
+        if (isFirstHour) {
+          label = date.format("MMM DD, HH:00");
+        }
 
         data.push({
-          hour: dayjs(current).format("HH:00"),
+          hour: label,
           "Airtime Success": stat?.airtime_successful || 0,
           "Airtime Failed": stat?.airtime_failed || 0,
           "Airtime Others": stat?.airtime_others || 0,
@@ -88,6 +97,17 @@ const TransactionGraph = ({ isAdmin = false }: { isAdmin?: boolean }) => {
         });
 
         current.setHours(current.getHours() + 1);
+        hourIndex++;
+      }
+      
+      // Update last item to show date + time
+      if (data.length > 0) {
+        const lastItem = data[data.length - 1];
+        const lastDate = dayjs(now);
+        data[data.length - 1] = {
+          ...lastItem,
+          hour: lastDate.format("MMM DD, HH:00")
+        };
       }
 
       console.log("TransactionGraph - Final chart data:", data);
