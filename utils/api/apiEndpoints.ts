@@ -16,6 +16,8 @@ const apiEndpoints = {
   users: "admin/users",
   creditUser: (id: number) => `admin/user/${id}/credit-balance`,
   creditCommission: (id: number) => `admin/user/${id}/credit-commission`,
+  debitBalance: (id: number) => `admin/user/${id}/debit-balance`,
+  debitCommission: (id: number) => `admin/user/${id}/debit-commission`,
   transferCommissionToBalance: (id: number) => `admin/user/${id}/transfer-commission-to-balance`,
   summariesTotal: "admin/reports/transaction-summary",
   summariesUser: "admin/reports/user-transactions",

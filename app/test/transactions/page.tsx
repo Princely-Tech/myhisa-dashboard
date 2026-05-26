@@ -92,7 +92,6 @@ const TestTransactions = () => {
   const [productsLoading, setProductsLoading] = useState(false);
   const router = useRouter();
 
-  const MAX_AMOUNT = 5000;
   const MIN_AIRTIME = 50;
   const MIN_ELECTRICITY = 1000;
 
@@ -216,8 +215,8 @@ const TestTransactions = () => {
       categories.forEach((category: any) => {
         if (category.bundle && Array.isArray(category.bundle)) {
           category.bundle.forEach((plan: any) => {
-            // Only include plans under 5000 naira (500000 kobo)
-            if (plan.amount <= 500000) {
+            // Include all plans - backend will validate limits
+            if (true) {
               allPlans.push({
                 ...plan,
                 bundle_type: category.name, // Add category name for grouping
@@ -244,8 +243,8 @@ const TestTransactions = () => {
         endPoint: apiEndpoints.cableBillerProducts(biller),
       });
       
-      // Filter products under 5000 naira
-      const products = (res.data || []).filter((p: Product) => p.amount <= 500000);
+      // Get all products - backend will validate limits
+      const products = (res.data || []);
       setCableProducts(products);
     } catch (err) {
       console.error("Error fetching cable products:", err);
@@ -263,8 +262,8 @@ const TestTransactions = () => {
         endPoint: apiEndpoints.electricityBillerProducts(biller),
       });
       
-      // Filter products under 5000 naira
-      const products = (res.data || []).filter((p: Product) => p.amount <= 500000);
+      // Get all products - backend will validate limits
+      const products = (res.data || []);
       setElectricityProducts(products);
     } catch (err) {
       console.error("Error fetching electricity products:", err);
@@ -441,7 +440,7 @@ const TestTransactions = () => {
                 />
                 <h3 className="mt-4 font-semibold">Test Airtime</h3>
                 <p className="text-sm text-gray-600">
-                  ₦{MIN_AIRTIME} - ₦{MAX_AMOUNT}
+                  Min ₦{MIN_AIRTIME}
                 </p>
                 <p className="text-xs text-gray-500 mt-2">
                   {getVerifiedBeneficiaries("airtime").length} beneficiaries
@@ -457,7 +456,7 @@ const TestTransactions = () => {
                   style={{ fontSize: 48, color: "#52c41a" }}
                 />
                 <h3 className="mt-4 font-semibold">Test Data</h3>
-                <p className="text-sm text-gray-600">Max ₦{MAX_AMOUNT}</p>
+                <p className="text-sm text-gray-600">Test transactions</p>
                 <p className="text-xs text-gray-500 mt-2">
                   {getVerifiedBeneficiaries("data").length} beneficiaries
                 </p>
@@ -472,7 +471,7 @@ const TestTransactions = () => {
                   style={{ fontSize: 48, color: "#722ed1" }}
                 />
                 <h3 className="mt-4 font-semibold">Test Cable</h3>
-                <p className="text-sm text-gray-600">Max ₦{MAX_AMOUNT}</p>
+                <p className="text-sm text-gray-600">Test transactions</p>
                 <p className="text-xs text-gray-500 mt-2">
                   {getVerifiedBeneficiaries("cable").length} beneficiaries
                 </p>
@@ -488,7 +487,7 @@ const TestTransactions = () => {
                 />
                 <h3 className="mt-4 font-semibold">Test Electricity</h3>
                 <p className="text-sm text-gray-600">
-                  ₦{MIN_ELECTRICITY} - ₦{MAX_AMOUNT}
+                  Min ₦{MIN_ELECTRICITY}
                 </p>
                 <p className="text-xs text-gray-500 mt-2">
                   {getVerifiedBeneficiaries("electricity").length} beneficiaries
@@ -589,11 +588,6 @@ const TestTransactions = () => {
                 {
                   validator: (_, value) => {
                     if (!value) return Promise.resolve();
-                    if (value > MAX_AMOUNT) {
-                      return Promise.reject(
-                        `Maximum amount is ₦${MAX_AMOUNT}`
-                      );
-                    }
                     if (
                       selectedType === "airtime" &&
                       value < MIN_AIRTIME
@@ -621,14 +615,14 @@ const TestTransactions = () => {
                     ? MIN_AIRTIME
                     : MIN_ELECTRICITY
                 }
-                max={MAX_AMOUNT}
+                max={100000}
                 step={selectedType === "airtime" ? 50 : 100}
                 style={{ width: "100%" }}
-                placeholder={`Enter amount (${
+                placeholder={`Enter amount (Min ₦${
                   selectedType === "airtime"
                     ? MIN_AIRTIME
                     : MIN_ELECTRICITY
-                } - ${MAX_AMOUNT})`}
+                })`}
               />
             </Form.Item>
           )}
@@ -746,21 +740,9 @@ const TestTransactions = () => {
 
           {selectedType === "electricity" && (
             <>
-              <Form.Item
-                name="meter_type"
-                label="Meter Type"
-                rules={[{ required: true, message: "Please select meter type" }]}
-                initialValue="prepaid"
-              >
-                <Select placeholder="Select meter type">
-                  <Option value="prepaid">Prepaid</Option>
-                  <Option value="postpaid">Postpaid</Option>
-                </Select>
-              </Form.Item>
-
               <div className="p-3 bg-blue-50 border border-blue-200 rounded mb-4">
                 <p className="text-sm text-blue-800">
-                  <strong>ℹ️ Note:</strong> Customer name and address will be automatically retrieved from the beneficiary record (verified during beneficiary creation).
+                  <strong>ℹ️ Note:</strong> Customer name, address, and meter type (Prepaid/Postpaid) will be automatically retrieved from the beneficiary record (verified during beneficiary creation).
                 </p>
               </div>
             </>
@@ -777,7 +759,7 @@ const TestTransactions = () => {
               <li>Amount will be <strong>debited from your wallet</strong></li>
               <li>Service will be <strong>delivered to the beneficiary</strong></li>
               <li>Transaction appears in your regular transaction history</li>
-              <li>Maximum amount: ₦{MAX_AMOUNT} per transaction</li>
+              <li>Amount limits validated by backend</li>
               {selectedType === "airtime" && (
                 <li>Minimum airtime: ₦{MIN_AIRTIME}</li>
               )}
