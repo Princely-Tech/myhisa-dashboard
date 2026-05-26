@@ -42,7 +42,7 @@ const UsersListTable = ({
     };
   }
   const [modalContent, setModalContent] = useState<User | null>(null);
-  const [modalAction, setModalAction] = useState<'credit' | 'creditCommission' | 'transfer' | 'apiKey' | 'blockWallet' | 'unblockWallet'>('credit');
+  const [modalAction, setModalAction] = useState<'credit' | 'creditCommission' | 'debit' | 'debitCommission' | 'transfer' | 'apiKey' | 'blockWallet' | 'unblockWallet'>('credit');
   const [creditingAccount, setCreditingAccount] = useState(false);
   const [apiKey, setApiKey] = useState<string>('');
   const [showFullApiKey, setShowFullApiKey] = useState(false);
@@ -94,6 +94,58 @@ const UsersListTable = ({
 
       messageApi.open({
         content: "User commission wallet has been credited",
+        type: "success",
+      });
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+      setModalContent(null);
+      form.resetFields();
+    } catch (err) {}
+    setCreditingAccount(false);
+  };
+
+  const debitBalance = async (values: any) => {
+    setCreditingAccount(true);
+
+    try {
+      let amount = Number(values.amount) * 100;
+      const res = await apiService.post({
+        endPoint: apiEndpoints.debitBalance(modalContent!.id),
+        body: {
+          ...values,
+          amount,
+        },
+      });
+
+      messageApi.open({
+        content: "User balance has been debited",
+        type: "success",
+      });
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+      setModalContent(null);
+      form.resetFields();
+    } catch (err) {}
+    setCreditingAccount(false);
+  };
+
+  const debitCommission = async (values: any) => {
+    setCreditingAccount(true);
+
+    try {
+      let amount = Number(values.amount) * 100;
+      const res = await apiService.post({
+        endPoint: apiEndpoints.debitCommission(modalContent!.id),
+        body: {
+          ...values,
+          amount,
+        },
+      });
+
+      messageApi.open({
+        content: "User commission wallet has been debited",
         type: "success",
       });
       setTimeout(() => {
@@ -315,6 +367,24 @@ const UsersListTable = ({
                       >
                         Credit Commission
                       </BlueButton>
+                      <BlueButton
+                        className="min-w-[100px] min-h-[44px] bg-red-600 hover:bg-red-700"
+                        onClick={() => {
+                          setModalAction('debit');
+                          setModalContent(item);
+                        }}
+                      >
+                        Debit Balance
+                      </BlueButton>
+                      <BlueButton
+                        className="min-w-[100px] min-h-[44px] bg-orange-600 hover:bg-orange-700"
+                        onClick={() => {
+                          setModalAction('debitCommission');
+                          setModalContent(item);
+                        }}
+                      >
+                        Debit Commission
+                      </BlueButton>
                       {item.wallet.commission > 0 && (
                         <BlueButton
                           className="min-w-[100px] min-h-[44px] bg-green-600 hover:bg-green-700"
@@ -371,6 +441,8 @@ const UsersListTable = ({
     const getModalTitle = () => {
       if (modalAction === 'credit') return `Credit Balance - ${modalContent?.name} (${modalContent?.email})`;
       if (modalAction === 'creditCommission') return `Credit Commission - ${modalContent?.name} (${modalContent?.email})`;
+      if (modalAction === 'debit') return `Debit Balance - ${modalContent?.name} (${modalContent?.email})`;
+      if (modalAction === 'debitCommission') return `Debit Commission - ${modalContent?.name} (${modalContent?.email})`;
       if (modalAction === 'transfer') return `Transfer Commission to Balance - ${modalContent?.name} (${modalContent?.email})`;
       if (modalAction === 'apiKey') return `API Key Management - ${modalContent?.name} (${modalContent?.email})`;
       if (modalAction === 'blockWallet') return `Block Wallet - ${modalContent?.name} (${modalContent?.email})`;
@@ -570,8 +642,12 @@ const UsersListTable = ({
           onFinish={(values) => {
             if (modalAction === 'credit') {
               creditUser(values);
-            } else {
+            } else if (modalAction === 'creditCommission') {
               creditCommission(values);
+            } else if (modalAction === 'debit') {
+              debitBalance(values);
+            } else {
+              debitCommission(values);
             }
           }}
         >
@@ -629,6 +705,7 @@ const UsersListTable = ({
       let buttonText = 'Submit';
       if (modalAction === 'transfer') buttonText = 'Transfer';
       else if (modalAction === 'credit' || modalAction === 'creditCommission') buttonText = 'Credit';
+      else if (modalAction === 'debit' || modalAction === 'debitCommission') buttonText = 'Debit';
       else if (modalAction === 'blockWallet') buttonText = 'Block Wallet';
       else if (modalAction === 'unblockWallet') buttonText = 'Unblock Wallet';
       
