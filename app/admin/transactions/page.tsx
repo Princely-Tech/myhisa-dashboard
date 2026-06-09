@@ -31,7 +31,15 @@ const STATUSES = [
   { value: "Successful", label: "Successful" },
   { value: "Failed", label: "Failed" },
   { value: "Pending", label: "Pending" },
+  { value: "InsufficientBalance", label: "InsufficientBalance" },
+  { value: "Processing", label: "Processing" },
+  { value: "InvalidMsisdn", label: "InvalidMsisdn" },
+  { value: "InvalidAmount", label: "InvalidAmount" },
+  { value: "TelcoError", label: "TelcoError" },
+  { value: "InvalidTelco", label: "InvalidTelco" },
+  { value: "InternalError", label: "InternalError" },
 ];
+
 
 const AdminTransactions = () => {
   const [data, setData] = useState<AdminTransactionHistory | null>(null);
