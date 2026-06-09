@@ -39,19 +39,29 @@ interface HourlyStatsResponse {
 
 const HourlyStatsGraph = ({ 
   isAdmin = false, 
-  userId 
+  userId,
+  refreshKey
 }: { 
   isAdmin?: boolean;
   userId?: number;
+  refreshKey?: string | number;
 }) => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<HourlyStat[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);
+  const [chartKey, setChartKey] = useState(0);
 
   useEffect(() => {
     fetchStats();
   }, [userId]);
+
+  useEffect(() => {
+    // Force chart re-render when refreshKey changes (e.g., tab switch)
+    if (refreshKey !== undefined) {
+      setChartKey(prev => prev + 1);
+    }
+  }, [refreshKey]);
 
   const fetchStats = async () => {
     try {
@@ -355,7 +365,7 @@ const HourlyStatsGraph = ({
           )}
           <Spin spinning={loading}>
             {!loading && chartData.length > 0 ? (
-              <div style={{ width: "100%", height: 400 }}>
+              <div key={chartKey} style={{ width: "100%", height: 400 }}>
                 <CanvasJSChart options={options} />
               </div>
             ) : !loading ? (

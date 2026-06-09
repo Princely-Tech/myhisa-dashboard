@@ -80,7 +80,7 @@ export default function AdminTransactionGraphs() {
                       transactions in an hour, the graph will show 60 for that
                       hour.
                     </p>
-                    <HourlyStatsGraph isAdmin={true} />
+                    <HourlyStatsGraph isAdmin={true} refreshKey={activeTab} />
                   </div>
                 </TabPane>
 
@@ -136,6 +136,7 @@ export default function AdminTransactionGraphs() {
                         <HourlyStatsGraph
                           isAdmin={true}
                           userId={selectedUserId}
+                          refreshKey={activeTab}
                         />
                       </div>
                     )}
