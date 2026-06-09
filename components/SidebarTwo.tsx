@@ -365,6 +365,7 @@ const SidebarTwo = () => {
                     pathname == routes.adminCommissionRates ||
                     pathname == routes.adminExportWalletLogs ||
                     pathname == routes.adminDataBundles ||
+                    pathname == routes.adminTransactionGraphs ||
                     pathname == routes.adminAuditLogs
                   }
                   title="Admin Tools"
@@ -441,6 +442,12 @@ const SidebarTwo = () => {
                       route: routes.adminDataBundles,
                       icon: <i className="las la-database iq-arrow-left"></i>,
                       isActive: pathname == routes.adminDataBundles,
+                    },
+                    {
+                      title: "Transaction Graphs",
+                      route: routes.adminTransactionGraphs,
+                      icon: <i className="las la-chart-line iq-arrow-left"></i>,
+                      isActive: pathname == routes.adminTransactionGraphs,
                     },
                     {
                       title: "Audit Logs",

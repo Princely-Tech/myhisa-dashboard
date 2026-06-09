@@ -37,7 +37,13 @@ interface HourlyStatsResponse {
   };
 }
 
-const HourlyStatsGraph = ({ isAdmin = false }: { isAdmin?: boolean }) => {
+const HourlyStatsGraph = ({ 
+  isAdmin = false, 
+  userId 
+}: { 
+  isAdmin?: boolean;
+  userId?: number;
+}) => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<HourlyStat[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
@@ -45,7 +51,7 @@ const HourlyStatsGraph = ({ isAdmin = false }: { isAdmin?: boolean }) => {
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [userId]);
 
   const fetchStats = async () => {
     try {
@@ -58,9 +64,17 @@ const HourlyStatsGraph = ({ isAdmin = false }: { isAdmin?: boolean }) => {
 
       console.log("Fetching stats from:", from, "to:", to);
 
-      const endpoint = isAdmin
-        ? apiEndpoints.hourlyStatsGlobal
-        : apiEndpoints.hourlyStatsUser;
+      let endpoint: string;
+      if (isAdmin && userId) {
+        // Admin viewing specific user
+        endpoint = apiEndpoints.hourlyStatsForUser(userId);
+      } else if (isAdmin) {
+        // Admin viewing global stats
+        endpoint = apiEndpoints.hourlyStatsGlobal;
+      } else {
+        // Regular user viewing their own stats
+        endpoint = apiEndpoints.hourlyStatsUser;
+      }
 
       const res: HourlyStatsResponse = await apiService.get({
         endPoint: `${endpoint}?from=${from}&to=${to}`,
@@ -326,7 +340,11 @@ const HourlyStatsGraph = ({ isAdmin = false }: { isAdmin?: boolean }) => {
       <div className="iq-card iq-card-block iq-card-stretch m-0">
         <div className="iq-card-body">
           <h4 className="mb-4">
-            {isAdmin ? "Global" : "Your"} Transaction Trends (Last 24 Hours)
+            {isAdmin && userId 
+              ? `User ${userId} Transaction Trends (Last 24 Hours)`
+              : isAdmin 
+              ? "Global Transaction Trends (Last 24 Hours)" 
+              : "Your Transaction Trends (Last 24 Hours)"}
           </h4>
           {!hasData && !loading && stats.length > 0 && (
             <div className="text-center py-4 text-gray-500 mb-2">
