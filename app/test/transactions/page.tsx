@@ -529,6 +529,7 @@ const TestTransactions = () => {
               dataSource={transactions}
               rowKey="id"
               loading={transactionsLoading}
+              scroll={{ x: 1400 }}
               pagination={{
                 current: currentPage,
                 pageSize: 20,
