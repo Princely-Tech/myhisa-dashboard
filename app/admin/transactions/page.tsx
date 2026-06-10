@@ -53,6 +53,7 @@ const AdminTransactions = () => {
   const [maxAmount, setMaxAmount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
@@ -194,26 +195,76 @@ const AdminTransactions = () => {
     },
   ];
 
-  const handleExport = () => {
-    if (!data || !data.records) return;
+  const handleExport = async () => {
+    if (!data || !data.total_records) return;
     
-    const exportData = data.records.map((item) => ({
-      Date: dayjs(item.created_at).format("YYYY-MM-DD HH:mm:ss"),
-      "Transaction ID": item.transaction_id,
-      "User Name": item.user_name,
-      "User Email": item.user_email,
-      Type: item.type,
-      Network: item.network,
-      Beneficiary: item.msisdn,
-      "Amount (₦)": plainKoboNairaConvert(item.amount),
-      "Commission (₦)": plainKoboNairaConvert(item.commission_amount),
-      Status: item.status,
-      "External Ref": item.external_ref,
-      "Balance Before (₦)": plainKoboNairaConvert(item.balance_before),
-    }));
-    
-    const fileName = `admin_transactions_${dayjs().format("YYYY-MM-DD")}.csv`;
-    handleDownloadCSV(exportData, fileName);
+    try {
+      setExporting(true);
+      messageApi.loading({
+        content: `Fetching ${formatNumber(data.total_records)} records for export...`,
+        key: "export",
+        duration: 0,
+      });
+
+      const apiService = new AxiosHandler(messageApi);
+      const params = new URLSearchParams();
+      
+      // Apply same filters as current view
+      if (selectedUserId) params.append("user_id", selectedUserId.toString());
+      if (selectedTypes.length > 0) params.append("type", selectedTypes.join(","));
+      if (selectedNetworks.length > 0) params.append("network", selectedNetworks.join(","));
+      if (selectedStatus) params.append("status", selectedStatus);
+      if (dateRange) {
+        params.append("from_date", dateRange[0].format("YYYY-MM-DD"));
+        params.append("to_date", dateRange[1].format("YYYY-MM-DD"));
+      }
+      if (minAmount !== null) params.append("min_amount", (minAmount * 100).toString());
+      if (maxAmount !== null) params.append("max_amount", (maxAmount * 100).toString());
+      
+      // Request all records by setting a very high limit
+      params.append("per_page", data.total_records.toString());
+      params.append("page", "1");
+      
+      const endpoint = `${apiEndpoints.adminTransactions}?${params.toString()}`;
+      const response = await apiService.get({
+        endPoint: endpoint,
+      });
+      
+      const allRecords = response.data.records || [];
+      
+      const exportData = allRecords.map((item: any) => ({
+        Date: dayjs(item.created_at).format("YYYY-MM-DD HH:mm:ss"),
+        "Transaction ID": item.transaction_id,
+        "User Name": item.user_name,
+        "User Email": item.user_email,
+        Type: item.type,
+        Network: item.network,
+        Beneficiary: item.msisdn,
+        "Amount (₦)": plainKoboNairaConvert(item.amount),
+        "Commission (₦)": plainKoboNairaConvert(item.commission_amount),
+        Status: item.status,
+        "External Ref": item.external_ref,
+        "Balance Before (₦)": plainKoboNairaConvert(item.balance_before),
+      }));
+      
+      const fileName = `admin_transactions_${dayjs().format("YYYY-MM-DD_HH-mm-ss")}.csv`;
+      handleDownloadCSV(exportData, fileName);
+      
+      messageApi.success({
+        content: `Successfully exported ${formatNumber(exportData.length)} records`,
+        key: "export",
+        duration: 3,
+      });
+    } catch (error) {
+      console.error("Error exporting transactions:", error);
+      messageApi.error({
+        content: "Failed to export transactions",
+        key: "export",
+        duration: 3,
+      });
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleClearFilters = () => {
@@ -349,8 +400,12 @@ const AdminTransactions = () => {
             Clear Filters
           </CustomButton>
           {data && data.records && data.records.length > 0 && (
-            <CustomButton onClick={handleExport}>
-              Export CSV
+            <CustomButton 
+              onClick={handleExport}
+              loading={exporting}
+              disabled={exporting}
+            >
+              {exporting ? `Exporting ${formatNumber(data.total_records)} records...` : `Export CSV (${formatNumber(data.total_records)} records)`}
             </CustomButton>
           )}
         </div>

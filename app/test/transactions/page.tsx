@@ -46,6 +46,7 @@ interface Transaction {
   transaction_id: string;
   beneficiary_id: number;
   type: string;
+  token: string;
   amount: number;
   service_amount: number;
   status: string;
@@ -340,11 +341,19 @@ const TestTransactions = () => {
       render: (date: string) => new Date(date).toLocaleString(),
     },
     {
+      title: "Token",
+      dataIndex: "token",
+      key: "token",
+      ellipsis: false,
+    },
+    {
       title: "External Ref",
       dataIndex: "external_ref",
       key: "external_ref",
       ellipsis: true,
     },
+
+
   ];
 
   const verifiedBeneficiariesCount = beneficiaries.filter(
