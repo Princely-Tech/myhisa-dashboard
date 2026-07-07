@@ -240,6 +240,20 @@ const TransactionLookup = () => {
         return <Tag color="default">No</Tag>;
       },
     },
+
+    {
+      title: "Ref to Telco",
+      dataIndex: ["transaction", "ref_to_telco"],
+      key: "ref_to_telco",
+      width: 150,
+    },
+
+     {
+      title: "Previous Ref",
+      dataIndex: ["transaction", "retry_refs_to_telco"],
+      key: "retry_refs_to_telco",
+      width: 150,
+    },
   ];
 
   const expandedRowRender = (record: LookupResult) => {
