@@ -47,13 +47,17 @@ const TransactionTable = ({
             <th>Token</th>
             <th>Beneficiary Name</th>
             <th>Date</th>
+
+            <th>Ref to Telco</th>
+            <th>Previous Ref</th>
+
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {data.records.length === 0 && showEmpty ? (
             <tr>
-              <td colSpan={12} rowSpan={5}>
+              <td colSpan={14} rowSpan={5}>
                 <Empty />
               </td>
             </tr>
@@ -74,6 +78,8 @@ const TransactionTable = ({
                 <td className="min-w-[200px]">{item.token}</td>
                 <td>{item.beneficiary_name}</td>
                 <td>{formatDateSideBySide(item.created_at)}</td>
+                <td>{item.ref_to_telco}</td>
+                <td>{item.retry_refs_to_telco}</td>
                 <td>
                   <div className="flex justify-center items-center">
                     <BlueButton href={routes.query(item.transaction_id)}>

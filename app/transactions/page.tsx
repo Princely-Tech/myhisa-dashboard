@@ -12,7 +12,7 @@ import tableJson, {
   networkArray,
   searchParamKeys,
 } from "@/data/tableJson";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { TransactionHistory, TransactionItem } from "@/utils/types";
 import AxiosHandler from "@/utils/api/axiosHandler";
@@ -47,46 +47,42 @@ const Transactions = () => {
   const externalRef =
     searchParams.get(constants.searchParamsKeys.externalRef) ?? "";
   const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
-  const formKey = Math.random() * 1000000;
+  const formKey = useRef(Math.random() * 1000000).current;
   const toDate = searchParams.get(constants.searchParamsKeys.toDate);
   const fromDate = searchParams.get(constants.searchParamsKeys.fromDate);
   const [messageApi, contextHolder] = message.useMessage();
-  const process = useCallback(async () => {
-    try {
-      const apiService = new AxiosHandler(messageApi);
-      const queryFromDate = fromDate ?? "";
-      const queryToDate = toDate ?? "";
-      const res = await apiService.get({
-        endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}&from_date=${queryFromDate}&to_date=${queryToDate}`,
-      });
-      setData(res.data);
-    } catch (err) {}
-    updateSearchParams({
-      values: [
-        {
-          key: constants.searchParamsKeys.isFiltering,
-          value: null,
-        },
-      ],
-      pathname: pathname,
-      router: router,
-      searchParams: searchParams,
-    });
-  }, [
-    fromDate,
-    toDate,
-    reference,
-    beneficiary,
-    externalRef,
-    messageApi,
-    pathname,
-    router,
-    searchParams,
-  ]);
+  const prevFilterKey = useRef<string | null>(null);
 
   useEffect(() => {
-    process();
-  }, [searchParams, process]);
+    const filterKey = `${reference}|${beneficiary}|${externalRef}|${fromDate}|${toDate}`;
+    if (filterKey === prevFilterKey.current) return;
+    prevFilterKey.current = filterKey;
+
+    const fetch = async () => {
+      try {
+        const apiService = new AxiosHandler(messageApi);
+        const queryFromDate = fromDate ?? "";
+        const queryToDate = toDate ?? "";
+        const res = await apiService.get({
+          endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}&from_date=${queryFromDate}&to_date=${queryToDate}`,
+        });
+        setData(res.data);
+      } catch (err) {}
+      updateSearchParams({
+        values: [
+          {
+            key: constants.searchParamsKeys.isFiltering,
+            value: null,
+          },
+        ],
+        pathname: pathname,
+        router: router,
+        searchParams: searchParams,
+      });
+    };
+
+    fetch();
+  }, [reference, beneficiary, externalRef, fromDate, toDate, messageApi, pathname, router, searchParams]);
 
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     const paramValues: { key: string; value: string }[] = [];

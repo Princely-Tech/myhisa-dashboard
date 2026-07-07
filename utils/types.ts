@@ -22,8 +22,12 @@ type TransactionItem = {
   external_ref: string;
   status: string;
   balance_before: number;
+  token: number;
   commission_amount: number;
   created_at: string;
+  beneficiary_name: string;
+  ref_to_telco: string;
+  retry_refs_to_telco: string;
 };
 export type SummaryTotalItem = {
   user_id: number;
