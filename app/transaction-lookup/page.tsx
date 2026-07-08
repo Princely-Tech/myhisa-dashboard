@@ -254,6 +254,14 @@ const TransactionLookup = () => {
       key: "retry_refs_to_telco",
       width: 150,
     },
+
+    {
+      title: "Channel",
+      dataIndex: ["transaction", "channel"],
+      key: "channel",
+      width: 150,
+    },
+
   ];
 
   const expandedRowRender = (record: LookupResult) => {

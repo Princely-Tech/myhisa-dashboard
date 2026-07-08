@@ -28,6 +28,7 @@ type TransactionItem = {
   beneficiary_name: string;
   ref_to_telco: string;
   retry_refs_to_telco: string;
+  channel: string;
 };
 export type SummaryTotalItem = {
   user_id: number;

@@ -50,6 +50,7 @@ const TransactionTable = ({
 
             <th>Ref to Telco</th>
             <th>Previous Ref</th>
+            <th>Channel</th>
 
             <th>Action</th>
           </tr>
@@ -80,6 +81,7 @@ const TransactionTable = ({
                 <td>{formatDateSideBySide(item.created_at)}</td>
                 <td>{item.ref_to_telco}</td>
                 <td>{item.retry_refs_to_telco}</td>
+                <td>{item.channel}</td>
                 <td>
                   <div className="flex justify-center items-center">
                     <BlueButton href={routes.query(item.transaction_id)}>

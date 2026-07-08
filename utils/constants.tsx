@@ -17,6 +17,7 @@ const constants = {
     externalRef: "externalRef",
     isFiltering:'is-filtering',
     isExporting:'is-exporting',
+    channel: 'channel',
   },
 };
 export default constants;

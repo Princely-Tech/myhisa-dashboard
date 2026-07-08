@@ -32,6 +32,7 @@ type FieldType = {
   reference: string;
   beneficiary: string;
   externalRef: string;
+  channel: string;
 };
 const Transactions = () => {
   const [data, setData] = useState<TransactionHistory | null>(null);
@@ -46,6 +47,7 @@ const Transactions = () => {
     searchParams.get(constants.searchParamsKeys.beneficiary) ?? "";
   const externalRef =
     searchParams.get(constants.searchParamsKeys.externalRef) ?? "";
+  const channel = searchParams.get(constants.searchParamsKeys.channel) ?? "";
   const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
   const formKey = useRef(Math.random() * 1000000).current;
   const toDate = searchParams.get(constants.searchParamsKeys.toDate);
@@ -54,7 +56,7 @@ const Transactions = () => {
   const prevFilterKey = useRef<string | null>(null);
 
   useEffect(() => {
-    const filterKey = `${reference}|${beneficiary}|${externalRef}|${fromDate}|${toDate}`;
+    const filterKey = `${reference}|${beneficiary}|${externalRef}|${channel}|${fromDate}|${toDate}`;
     if (filterKey === prevFilterKey.current) return;
     prevFilterKey.current = filterKey;
 
@@ -64,7 +66,7 @@ const Transactions = () => {
         const queryFromDate = fromDate ?? "";
         const queryToDate = toDate ?? "";
         const res = await apiService.get({
-          endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}&from_date=${queryFromDate}&to_date=${queryToDate}`,
+          endPoint: `${apiEndpoints.transactionHistory}?transaction_id=${reference}&msisdn=${beneficiary}&ref=${externalRef}&channel=${channel}&from_date=${queryFromDate}&to_date=${queryToDate}`,
         });
         setData(res.data);
       } catch (err) {}
@@ -82,7 +84,7 @@ const Transactions = () => {
     };
 
     fetch();
-  }, [reference, beneficiary, externalRef, fromDate, toDate, messageApi, pathname, router, searchParams]);
+  }, [reference, beneficiary, externalRef, channel, fromDate, toDate, messageApi, pathname, router, searchParams]);
 
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     const paramValues: { key: string; value: string }[] = [];
@@ -97,6 +99,10 @@ const Transactions = () => {
     paramValues.push({
       key: constants.searchParamsKeys.externalRef,
       value: values.externalRef ?? "",
+    });
+    paramValues.push({
+      key: constants.searchParamsKeys.channel,
+      value: values.channel ?? "",
     });
     paramValues.push({
       key: constants.searchParamsKeys.isFiltering,
@@ -136,6 +142,7 @@ const Transactions = () => {
           beneficiary: beneficiary,
           dateRange: fromDate ? [dayjs(fromDate), dayjs(toDate)] : null,
           externalRef: externalRef,
+          channel: channel,
         }}
       >
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3">
@@ -175,6 +182,16 @@ const Transactions = () => {
             className="max-h-[40px]"
             formItemProps={{ name: constants.searchParamsKeys.externalRef }}
           />
+
+           <InputField
+            placeholder="Channel"
+            showTitle={false}
+            inputClassName="h-[30px]"
+            className="max-h-[40px]"
+            formItemProps={{ name: constants.searchParamsKeys.channel }}
+          />
+
+
           <div className="gap-3 flex justify-start items-start mb-[10px]">
             <Form.Item>
               <BlueButton htmlType="submit" loading={isFiltering}>
