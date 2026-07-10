@@ -18,6 +18,7 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 
 const SidebarTwo = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -29,6 +30,12 @@ const SidebarTwo = () => {
       setUser(userJson);
     }
   }, [pathname]);
+
+  // Close sidebar on navigation (mobile)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
   if (pathname == routes.login || pathname == routes.register || !user) {
     return <></>;
   }
