@@ -7,8 +7,7 @@ import "@/css/style-customizer.css";
 import "@/css/fontawesome.css";
 //import { MyHisaSideBar } from "@/components";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import SidebarTwo from "@/components/SidebarTwo";
-import { Suspense } from "react";
+import ResponsiveSidebar from "@/components/ResponsiveSidebar";
 import { cookies } from "next/headers";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { User } from "@/utils/types";
@@ -33,12 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AntdRegistry>
-          <div className="flex gap-2 overflow-hidden max-h-full max-w-full">
-            <Suspense>
-              <SidebarTwo />
-            </Suspense>
-            {children}
-          </div>
+          <ResponsiveSidebar>{children}</ResponsiveSidebar>
         </AntdRegistry>
       </body>
     </html>
