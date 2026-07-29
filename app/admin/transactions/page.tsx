@@ -9,6 +9,7 @@ import { BlueButton, InputField } from "@/components";
 import { formatCurrency, formatNumber } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
 import { CustomButton } from "@/components/buttons";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -42,6 +43,7 @@ const STATUSES = [
 
 
 const AdminTransactions = () => {
+  useRequirePermission("transactions.view");
   const [data, setData] = useState<AdminTransactionHistory | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);

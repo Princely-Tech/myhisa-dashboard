@@ -26,6 +26,7 @@ import {
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BlueButton, CustomButton, RedButton } from "@/components/buttons";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const NETWORKS = [
   { key: "mtn", label: "MTN", color: "#ffcc00", text: "#000" },
@@ -61,6 +62,7 @@ interface Bundle {
 type ModalMode = "create" | "edit";
 
 const AdminDataBundlesPage = () => {
+  useRequirePermission("data_bundles.view");
   const [messageApi, contextHolder] = message.useMessage();
   const api = new AxiosHandler(messageApi);
 

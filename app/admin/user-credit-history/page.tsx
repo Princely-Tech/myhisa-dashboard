@@ -9,11 +9,13 @@ import { BlueButton } from "@/components";
 import { formatCurrency, formatNumber } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert, formatDateTimeYYYYMMDD } from "@/utils/helperfunctions";
 import { CustomButton } from "@/components/buttons";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 const AdminUserCreditHistory = () => {
+  useRequirePermission("wallet.view");
   const [data, setData] = useState<AdminCreditHistory | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);

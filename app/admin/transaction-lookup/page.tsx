@@ -7,6 +7,7 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BlueButton, CustomButton, RedButton } from "@/components/buttons";
 import { formatCurrency } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { TextArea } = Input;
 
@@ -64,6 +65,7 @@ interface ReversalResult {
 }
 
 const AdminTransactionLookup = () => {
+  useRequirePermission("transactions.view");
   const [transactionRefs, setTransactionRefs] = useState<string>("");
   const [lookupResults, setLookupResults] = useState<LookupResult[] | null>(null);
   const [loading, setLoading] = useState(false);

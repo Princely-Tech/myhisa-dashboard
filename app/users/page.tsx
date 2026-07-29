@@ -16,8 +16,10 @@ import {
 } from "@/utils/helperfunctions";
 import dayjs from "dayjs";
 import { CustomButton } from "@/components/buttons";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const UsersListPage = () => {
+  useRequirePermission("users.view");
   const [data, setData] = useState<UsersList | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);

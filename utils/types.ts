@@ -214,7 +214,8 @@ export type User = {
   phone: string;
   email_verified_at: string | null;
   approved_at: string | null;
-  rank: 1;
+  rank: number; // 0 = user, 1 = staff (permission-scoped), 2 = super admin
+  permissions?: string[];
   reporting_emails: string;
   referral_code: string;
   created_at: string;
@@ -556,6 +557,9 @@ export interface AdminAuditLog {
   action: string;
   entity_type: string;
   entity_id: string;
+  permission_used: string;
+  action_label: string;
+  target_user_id: number | null;
   method: string;
   path: string;
   route: string;
@@ -570,6 +574,21 @@ export interface AdminAuditLog {
   reason: string | null;
   metadata: string | null;
   created_at: string;
+}
+
+export interface Permission {
+  key: string;
+  label: string;
+  category: string;
+  description: string;
+}
+
+export interface StaffUser {
+  id: number;
+  name: string;
+  email: string;
+  rank: number;
+  permissions: string[];
 }
 
 export interface AdminAuditLogsResponse {

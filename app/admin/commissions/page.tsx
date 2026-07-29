@@ -10,6 +10,7 @@ import { BlueButton } from "@/components";
 import { formatCurrency, formatNumber, TRANSACTION_TYPES, CHART_COLORS } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
 import { CustomButton } from "@/components/buttons";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -23,6 +24,7 @@ const NETWORKS = [
 ];
 
 const AdminCommissions = () => {
+  useRequirePermission("commission.view");
   const [summaryData, setSummaryData] = useState<AdminCommissionSummary | null>(null);
   const [detailsData, setDetailsData] = useState<AdminCommissionDetails | null>(null);
   const [billerData, setBillerData] = useState<AdminCommissionByBiller | null>(null);

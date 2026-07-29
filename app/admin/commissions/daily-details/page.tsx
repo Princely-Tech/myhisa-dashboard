@@ -13,6 +13,7 @@ import {
   AdminCommissionDailyDetailsTransaction,
 } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -24,6 +25,7 @@ interface LogStatus {
 }
 
 const AdminCommissionDailyDetails = () => {
+  useRequirePermission("commission.view");
   const [data, setData] = useState<AdminCommissionDailyDetailsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);

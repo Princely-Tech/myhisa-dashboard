@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { AdminWebhookDeliveryItem, AdminWebhookDeliveryResponse } from "@/utils/types";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const AdminWebhookDeliveriesPage = () => {
+  useRequirePermission("webhooks.view");
   const [deliveries, setDeliveries] = useState<AdminWebhookDeliveryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

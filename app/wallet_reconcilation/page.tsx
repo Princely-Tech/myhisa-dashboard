@@ -22,8 +22,10 @@ import {
 } from "@/utils/helperfunctions";
 import dayjs from "dayjs";
 import { CustomButton } from "@/components/buttons";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const WalletReconciliation = () => {
+  useRequirePermission("reports.view");
   const [data, setData] = useState<WalletReconciliationGet | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);

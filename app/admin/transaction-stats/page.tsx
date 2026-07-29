@@ -1,8 +1,10 @@
 "use client";
 import TransactionGraph from "@/app/dashboard/TransactionGraph";
 import { Suspense } from "react";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const AdminTransactionStats = () => {
+  useRequirePermission("reports.view");
   return (
     <div className="px-8 py-4 flex-1 max-h-full overflow-auto">
       <h2 className="mb-4">Global Transaction Statistics</h2>

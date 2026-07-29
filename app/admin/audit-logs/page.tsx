@@ -1,12 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
 import apiEndpoints from "@/utils/api/apiEndpoints";
-import { AdminAuditLog, AdminAuditLogsResponse } from "@/utils/types";
+import { AdminAuditLog, AdminAuditLogsResponse, Permission } from "@/utils/types";
+import useRequirePermission from "@/utils/useRequirePermission";
+import AxiosHandler from "@/utils/api/axiosHandler";
+import { message } from "antd";
 
 const AdminAuditLogsPage = () => {
+  useRequirePermission("audit_logs.view");
+  const [messageApi, contextHolder] = message.useMessage();
   const [logs, setLogs] = useState<AdminAuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<Permission[]>([]);
   const [filters, setFilters] = useState({
     admin_user_id: "",
     admin_email: "",
@@ -16,6 +22,8 @@ const AdminAuditLogsPage = () => {
     method: "",
     route: "",
     status_code: "",
+    permission_used: "",
+    target_user_id: "",
     from: "",
     to: "",
   });
@@ -42,6 +50,8 @@ const AdminAuditLogsPage = () => {
       if (filters.method) queryParams.append("method", filters.method);
       if (filters.route) queryParams.append("route", filters.route);
       if (filters.status_code) queryParams.append("status_code", filters.status_code);
+      if (filters.permission_used) queryParams.append("permission_used", filters.permission_used);
+      if (filters.target_user_id) queryParams.append("target_user_id", filters.target_user_id);
       if (filters.from) queryParams.append("from", filters.from);
       if (filters.to) queryParams.append("to", filters.to);
       queryParams.append("page", page.toString());
@@ -71,7 +81,15 @@ const AdminAuditLogsPage = () => {
 
   useEffect(() => {
     fetchAuditLogs();
+    fetchCatalog();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchCatalog = async () => {
+    const apiService = new AxiosHandler(messageApi);
+    const response = await apiService.get({ endPoint: apiEndpoints.adminPermissionsCatalog });
+    setCatalog(response?.data || []);
+  };
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters({ ...filters, [key]: value });
@@ -91,6 +109,8 @@ const AdminAuditLogsPage = () => {
       method: "",
       route: "",
       status_code: "",
+      permission_used: "",
+      target_user_id: "",
       from: "",
       to: "",
     });
@@ -122,6 +142,10 @@ const AdminAuditLogsPage = () => {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const catalogLabel = (permissionKey: string) => {
+    return catalog.find((p) => p.key === permissionKey)?.label || permissionKey;
   };
 
   const formatDate = (dateString: string) => {
@@ -156,6 +180,7 @@ const AdminAuditLogsPage = () => {
 
   return (
     <div className="px-8 py-4 flex-1 max-h-full overflow-auto">
+      {contextHolder}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold">Admin Audit Logs</h2>
@@ -287,6 +312,35 @@ const AdminAuditLogsPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
+              Permission Used
+            </label>
+            <select
+              value={filters.permission_used}
+              onChange={(e) => handleFilterChange("permission_used", e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All</option>
+              {catalog.map((permission) => (
+                <option key={permission.key} value={permission.key}>
+                  {permission.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Target User ID
+            </label>
+            <input
+              type="text"
+              value={filters.target_user_id}
+              onChange={(e) => handleFilterChange("target_user_id", e.target.value)}
+              placeholder="e.g., 123"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               From Date
             </label>
             <input
@@ -366,7 +420,7 @@ const AdminAuditLogsPage = () => {
                       </span>
                     </div>
                     <div className="text-lg font-semibold text-gray-800 mb-1">
-                      {log.action}
+                      {log.action_label || log.action}
                     </div>
                     <div className="text-sm text-gray-600 font-mono">
                       {log.route || log.path}
@@ -379,6 +433,19 @@ const AdminAuditLogsPage = () => {
                     <span className="text-gray-600">Admin:</span>
                     <span className="ml-2 font-medium">
                       {log.admin_name} ({log.admin_email})
+                      {log.admin_rank === 2 ? " · Super Admin" : log.admin_rank === 1 ? " · Staff" : ""}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Permission Used:</span>
+                    <span className="ml-2 font-medium">
+                      {log.permission_used ? (
+                        <span className="px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 text-xs font-semibold">
+                          {catalogLabel(log.permission_used)}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">bypassed (super admin)</span>
+                      )}
                     </span>
                   </div>
                   <div>
@@ -396,6 +463,12 @@ const AdminAuditLogsPage = () => {
                         {log.entity_type}
                         {log.entity_id && ` #${log.entity_id}`}
                       </span>
+                    </div>
+                  )}
+                  {log.target_user_id != null && (
+                    <div>
+                      <span className="text-gray-600">Target User:</span>
+                      <span className="ml-2 font-medium">#{log.target_user_id}</span>
                     </div>
                   )}
                 </div>

@@ -6,6 +6,7 @@ import { UserOutlined, GlobalOutlined } from "@ant-design/icons";
 import HourlyStatsGraph from "@/app/dashboard/HourlyStatsGraph";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { TabPane } = Tabs;
 
@@ -16,6 +17,7 @@ interface User {
 }
 
 export default function AdminTransactionGraphs() {
+  useRequirePermission("transactions.view");
   const [messageApi, contextHolder] = message.useMessage();
   const [activeTab, setActiveTab] = useState("global");
   const [users, setUsers] = useState<User[]>([]);

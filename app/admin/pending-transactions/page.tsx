@@ -8,6 +8,7 @@ import { User } from "@/utils/types";
 import { BlueButton, CustomButton, RedButton } from "@/components/buttons";
 import { formatCurrency, formatNumber } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -70,6 +71,7 @@ interface QueryUpdateResult {
 }
 
 const AdminPendingTransactions = () => {
+  useRequirePermission("transactions.view");
   const [data, setData] = useState<PendingTransactionsResponse | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);

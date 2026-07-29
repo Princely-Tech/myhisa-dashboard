@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { AvailabilityItem } from "@/utils/types";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const serviceProviderMap: Record<string, string[]> = {
   electricity: [
@@ -25,6 +26,7 @@ const serviceProviderMap: Record<string, string[]> = {
 };
 
 const AdminAvailabilityPage = () => {
+  useRequirePermission("availability.manage");
   const [serviceType, setServiceType] = useState<string>("");
   const [provider, setProvider] = useState<string>("");
   const [availability, setAvailability] = useState<number>(100);

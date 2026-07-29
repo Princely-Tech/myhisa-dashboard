@@ -15,6 +15,7 @@ import { FormProps } from "antd/lib/form";
 import constants from "@/utils/constants";
 import dayjs from "dayjs";
 import { User } from "@/utils/types";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { Option } = Select;
 
@@ -25,6 +26,7 @@ type FieldType = {
 };
 
 const AdminExportWalletLogs = () => {
+  useRequirePermission("wallet.view");
   const [isExporting, setIsExporting] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [users, setUsers] = useState<User[]>([]);

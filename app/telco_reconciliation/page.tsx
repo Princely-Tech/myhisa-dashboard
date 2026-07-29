@@ -17,8 +17,10 @@ import {
 import dayjs from "dayjs";
 import { CustomButton } from "@/components/buttons";
 import TelcoReconciliationTable from "./table";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const TelcoReconciliation = () => {
+  useRequirePermission("reports.view");
   const [data, setData] = useState<TelcoReconciliationGet | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);

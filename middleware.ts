@@ -4,6 +4,7 @@ import constants from "./utils/constants";
 import apiEndpoints from "./utils/api/apiEndpoints";
 import routes from "./utils/routes";
 import { User } from "./utils/types";
+import { canAccessPage } from "./utils/permissions";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get(apiEndpoints.tokenSetUrl);
@@ -13,17 +14,32 @@ export function middleware(request: NextRequest) {
       `${request.nextUrl.origin}${routes.login}`
     );
   }
-  if (request.nextUrl.pathname === routes.users) {
-    let user = request.cookies.get(apiEndpoints.userSetUrl);
-    if (user) {
-      let userJson = JSON.parse(user.value) as User;
-      if (!(userJson.rank > 0)) {
-        return routeToDashboard();
-      }
-    } else {
+
+  const pathname = request.nextUrl.pathname;
+  const isGated =
+    pathname.startsWith("/admin") ||
+    pathname === routes.users ||
+    pathname === routes.walletReconciliation ||
+    pathname === routes.telcoReconciliation;
+
+  if (isGated) {
+    const userCookie = request.cookies.get(apiEndpoints.userSetUrl);
+    if (!userCookie) {
+      return routeToDashboard();
+    }
+
+    let userJson: User;
+    try {
+      userJson = JSON.parse(userCookie.value) as User;
+    } catch {
+      return routeToDashboard();
+    }
+
+    if (!canAccessPage(userJson, pathname)) {
       return routeToDashboard();
     }
   }
+
   return NextResponse.next();
   function routeToDashboard() {
     return NextResponse.redirect(

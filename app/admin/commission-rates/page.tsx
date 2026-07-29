@@ -5,6 +5,7 @@ import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BlueButton, CustomButton, RedButton } from "@/components/buttons";
 import { SearchOutlined, EditOutlined, DeleteOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -53,6 +54,7 @@ interface ElectricityBiller {
 }
 
 const AdminCommissionRates = () => {
+  useRequirePermission("commission.manage");
   const [messageApi, contextHolder] = message.useMessage();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);

@@ -12,10 +12,12 @@ import {
   AdminCommissionDailySummaryData,
 } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
+import useRequirePermission from "@/utils/useRequirePermission";
 
 const { Option } = Select;
 
 const AdminCommissionDailySummary = () => {
+  useRequirePermission("commission.view");
   const [data, setData] = useState<AdminCommissionDailySummaryData | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);

@@ -96,6 +96,9 @@ const apiEndpoints = {
   hourlyStatsGlobal: "admin/transactions/hourly-stats/global",
   hourlyStatsForUser: (userId: number) => `admin/transactions/hourly-stats/user/${userId}`,
   adminAuditLogs: "admin/audit-logs",
+  adminPermissionsCatalog: "admin/permissions",
+  adminStaffList: "admin/staff",
+  adminStaffDetail: (userId: number) => `admin/staff/${userId}`,
 };
 export const localApiEndPoints = {
   main: "/api",
