@@ -303,14 +303,14 @@ const StaffManagementPage = () => {
         open={!!editingUser}
         onCancel={closeEditModal}
         width={600}
-        footer={[
-          <CustomButton key="cancel" onClick={closeEditModal}>
-            Cancel
-          </CustomButton>,
-          <BlueButton key="save" onClick={saveStaffAccess} loading={saving}>
-            Save
-          </BlueButton>,
-        ]}
+        footer={
+          <div className="flex justify-end gap-2">
+            <CustomButton onClick={closeEditModal}>Cancel</CustomButton>
+            <BlueButton onClick={saveStaffAccess} loading={saving}>
+              Save
+            </BlueButton>
+          </div>
+        }
       >
         <div className="space-y-4">
           <div>

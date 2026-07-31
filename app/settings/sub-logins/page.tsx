@@ -277,14 +277,14 @@ const SubLoginManagementPage = () => {
         open={creating}
         onCancel={() => setCreating(false)}
         width={600}
-        footer={[
-          <CustomButton key="cancel" onClick={() => setCreating(false)}>
-            Cancel
-          </CustomButton>,
-          <BlueButton key="save" onClick={createSubLogin} loading={saving}>
-            Create
-          </BlueButton>,
-        ]}
+        footer={
+          <div className="flex justify-end gap-2">
+            <CustomButton onClick={() => setCreating(false)}>Cancel</CustomButton>
+            <BlueButton onClick={createSubLogin} loading={saving}>
+              Create
+            </BlueButton>
+          </div>
+        }
       >
         <div className="space-y-4">
           <div>
@@ -311,14 +311,14 @@ const SubLoginManagementPage = () => {
         open={!!editingSubLogin}
         onCancel={closeEditModal}
         width={600}
-        footer={[
-          <CustomButton key="cancel" onClick={closeEditModal}>
-            Cancel
-          </CustomButton>,
-          <BlueButton key="save" onClick={saveSubLogin} loading={saving}>
-            Save
-          </BlueButton>,
-        ]}
+        footer={
+          <div className="flex justify-end gap-2">
+            <CustomButton onClick={closeEditModal}>Cancel</CustomButton>
+            <BlueButton onClick={saveSubLogin} loading={saving}>
+              Save
+            </BlueButton>
+          </div>
+        }
       >
         <div className="space-y-4">
           <div>
