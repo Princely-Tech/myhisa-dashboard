@@ -99,6 +99,9 @@ const apiEndpoints = {
   adminPermissionsCatalog: "admin/permissions",
   adminStaffList: "admin/staff",
   adminStaffDetail: (userId: number) => `admin/staff/${userId}`,
+  accountPermissionsCatalog: "me/account-permissions",
+  subLoginList: "me/sub-logins",
+  subLoginDetail: (id: number) => `me/sub-logins/${id}`,
 };
 export const localApiEndPoints = {
   main: "/api",

@@ -59,6 +59,7 @@ const routes = {
   adminTransactionGraphs: "/admin/transaction-graphs",
   adminAuditLogs: "/admin/audit-logs",
   adminStaffManagement: "/admin/staff-management",
+  subLoginManagement: "/settings/sub-logins",
 };
 export default routes;
 export { transactionFilterStr };

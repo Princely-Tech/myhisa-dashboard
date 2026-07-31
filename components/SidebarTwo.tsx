@@ -16,6 +16,7 @@ import { User } from "@/utils/types";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { hasPermission, isSuperAdmin } from "@/utils/permissions";
+import { hasAccountPermission, isSubLogin } from "@/utils/accountPermissions";
 
 const SidebarTwo = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -65,6 +66,11 @@ const SidebarTwo = () => {
         <Image src={logo} alt="myHisa" />
       </div>
       <div id="sidebar-scrollbar" className="overflow-auto pb-20">
+        {user.sub_login && (
+          <div className="px-4 py-2 text-xs text-center opacity-70">
+            Logged in as {user.sub_login.name} ({user.sub_login.email})
+          </div>
+        )}
         <nav className="iq-sidebar-menu pb-8">
           <ul id="iq-sidebar-toggle" className="iq-menu">
             <MenuItem
@@ -74,6 +80,7 @@ const SidebarTwo = () => {
               icon={<i className="las la-home iq-arrow-left"></i>}
             />
 
+            {hasAccountPermission(user, "history.view") && (
             <CollapsibleMenuItem
               isActive={
                 pathname == routes.transactions || pathname == routes.queryPlain
@@ -169,8 +176,9 @@ const SidebarTwo = () => {
                 },
               ]}
             />
+            )}
 
-           
+           {hasAccountPermission(user, "bulk_airtime.manage") && (
            <CollapsibleMenuItem
                 isActive={
                   pathname == routes.bulkAirtimeUpload ||
@@ -194,41 +202,52 @@ const SidebarTwo = () => {
                   },
                 ]}
               />
-              
+              )}
+
+            {hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Credit History"
               route={routes.creditHistory}
               isActive={pathname == routes.creditHistory}
               icon={<i className="las la-history iq-arrow-left"></i>}
             />
+            )}
 
+            {hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Commission Credit History"
               route={routes.commissionCreditHistory}
               isActive={pathname == routes.commissionCreditHistory}
               icon={<i className="las la-coins iq-arrow-left"></i>}
             />
+            )}
 
+            {hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Export Wallet Logs"
               route={routes.exportWalletLogs}
               isActive={pathname == routes.exportWalletLogs}
               icon={<i className="las la-file-download iq-arrow-left"></i>}
             />
+            )}
 
+            {hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Pending Transactions"
               route={routes.pendingTransactions}
               isActive={pathname == routes.pendingTransactions}
               icon={<i className="las la-clock iq-arrow-left"></i>}
             />
+            )}
 
+            {hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Transaction Lookup"
               route={routes.transactionLookup}
               isActive={pathname == routes.transactionLookup}
               icon={<i className="las la-search iq-arrow-left"></i>}
             />
+            )}
 
             <MenuItem
               title="Service Availability"
@@ -237,6 +256,7 @@ const SidebarTwo = () => {
               icon={<i className="las la-server iq-arrow-left"></i>}
             />
 
+            {hasAccountPermission(user, "history.view") && (
             <CollapsibleMenuItem
               isActive={
                 pathname == routes.commissionSummary ||
@@ -266,6 +286,7 @@ const SidebarTwo = () => {
                 },
               ]}
             />
+            )}
 
               <MenuItem
               title="Service Availability"
@@ -274,19 +295,23 @@ const SidebarTwo = () => {
               icon={<i className="las la-server iq-arrow-left"></i>}
             />
 
+            {hasAccountPermission(user, "webhooks.manage") && (
             <MenuItem
               title="Webhooks"
               route={routes.webhooks}
               isActive={pathname == routes.webhooks}
               icon={<i className="las la-bell iq-arrow-left"></i>}
             />
+            )}
 
+            {hasAccountPermission(user, "sender_ids.manage") && (
             <MenuItem
               title="SMS Sender IDs"
               route={routes.senderIds}
               isActive={pathname == routes.senderIds}
               icon={<i className="las la-sms iq-arrow-left"></i>}
             />
+            )}
 
             <MenuItem
               title="AI Assistant"
@@ -295,47 +320,62 @@ const SidebarTwo = () => {
               icon={<i className="las la-robot iq-arrow-left"></i>}
             />
 
+            {hasAccountPermission(user, "tickets.manage") && (
             <MenuItem
               title="Support Tickets"
               route={routes.tickets}
               isActive={pathname == routes.tickets}
               icon={<i className="las la-ticket-alt iq-arrow-left"></i>}
             />
+            )}
 
-            <CollapsibleMenuItem
-              isActive={
-                pathname == routes.testBeneficiaries ||
-                pathname == routes.testTransactions
-              }
-              title="Perform Transactions"
-              icon={<i className="las la-flask iq-arrow-left"></i>}
-              menuItems={[
+            {(() => {
+              const performTransactionItems = [
                 {
                   title: "Beneficiaries",
                   route: routes.testBeneficiaries,
                   icon: <i className="las la-users iq-arrow-left"></i>,
                   isActive: pathname == routes.testBeneficiaries,
+                  allowed: hasAccountPermission(user, "test_transactions.manage"),
                 },
                 {
                   title: "New Transactions",
                   route: routes.testTransactions,
                   icon: <i className="las la-bolt iq-arrow-left"></i>,
                   isActive: pathname == routes.testTransactions,
+                  allowed: hasAccountPermission(user, "test_transactions.manage"),
                 },
                 {
                   title: "Data Plans",
                   route: routes.dataPlans,
                   icon: <i className="las la-database iq-arrow-left"></i>,
                   isActive: pathname == routes.dataPlans,
+                  // No dashboard flow for real purchases yet, so this stays
+                  // primary-login-only rather than a grantable permission.
+                  allowed: !isSubLogin(user),
                 },
                 {
                   title: "Electricity Billers",
                   route: routes.electricityBillers,
                   icon: <i className="las la-bolt iq-arrow-left"></i>,
                   isActive: pathname == routes.electricityBillers,
+                  allowed: !isSubLogin(user),
                 },
-              ]}
-            />
+              ].filter((item) => item.allowed);
+
+              if (performTransactionItems.length === 0) {
+                return null;
+              }
+
+              return (
+                <CollapsibleMenuItem
+                  isActive={performTransactionItems.some((item) => item.isActive)}
+                  title="Perform Transactions"
+                  icon={<i className="las la-flask iq-arrow-left"></i>}
+                  menuItems={performTransactionItems}
+                />
+              );
+            })()}
 
             {hasPermission(user, "reports.view") && (
               <MenuItem
@@ -367,6 +407,14 @@ const SidebarTwo = () => {
                 route={routes.adminStaffManagement}
                 isActive={pathname == routes.adminStaffManagement}
                 icon={<i className="las la-user-shield iq-arrow-left"></i>}
+              />
+            )}
+            {!isSubLogin(user) && (
+              <MenuItem
+                title="Sub-Login Management"
+                route={routes.subLoginManagement}
+                isActive={pathname == routes.subLoginManagement}
+                icon={<i className="las la-user-friends iq-arrow-left"></i>}
               />
             )}
             {(() => {

@@ -207,6 +207,13 @@ interface CustomButtonProps extends ButtonProps {
 export interface CookieSetParams {
   cookie: string;
 }
+export interface SubLoginInfo {
+  id: number;
+  name: string;
+  email: string;
+  permissions: string[];
+}
+
 export type User = {
   id: number;
   name: string;
@@ -216,6 +223,11 @@ export type User = {
   approved_at: string | null;
   rank: number; // 0 = user, 1 = staff (permission-scoped), 2 = super admin
   permissions?: string[];
+  // Present only when the current session is a sub-login (see
+  // utils/accountPermissions.ts) - absent/null means this is the primary
+  // account owner's own session. Unrelated to rank/permissions above, which
+  // are the internal staff/admin RBAC system.
+  sub_login?: SubLoginInfo | null;
   reporting_emails: string;
   referral_code: string;
   created_at: string;
@@ -589,6 +601,24 @@ export interface StaffUser {
   email: string;
   rank: number;
   permissions: string[];
+}
+
+// AccountPermission is the tenant/self-service permission catalog entry -
+// separate from Permission above, which is the internal staff/admin RBAC
+// catalog.
+export interface AccountPermission {
+  key: string;
+  label: string;
+  category: string;
+  description: string;
+}
+
+export interface SubLogin {
+  id: number;
+  name: string;
+  email: string;
+  permissions: string[];
+  created_at: string;
 }
 
 export interface AdminAuditLogsResponse {
