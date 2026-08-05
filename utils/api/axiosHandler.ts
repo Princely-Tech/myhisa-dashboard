@@ -125,6 +125,16 @@ class AxiosHandler {
     }
   }
   errHandler(error: any) {
+    if (error.response?.status === 401) {
+      // The backend's Auth() middleware returns a plain-text 401 body (not
+      // JSON), so error.response?.data?.message below would always be
+      // undefined for this case anyway - handle it explicitly rather than
+      // falling through to the generic "try again", which just invites
+      // retrying with the same dead token.
+      this.showError("Your session has expired. Please log in again.");
+      forceReLogin();
+      throw error;
+    }
     if (error.response?.data?.message) {
       this.showError(error.response?.data?.message);
     } else {

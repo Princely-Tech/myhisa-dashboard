@@ -519,6 +519,13 @@ const SidebarTwo = () => {
                   isActive: pathname == routes.adminAuditLogs,
                   permission: "audit_logs.view",
                 },
+                {
+                  title: "Support Tickets",
+                  route: routes.adminTickets,
+                  icon: <i className="las la-ticket-alt iq-arrow-left"></i>,
+                  isActive: pathname.startsWith(routes.adminTickets),
+                  permission: "tickets.manage",
+                },
               ].filter((item) => hasPermission(user, item.permission));
 
               if (adminToolItems.length === 0) {

@@ -45,6 +45,15 @@ export interface ChatResponse {
   };
 }
 
+// Minimal shape of the User record the backend embeds on admin ticket
+// responses (Preload("User")/"AssignedUser"/"ResolvedUser") - only what the
+// ticket UI actually reads, not the full account model.
+export interface TicketUserSummary {
+  id: number;
+  name: string;
+  email: string;
+}
+
 export interface Ticket {
   id: number;
   ticket_code: string;
@@ -61,6 +70,11 @@ export interface Ticket {
   created_at: string;
   updated_at: string;
   messages?: TicketMessage[];
+  // Only present on admin endpoints (AdminGetTickets/AdminGetTicket) -
+  // absent on the self-service /tickets responses.
+  user?: TicketUserSummary;
+  assigned_user?: TicketUserSummary;
+  resolved_user?: TicketUserSummary;
 }
 
 export interface TicketMessage {
@@ -70,12 +84,20 @@ export interface TicketMessage {
   message: string;
   is_staff: boolean;
   created_at: string;
+  // Only present on admin endpoints (Preload("Messages.User")).
+  user?: TicketUserSummary;
 }
 
 export interface TicketListParams {
   status?: string;
   page?: number;
   limit?: number;
+}
+
+export interface AdminTicketListParams extends TicketListParams {
+  priority?: string;
+  source?: string;
+  category?: string;
 }
 
 export interface CreateTicketRequest {
@@ -113,6 +135,38 @@ export const aiService = {
 
   addTicketMessage: async (ticketId: number, message: string) => {
     const response = await aiApi.post(`/tickets/${ticketId}/messages`, { message });
+    return response.data;
+  },
+
+  // Admin/staff ticket management - all gated server-side behind the
+  // tickets.manage staff permission (see /admin/tickets* in main.go).
+  adminGetTickets: async (params?: AdminTicketListParams) => {
+    const response = await aiApi.get('/admin/tickets', { params });
+    return response.data;
+  },
+
+  adminGetTicket: async (ticketId: number | string) => {
+    const response = await aiApi.get(`/admin/tickets/${ticketId}`);
+    return response.data;
+  },
+
+  adminUpdateTicketStatus: async (ticketId: number | string, status: string) => {
+    const response = await aiApi.put(`/admin/tickets/${ticketId}/status`, { status });
+    return response.data;
+  },
+
+  adminAssignTicket: async (ticketId: number | string, assignedTo: number) => {
+    const response = await aiApi.put(`/admin/tickets/${ticketId}/assign`, { assigned_to: assignedTo });
+    return response.data;
+  },
+
+  adminResolveTicket: async (ticketId: number | string, resolution: string) => {
+    const response = await aiApi.put(`/admin/tickets/${ticketId}/resolve`, { resolution });
+    return response.data;
+  },
+
+  adminReplyToTicket: async (ticketId: number | string, message: string) => {
+    const response = await aiApi.post(`/admin/tickets/${ticketId}/messages`, { message });
     return response.data;
   },
 };

@@ -110,6 +110,12 @@ const apiEndpoints = {
   accountPermissionsCatalog: "me/account-permissions",
   subLoginList: "me/sub-logins",
   subLoginDetail: (id: number) => `me/sub-logins/${id}`,
+  adminTickets: "admin/tickets",
+  adminTicket: (id: number | string) => `admin/tickets/${id}`,
+  adminTicketStatus: (id: number | string) => `admin/tickets/${id}/status`,
+  adminTicketAssign: (id: number | string) => `admin/tickets/${id}/assign`,
+  adminTicketResolve: (id: number | string) => `admin/tickets/${id}/resolve`,
+  adminTicketMessages: (id: number | string) => `admin/tickets/${id}/messages`,
 };
 export const localApiEndPoints = {
   main: "/api",

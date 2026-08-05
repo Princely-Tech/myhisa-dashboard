@@ -53,6 +53,13 @@ export function canAccessPage(user: User | null | undefined, path: string): bool
     return isSuperAdmin(user);
   }
 
+  // routes.adminTicketDetail is a dynamic /admin/tickets/:id route, so it
+  // can't be keyed exactly in PAGE_PERMISSIONS below - gate the whole
+  // /admin/tickets tree (list and detail) on the one prefix check instead.
+  if (path.startsWith(routes.adminTickets)) {
+    return hasPermission(user, "tickets.manage");
+  }
+
   const required = PAGE_PERMISSIONS[path];
   if (!required) {
     return true;

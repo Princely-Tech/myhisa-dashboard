@@ -62,6 +62,8 @@ const routes = {
   adminAuditLogs: "/admin/audit-logs",
   adminStaffManagement: "/admin/staff-management",
   subLoginManagement: "/settings/sub-logins",
+  adminTickets: "/admin/tickets",
+  adminTicketDetail: (id: number | string) => `/admin/tickets/${id}`,
 };
 export default routes;
 export { transactionFilterStr };
