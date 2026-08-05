@@ -18,6 +18,7 @@ const constants = {
     isFiltering:'is-filtering',
     isExporting:'is-exporting',
     channel: 'channel',
+    status: 'status',
   },
 };
 export default constants;

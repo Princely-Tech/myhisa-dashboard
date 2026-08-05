@@ -11,6 +11,10 @@ export function isSubLogin(user?: User | null): boolean {
   return !!user?.sub_login;
 }
 
+export function isApproved(user?: User | null): boolean {
+  return !!user?.approved_at;
+}
+
 export function hasAccountPermission(user?: User | null, permission?: string): boolean {
   if (!user) return false;
   if (!isSubLogin(user)) return true; // primary account owner has full account power
@@ -54,7 +58,44 @@ export const ACCOUNT_PAGE_PERMISSIONS: Record<string, string> = {
 // permission that doesn't exist in the catalog).
 const PRIMARY_LOGIN_ONLY_PAGES = [routes.subLoginManagement, routes.dataPlans, routes.electricityBillers];
 
+// Pages backed by an endpoint that sits behind the backend's `approved`
+// middleware group (main.go) - i.e. it 403s for an account still pending
+// admin approval. Kept as an explicit list rather than "everything except a
+// denylist" because a few pages (webhooks, tickets, AI assistant,
+// availability) deliberately work pre-approval and must stay reachable so a
+// pending partner can still get help/set things up. Keep this in sync with
+// main.go's `approved := emailVerified.Group("")` block.
+const APPROVAL_REQUIRED_PAGES = [
+  routes.transactions,
+  routes.queryPlain,
+  routes.creditHistory,
+  routes.commissionCreditHistory,
+  routes.exportWalletLogs,
+  routes.pendingTransactions,
+  routes.transactionLookup,
+  routes.commissionSummary,
+  routes.commissionDetails,
+  routes.commissionByNetwork,
+  routes.senderIds,
+  routes.bulkAirtimeUpload,
+  routes.bulkAirtimeCampaigns,
+  routes.testBeneficiaries,
+  routes.testTransactions,
+  routes.dataPlans,
+  routes.electricityBillers,
+  routes.subLoginManagement,
+];
+
 export function canAccessAccountPage(user: User | null | undefined, path: string): boolean {
+  // Bulk airtime's review/status pages are dynamic (/bulk-airtime/review/:id,
+  // /bulk-airtime/status/:id) so they can't be listed by exact path above -
+  // the whole /bulk-airtime/ tree sits behind `approved` on the backend.
+  const requiresApproval =
+    APPROVAL_REQUIRED_PAGES.includes(path) || path.startsWith("/bulk-airtime/");
+  if (requiresApproval && !isApproved(user)) {
+    return false;
+  }
+
   if (PRIMARY_LOGIN_ONLY_PAGES.includes(path)) {
     return !isSubLogin(user);
   }

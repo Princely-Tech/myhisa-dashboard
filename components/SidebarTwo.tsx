@@ -16,7 +16,7 @@ import { User } from "@/utils/types";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { hasPermission, isSuperAdmin } from "@/utils/permissions";
-import { hasAccountPermission, isSubLogin } from "@/utils/accountPermissions";
+import { hasAccountPermission, isApproved, isSubLogin } from "@/utils/accountPermissions";
 
 const SidebarTwo = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -80,7 +80,16 @@ const SidebarTwo = () => {
               icon={<i className="las la-home iq-arrow-left"></i>}
             />
 
-            {hasAccountPermission(user, "history.view") && (
+            {!isSubLogin(user) && (
+            <MenuItem
+              title="My Registration"
+              route={routes.profile}
+              isActive={pathname == routes.profile}
+              icon={<i className="las la-id-card iq-arrow-left"></i>}
+            />
+            )}
+
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
             <CollapsibleMenuItem
               isActive={
                 pathname == routes.transactions || pathname == routes.queryPlain
@@ -178,7 +187,7 @@ const SidebarTwo = () => {
             />
             )}
 
-           {hasAccountPermission(user, "bulk_airtime.manage") && (
+           {isApproved(user) && hasAccountPermission(user, "bulk_airtime.manage") && (
            <CollapsibleMenuItem
                 isActive={
                   pathname == routes.bulkAirtimeUpload ||
@@ -204,7 +213,7 @@ const SidebarTwo = () => {
               />
               )}
 
-            {hasAccountPermission(user, "history.view") && (
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Credit History"
               route={routes.creditHistory}
@@ -213,7 +222,7 @@ const SidebarTwo = () => {
             />
             )}
 
-            {hasAccountPermission(user, "history.view") && (
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Commission Credit History"
               route={routes.commissionCreditHistory}
@@ -222,7 +231,7 @@ const SidebarTwo = () => {
             />
             )}
 
-            {hasAccountPermission(user, "history.view") && (
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Export Wallet Logs"
               route={routes.exportWalletLogs}
@@ -231,7 +240,7 @@ const SidebarTwo = () => {
             />
             )}
 
-            {hasAccountPermission(user, "history.view") && (
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Pending Transactions"
               route={routes.pendingTransactions}
@@ -240,7 +249,7 @@ const SidebarTwo = () => {
             />
             )}
 
-            {hasAccountPermission(user, "history.view") && (
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
             <MenuItem
               title="Transaction Lookup"
               route={routes.transactionLookup}
@@ -256,7 +265,7 @@ const SidebarTwo = () => {
               icon={<i className="las la-server iq-arrow-left"></i>}
             />
 
-            {hasAccountPermission(user, "history.view") && (
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
             <CollapsibleMenuItem
               isActive={
                 pathname == routes.commissionSummary ||
@@ -304,7 +313,7 @@ const SidebarTwo = () => {
             />
             )}
 
-            {hasAccountPermission(user, "sender_ids.manage") && (
+            {isApproved(user) && hasAccountPermission(user, "sender_ids.manage") && (
             <MenuItem
               title="SMS Sender IDs"
               route={routes.senderIds}
@@ -361,7 +370,7 @@ const SidebarTwo = () => {
                   isActive: pathname == routes.electricityBillers,
                   allowed: !isSubLogin(user),
                 },
-              ].filter((item) => item.allowed);
+              ].filter((item) => item.allowed && isApproved(user));
 
               if (performTransactionItems.length === 0) {
                 return null;
@@ -409,7 +418,7 @@ const SidebarTwo = () => {
                 icon={<i className="las la-user-shield iq-arrow-left"></i>}
               />
             )}
-            {!isSubLogin(user) && (
+            {isApproved(user) && !isSubLogin(user) && (
               <MenuItem
                 title="Sub-Login Management"
                 route={routes.subLoginManagement}

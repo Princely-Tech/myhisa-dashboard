@@ -3,7 +3,7 @@ import AxiosHandler from "@/utils/api/axiosHandler";
 import { CreditHistory, UsersList } from "@/utils/types";
 import { useEffect, useState } from "react";
 import UsersListTable from "./table";
-import { Form, Spin, message } from "antd";
+import { Form, Segmented, Spin, message } from "antd";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BlueButton, FormField, InputField } from "@/components";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -28,10 +28,11 @@ const UsersListPage = () => {
   const router = useRouter();
   const search = searchParams.get(constants.searchParamsKeys.search) ?? "";
   const isFiltering = searchParams.has(constants.searchParamsKeys.isFiltering);
+  const status = searchParams.get(constants.searchParamsKeys.status) ?? "all";
 
   useEffect(() => {
     process();
-  }, [searchParams]);
+  }, [searchParams, status]);
   return (
     <main className="flex-1 border relative px-4 pt-2 pb-5 flex flex-col min-h-screen  overflow-hidden">
       {contextHolder}
@@ -40,6 +41,23 @@ const UsersListPage = () => {
           Users
         </header>
         <FormComponent />
+      </div>
+      <div className="mb-[20px]">
+        <Segmented
+          value={status}
+          onChange={(value) => {
+            updateSearchParams({
+              values: [{ key: constants.searchParamsKeys.status, value: String(value) }],
+              pathname: pathname,
+              router: router,
+              searchParams: searchParams,
+            });
+          }}
+          options={[
+            { label: "All", value: "all" },
+            { label: "Pending Approval", value: "pending" },
+          ]}
+        />
       </div>
       <section className="flex flex-1 overflow-hidden">
         <UsersListTable
@@ -74,8 +92,10 @@ const UsersListPage = () => {
   }
   async function process() {
     try {
+      const endpoint =
+        status === "pending" ? apiEndpoints.adminUnapprovedUsers : apiEndpoints.users;
       const res = await apiService.get({
-        endPoint: `${apiEndpoints.users}?search=${search}`,
+        endPoint: `${endpoint}?search=${search}`,
       });
       setData(res.data);
     } catch (err) {}

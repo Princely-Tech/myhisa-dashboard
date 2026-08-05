@@ -109,6 +109,7 @@ const InputField: React.FC<InputFieldProps> = ({
             defaultCountry="NG"
             placeholder="Enter phone number"
             onChange={(input) => {}}
+            disabled={rest.disabled}
             international
             limitMaxLength
             className={`input-phone-number border px-[14px] py-[10px] rounded-md focus-within:border-blue-500 hover:border-blue-500 ${

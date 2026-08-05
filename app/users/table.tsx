@@ -42,11 +42,13 @@ const UsersListTable = ({
     };
   }
   const [modalContent, setModalContent] = useState<User | null>(null);
-  const [modalAction, setModalAction] = useState<'credit' | 'creditCommission' | 'debit' | 'debitCommission' | 'transfer' | 'apiKey' | 'blockWallet' | 'unblockWallet'>('credit');
+  const [modalAction, setModalAction] = useState<'credit' | 'creditCommission' | 'debit' | 'debitCommission' | 'transfer' | 'apiKey' | 'blockWallet' | 'unblockWallet' | 'viewDetails'>('credit');
   const [creditingAccount, setCreditingAccount] = useState(false);
   const [apiKey, setApiKey] = useState<string>('');
   const [showFullApiKey, setShowFullApiKey] = useState(false);
   const [processingAction, setProcessingAction] = useState(false);
+  const [queryMessage, setQueryMessage] = useState('');
+  const [sendingQuery, setSendingQuery] = useState(false);
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);
@@ -204,6 +206,25 @@ const UsersListTable = ({
     setProcessingAction(false);
   };
 
+  const sendRegistrationQuery = async (user: User) => {
+    if (!queryMessage.trim()) {
+      messageApi.error('Enter a message to send');
+      return;
+    }
+    setSendingQuery(true);
+    try {
+      await apiService.post({
+        endPoint: apiEndpoints.adminSendRegistrationQuery(user.id),
+        body: { message: queryMessage.trim() },
+      });
+      messageApi.success('Registration query sent to partner');
+      setQueryMessage('');
+    } catch (err) {
+      console.error('Error sending registration query:', err);
+    }
+    setSendingQuery(false);
+  };
+
   const viewApiKey = async () => {
     setProcessingAction(true);
     try {
@@ -285,6 +306,33 @@ const UsersListTable = ({
     return `${key.substring(0, 10)}...${key.substring(key.length - 10)}`;
   };
 
+  const formatPartnerType = (type?: string | null) => {
+    if (type === 'bank') return 'Bank';
+    if (type === 'non_bank') return 'Non-Bank';
+    return 'N/A';
+  };
+
+  const viewDocument = async (userId: number, type: 'cac-certificate' | 'utility-bill') => {
+    try {
+      const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
+      const response = await fetch(
+        `${apiEndpoints.base}${apiEndpoints.adminUserDocument(userId, type)}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        messageApi.error(err.message || err.error || 'Document not found');
+        return;
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } catch (err) {
+      console.error('Error loading document:', err);
+      messageApi.error('Failed to load document');
+    }
+  };
+
   return (
     <div className={`table-responsive max-w-full ${className}`}>
       {contextHolder}
@@ -340,6 +388,15 @@ const UsersListTable = ({
                   <td>{formatDateSideBySide(item.created_at)}</td>
                   <td>
                     <div className="flex gap-2 flex-wrap">
+                      <BlueButton
+                        className="min-w-[100px] min-h-[44px] bg-gray-600 hover:bg-gray-700"
+                        onClick={() => {
+                          setModalAction('viewDetails');
+                          setModalContent(item);
+                        }}
+                      >
+                        View Details
+                      </BlueButton>
                       {!item.approved_at && (
                         <BlueButton
                           className="min-w-[100px] min-h-[44px] bg-green-600 hover:bg-green-700"
@@ -447,10 +504,109 @@ const UsersListTable = ({
       if (modalAction === 'apiKey') return `API Key Management - ${modalContent?.name} (${modalContent?.email})`;
       if (modalAction === 'blockWallet') return `Block Wallet - ${modalContent?.name} (${modalContent?.email})`;
       if (modalAction === 'unblockWallet') return `Unblock Wallet - ${modalContent?.name} (${modalContent?.email})`;
+      if (modalAction === 'viewDetails') return `Partner Details - ${modalContent?.name} (${modalContent?.email})`;
       return '';
     };
 
     const getModalContent = () => {
+      if (modalAction === 'viewDetails') {
+        return (
+          <div className="space-y-4">
+            <div className="bg-gray-100 p-3 rounded space-y-1">
+              <p><strong>Business Name:</strong> {modalContent?.name || 'N/A'}</p>
+              <p><strong>RC Number:</strong> {modalContent?.rc_number || 'N/A'}</p>
+              <p><strong>Partner Type:</strong> {formatPartnerType(modalContent?.partner_type)}</p>
+              <p><strong>BVN:</strong> {modalContent?.bvn || 'N/A'}</p>
+              <p><strong>NIN:</strong> {modalContent?.nin || 'N/A'}</p>
+            </div>
+
+            <div className="bg-gray-100 p-3 rounded space-y-1">
+              <p className="font-semibold mb-1">Contact Person</p>
+              <p><strong>Name:</strong> {modalContent?.contact_person_name || 'N/A'}</p>
+              <p><strong>Designation:</strong> {modalContent?.contact_person_designation || 'N/A'}</p>
+              <p><strong>Phone:</strong> {modalContent?.contact_person_phone || 'N/A'}</p>
+              <p><strong>Email:</strong> {modalContent?.contact_person_email || 'N/A'}</p>
+            </div>
+
+            <div className="bg-gray-100 p-3 rounded">
+              <p className="font-semibold mb-2">Documents</p>
+              <div className="flex gap-2 flex-wrap">
+                <BlueButton
+                  className="min-w-[160px]"
+                  disabled={!modalContent?.cac_certificate_uploaded_at}
+                  onClick={() => viewDocument(modalContent!.id, 'cac-certificate')}
+                >
+                  View CAC Certificate
+                </BlueButton>
+                <BlueButton
+                  className="min-w-[160px]"
+                  disabled={!modalContent?.utility_bill_uploaded_at}
+                  onClick={() => viewDocument(modalContent!.id, 'utility-bill')}
+                >
+                  View Utility Bill
+                </BlueButton>
+              </div>
+              {!modalContent?.cac_certificate_uploaded_at && !modalContent?.utility_bill_uploaded_at && (
+                <p className="text-xs text-gray-500 mt-2">
+                  No documents on file - this account may predate document uploads.
+                </p>
+              )}
+            </div>
+
+            {!modalContent?.approved_at && modalContent?.registration_query && (
+              <div className="bg-orange-50 border border-orange-200 p-3 rounded">
+                <p className="text-sm text-orange-800">
+                  <strong>Last query sent:</strong> {modalContent.registration_query}
+                </p>
+                {modalContent.registration_query_at && (
+                  <p className="text-xs text-orange-600 mt-1">
+                    {new Date(modalContent.registration_query_at).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {!modalContent?.approved_at && (
+              <div className="bg-blue-50 border border-blue-200 p-3 rounded">
+                <p className="text-sm text-blue-800 mb-2">
+                  If something needs to be fixed before approving, send the partner a query - they'll
+                  see it (and get an email) and can update their details.
+                </p>
+                <textarea
+                  className="w-full border rounded p-2 text-sm mb-2"
+                  rows={3}
+                  placeholder="e.g. Your CAC Certificate is unreadable, please re-upload a clearer copy."
+                  value={queryMessage}
+                  onChange={(e) => setQueryMessage(e.target.value)}
+                />
+                <BlueButton
+                  onClick={() => modalContent && sendRegistrationQuery(modalContent)}
+                  loading={sendingQuery}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Send Query
+                </BlueButton>
+              </div>
+            )}
+
+            {!modalContent?.approved_at && (
+              <div className="bg-yellow-50 border border-yellow-200 p-3 rounded">
+                <p className="text-sm text-yellow-800 mb-2">
+                  This partner is pending approval. Review the details and documents above before approving.
+                </p>
+                <BlueButton
+                  onClick={() => modalContent && approveUser(modalContent)}
+                  loading={processingAction}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Approve User
+                </BlueButton>
+              </div>
+            )}
+          </div>
+        );
+      }
+
       if (modalAction === 'apiKey') {
         return (
           <div className="space-y-4">
@@ -699,7 +855,7 @@ const UsersListTable = ({
     };
 
     const getOkButtonProps = () => {
-      if (modalAction === 'apiKey') {
+      if (modalAction === 'apiKey' || modalAction === 'viewDetails') {
         return { style: { display: 'none' } };
       }
       let buttonText = 'Submit';
@@ -736,6 +892,7 @@ const UsersListTable = ({
           form.resetFields();
           setApiKey('');
           setShowFullApiKey(false);
+          setQueryMessage('');
         }}
       >
         {getModalContent()}

@@ -8,6 +8,7 @@ const routes = {
   login: "/",
   register: "/register",
   dashboard: "/dashboard",
+  profile: "/profile",
   transactions: "/transactions",
   summariesTotal: "/summaries_total",
   summariesUser: "/summaries_user",

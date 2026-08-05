@@ -214,6 +214,9 @@ export interface SubLoginInfo {
   permissions: string[];
 }
 
+// Matches partnerConstants.Bank / partnerConstants.NonBank on the backend.
+export type PartnerType = "bank" | "non_bank";
+
 export type User = {
   id: number;
   name: string;
@@ -231,6 +234,23 @@ export type User = {
   reporting_emails: string;
   referral_code: string;
   created_at: string;
+  // Partner onboarding/KYC details. Optional/nullable throughout - accounts
+  // registered before this was added simply don't have these set.
+  rc_number?: string | null;
+  contact_person_name?: string | null;
+  contact_person_designation?: string | null;
+  contact_person_phone?: string | null;
+  contact_person_email?: string | null;
+  bvn?: string | null;
+  nin?: string | null;
+  partner_type?: PartnerType | null;
+  cac_certificate_uploaded_at?: string | null;
+  utility_bill_uploaded_at?: string | null;
+  // Set by an admin while the account is pending, asking the partner to
+  // clarify/fix something. Never present once approved_at is set - the
+  // backend strips it from this user's own responses at that point.
+  registration_query?: string | null;
+  registration_query_at?: string | null;
   wallet: {
     balance: number;
     commission: number;
