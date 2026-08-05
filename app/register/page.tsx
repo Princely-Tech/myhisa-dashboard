@@ -21,7 +21,7 @@ import {
   partnerTypeFormItemProps,
 } from "@/utils/formItemProps";
 import apiEndpoints from "@/utils/api/apiEndpoints";
-import { PartnerType } from "@/utils/types";
+import { CookieSetParams, PartnerType } from "@/utils/types";
 import Image from "next/image";
 import Link from "next/link";
 import type { UploadProps } from "antd";
@@ -139,6 +139,28 @@ const Register: React.FC = () => {
         setRegisteredEmail(values.email || "");
         setShowSuccessModal(true);
         messageApi.success("Account created successfully!");
+
+        // Register logs the account in the same way Login does (a token is
+        // always issued, verified or not) - stash it now so the
+        // verification screen the modal sends them to next can call /me
+        // once they've entered the OTP, without making them log in again.
+        if (result.data.token) {
+          localStorage.setItem(apiEndpoints.tokenSetUrl, result.data.token);
+          localStorage.setItem(apiEndpoints.userSetUrl, JSON.stringify(result.data.user));
+          const expires = new Date(Date.now() + 31536000000);
+          const userBody: CookieSetParams = {
+            cookie: `${apiEndpoints.userSetUrl}=${JSON.stringify(
+              result.data.user
+            )}; Path=/;Expires=${expires.toUTCString()}; HttpOnly; Secure; SameSite=Strict`,
+          };
+          const tokenBody: CookieSetParams = {
+            cookie: `${apiEndpoints.tokenSetUrl}=${
+              result.data.token
+            }; Path=/;Expires=${expires.toUTCString()}; HttpOnly; Secure; SameSite=Strict`,
+          };
+          await fetch(apiEndpoints.cookie, { method: "POST", body: JSON.stringify(userBody) });
+          await fetch(apiEndpoints.cookie, { method: "POST", body: JSON.stringify(tokenBody) });
+        }
       } else {
         messageApi.error(result.message || result.error || "Registration failed");
       }
@@ -151,7 +173,7 @@ const Register: React.FC = () => {
 
   const handleModalClose = () => {
     setShowSuccessModal(false);
-    router.push(routes.login);
+    router.push(`${routes.verifyEmail}?email=${encodeURIComponent(registeredEmail)}`);
   };
 
   return (
@@ -289,7 +311,7 @@ const Register: React.FC = () => {
         onCancel={handleModalClose}
         footer={[
           <BlueButton key="ok" onClick={handleModalClose}>
-            Go to Login
+            Continue to Verification
           </BlueButton>
         ]}
         width={500}

@@ -7,6 +7,7 @@ const transactionFilterStr = {
 const routes = {
   login: "/",
   register: "/register",
+  verifyEmail: "/verify-email",
   dashboard: "/dashboard",
   profile: "/profile",
   transactions: "/transactions",

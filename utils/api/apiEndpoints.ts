@@ -5,6 +5,8 @@ const apiEndpoints = {
   base: process.env.NEXT_PUBLIC_API_URL,
   login: "auth/login",
   register: "auth/register",
+  verifyEmail: "auth/verify-email",
+  resendVerificationOtp: "auth/resend-verification-otp",
   me: "me",
   updateRegistration: "me/registration",
   transactionStats: "transaction-stats",

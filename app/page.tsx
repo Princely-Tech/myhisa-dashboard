@@ -54,7 +54,16 @@ const Login: React.FC = () => {
         method: "POST",
         body: JSON.stringify(tokenBody),
       });
-      router.push(routes.dashboard);
+
+      // Backend flags a still-unverified account by including `otp` in the
+      // login response (same shape Register uses) - route there instead of
+      // straight into the dashboard, which would just fail to load (most of
+      // it sits behind the EmailVerified middleware).
+      if (res.data.otp) {
+        router.push(`${routes.verifyEmail}?email=${encodeURIComponent(values.email || "")}`);
+      } else {
+        router.push(routes.dashboard);
+      }
     } catch (err) {}
     setIsProcessing(false);
   };

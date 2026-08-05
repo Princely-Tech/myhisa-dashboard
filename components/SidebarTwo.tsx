@@ -81,114 +81,114 @@ const SidebarTwo = () => {
             />
 
             {!isSubLogin(user) && (
-            <MenuItem
-              title="My Registration"
-              route={routes.profile}
-              isActive={pathname == routes.profile}
-              icon={<i className="las la-id-card iq-arrow-left"></i>}
-            />
+              <MenuItem
+                title="My Registration"
+                route={routes.profile}
+                isActive={pathname == routes.profile}
+                icon={<i className="las la-id-card iq-arrow-left"></i>}
+              />
             )}
 
             {isApproved(user) && hasAccountPermission(user, "history.view") && (
-            <CollapsibleMenuItem
-              isActive={
-                pathname == routes.transactions || pathname == routes.queryPlain
-              }
-              title="Transactions"
-              icon={<i className="las la-list iq-arrow-left"></i>}
-              menuItems={[
-                {
-                  title: "All",
-                  route: newSearchParams({
-                    pathname: routes.transactions,
-                    values: [
-                      {
-                        key: constants.searchParamsKeys.fromDate,
-                        value: null,
-                      },
-                      {
-                        key: constants.searchParamsKeys.toDate,
-                        value: null,
-                      },
-                    ],
-                  }).pathname,
-                  icon: <i className="las la-calendar-check iq-arrow-left"></i>,
-                  isActive:
-                    pathname == routes.transactions &&
-                    currentCollapsibleActive == transactionFilterStr.all,
-                },
-                {
-                  title: "Today",
-                  route: newSearchParams({
-                    pathname: routes.transactions,
-                    values: [
-                      {
-                        key: constants.searchParamsKeys.fromDate,
-                        value: date,
-                      },
-                      {
-                        key: constants.searchParamsKeys.toDate,
-                        value: date,
-                      },
-                    ],
-                  }).pathname,
-                  icon: <i className="las la-calendar-day iq-arrow-left"></i>,
-                  isActive:
-                    currentCollapsibleActive == transactionFilterStr.today,
-                },
-                {
-                  title: "Last 7 days",
+              <CollapsibleMenuItem
+                isActive={
+                  pathname == routes.transactions || pathname == routes.queryPlain
+                }
+                title="Transactions"
+                icon={<i className="las la-list iq-arrow-left"></i>}
+                menuItems={[
+                  {
+                    title: "All",
+                    route: newSearchParams({
+                      pathname: routes.transactions,
+                      values: [
+                        {
+                          key: constants.searchParamsKeys.fromDate,
+                          value: null,
+                        },
+                        {
+                          key: constants.searchParamsKeys.toDate,
+                          value: null,
+                        },
+                      ],
+                    }).pathname,
+                    icon: <i className="las la-calendar-check iq-arrow-left"></i>,
+                    isActive:
+                      pathname == routes.transactions &&
+                      currentCollapsibleActive == transactionFilterStr.all,
+                  },
+                  {
+                    title: "Today",
+                    route: newSearchParams({
+                      pathname: routes.transactions,
+                      values: [
+                        {
+                          key: constants.searchParamsKeys.fromDate,
+                          value: date,
+                        },
+                        {
+                          key: constants.searchParamsKeys.toDate,
+                          value: date,
+                        },
+                      ],
+                    }).pathname,
+                    icon: <i className="las la-calendar-day iq-arrow-left"></i>,
+                    isActive:
+                      currentCollapsibleActive == transactionFilterStr.today,
+                  },
+                  {
+                    title: "Last 7 days",
 
-                  route: newSearchParams({
-                    pathname: routes.transactions,
-                    values: [
-                      {
-                        key: constants.searchParamsKeys.fromDate,
-                        value: last7DaysDateStr,
-                      },
-                      {
-                        key: constants.searchParamsKeys.toDate,
-                        value: date,
-                      },
-                    ],
-                  }).pathname,
-                  isActive:
-                    currentCollapsibleActive ==
-                    transactionFilterStr.lastSevenDays,
-                  icon: <i className="las la-calendar-week iq-arrow-left"></i>,
-                },
-                {
-                  title: "Last 30 days",
-                  route: newSearchParams({
-                    pathname: routes.transactions,
-                    values: [
-                      {
-                        key: constants.searchParamsKeys.fromDate,
-                        value: last30DaysDateStr,
-                      },
-                      {
-                        key: constants.searchParamsKeys.toDate,
-                        value: date,
-                      },
-                    ],
-                  }).pathname,
-                  isActive:
-                    currentCollapsibleActive ==
-                    transactionFilterStr.lastThirtyDays,
-                  icon: <i className="las la-calendar iq-arrow-left"></i>,
-                },
-                {
-                  title: "Export",
-                  route: routes.exportTransacton,
-                  isActive: pathname == routes.exportTransacton,
-                  icon: <i className="las la-file-export iq-arrow-left"></i>,
-                },
-              ]}
-            />
+                    route: newSearchParams({
+                      pathname: routes.transactions,
+                      values: [
+                        {
+                          key: constants.searchParamsKeys.fromDate,
+                          value: last7DaysDateStr,
+                        },
+                        {
+                          key: constants.searchParamsKeys.toDate,
+                          value: date,
+                        },
+                      ],
+                    }).pathname,
+                    isActive:
+                      currentCollapsibleActive ==
+                      transactionFilterStr.lastSevenDays,
+                    icon: <i className="las la-calendar-week iq-arrow-left"></i>,
+                  },
+                  {
+                    title: "Last 30 days",
+                    route: newSearchParams({
+                      pathname: routes.transactions,
+                      values: [
+                        {
+                          key: constants.searchParamsKeys.fromDate,
+                          value: last30DaysDateStr,
+                        },
+                        {
+                          key: constants.searchParamsKeys.toDate,
+                          value: date,
+                        },
+                      ],
+                    }).pathname,
+                    isActive:
+                      currentCollapsibleActive ==
+                      transactionFilterStr.lastThirtyDays,
+                    icon: <i className="las la-calendar iq-arrow-left"></i>,
+                  },
+                  {
+                    title: "Export",
+                    route: routes.exportTransacton,
+                    isActive: pathname == routes.exportTransacton,
+                    icon: <i className="las la-file-export iq-arrow-left"></i>,
+                  },
+                ]}
+              />
             )}
 
-           {isApproved(user) && hasAccountPermission(user, "bulk_airtime.manage") && (
-           <CollapsibleMenuItem
+            {isApproved(user) && hasAccountPermission(user, "bulk_airtime.manage") && (
+              <CollapsibleMenuItem
                 isActive={
                   pathname == routes.bulkAirtimeUpload ||
                   pathname == routes.bulkAirtimeCampaigns ||
@@ -211,115 +211,108 @@ const SidebarTwo = () => {
                   },
                 ]}
               />
-              )}
-
-            {isApproved(user) && hasAccountPermission(user, "history.view") && (
-            <MenuItem
-              title="Credit History"
-              route={routes.creditHistory}
-              isActive={pathname == routes.creditHistory}
-              icon={<i className="las la-history iq-arrow-left"></i>}
-            />
             )}
 
             {isApproved(user) && hasAccountPermission(user, "history.view") && (
-            <MenuItem
-              title="Commission Credit History"
-              route={routes.commissionCreditHistory}
-              isActive={pathname == routes.commissionCreditHistory}
-              icon={<i className="las la-coins iq-arrow-left"></i>}
-            />
-            )}
-
-            {isApproved(user) && hasAccountPermission(user, "history.view") && (
-            <MenuItem
-              title="Export Wallet Logs"
-              route={routes.exportWalletLogs}
-              isActive={pathname == routes.exportWalletLogs}
-              icon={<i className="las la-file-download iq-arrow-left"></i>}
-            />
-            )}
-
-            {isApproved(user) && hasAccountPermission(user, "history.view") && (
-            <MenuItem
-              title="Pending Transactions"
-              route={routes.pendingTransactions}
-              isActive={pathname == routes.pendingTransactions}
-              icon={<i className="las la-clock iq-arrow-left"></i>}
-            />
-            )}
-
-            {isApproved(user) && hasAccountPermission(user, "history.view") && (
-            <MenuItem
-              title="Transaction Lookup"
-              route={routes.transactionLookup}
-              isActive={pathname == routes.transactionLookup}
-              icon={<i className="las la-search iq-arrow-left"></i>}
-            />
-            )}
-
-            <MenuItem
-              title="Service Availability"
-              route={routes.availability}
-              isActive={pathname == routes.availability}
-              icon={<i className="las la-server iq-arrow-left"></i>}
-            />
-
-            {isApproved(user) && hasAccountPermission(user, "history.view") && (
-            <CollapsibleMenuItem
-              isActive={
-                pathname == routes.commissionSummary ||
-                pathname == routes.commissionDetails ||
-                pathname == routes.commissionByNetwork
-              }
-              title="Commission"
-              icon={<i className="las la-coins iq-arrow-left"></i>}
-              menuItems={[
-                {
-                  title: "Summary",
-                  route: routes.commissionSummary,
-                  icon: <i className="las la-chart-pie iq-arrow-left"></i>,
-                  isActive: pathname == routes.commissionSummary,
-                },
-                {
-                  title: "Details",
-                  route: routes.commissionDetails,
-                  icon: <i className="las la-list-ul iq-arrow-left"></i>,
-                  isActive: pathname == routes.commissionDetails,
-                },
-                {
-                  title: "By Network",
-                  route: routes.commissionByNetwork,
-                  icon: <i className="las la-network-wired iq-arrow-left"></i>,
-                  isActive: pathname == routes.commissionByNetwork,
-                },
-              ]}
-            />
-            )}
-
               <MenuItem
+                title="Credit History"
+                route={routes.creditHistory}
+                isActive={pathname == routes.creditHistory}
+                icon={<i className="las la-history iq-arrow-left"></i>}
+              />
+            )}
+
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
+              <MenuItem
+                title="Commission Credit History"
+                route={routes.commissionCreditHistory}
+                isActive={pathname == routes.commissionCreditHistory}
+                icon={<i className="las la-coins iq-arrow-left"></i>}
+              />
+            )}
+
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
+              <MenuItem
+                title="Export Wallet Logs"
+                route={routes.exportWalletLogs}
+                isActive={pathname == routes.exportWalletLogs}
+                icon={<i className="las la-file-download iq-arrow-left"></i>}
+              />
+            )}
+
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
+              <MenuItem
+                title="Pending Transactions"
+                route={routes.pendingTransactions}
+                isActive={pathname == routes.pendingTransactions}
+                icon={<i className="las la-clock iq-arrow-left"></i>}
+              />
+            )}
+
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
+              <MenuItem
+                title="Transaction Lookup"
+                route={routes.transactionLookup}
+                isActive={pathname == routes.transactionLookup}
+                icon={<i className="las la-search iq-arrow-left"></i>}
+              />
+            )}
+
+            <MenuItem
               title="Service Availability"
               route={routes.availability}
               isActive={pathname == routes.availability}
               icon={<i className="las la-server iq-arrow-left"></i>}
             />
+
+            {isApproved(user) && hasAccountPermission(user, "history.view") && (
+              <CollapsibleMenuItem
+                isActive={
+                  pathname == routes.commissionSummary ||
+                  pathname == routes.commissionDetails ||
+                  pathname == routes.commissionByNetwork
+                }
+                title="Commission"
+                icon={<i className="las la-coins iq-arrow-left"></i>}
+                menuItems={[
+                  {
+                    title: "Summary",
+                    route: routes.commissionSummary,
+                    icon: <i className="las la-chart-pie iq-arrow-left"></i>,
+                    isActive: pathname == routes.commissionSummary,
+                  },
+                  {
+                    title: "Details",
+                    route: routes.commissionDetails,
+                    icon: <i className="las la-list-ul iq-arrow-left"></i>,
+                    isActive: pathname == routes.commissionDetails,
+                  },
+                  {
+                    title: "By Network",
+                    route: routes.commissionByNetwork,
+                    icon: <i className="las la-network-wired iq-arrow-left"></i>,
+                    isActive: pathname == routes.commissionByNetwork,
+                  },
+                ]}
+              />
+            )}
 
             {hasAccountPermission(user, "webhooks.manage") && (
-            <MenuItem
-              title="Webhooks"
-              route={routes.webhooks}
-              isActive={pathname == routes.webhooks}
-              icon={<i className="las la-bell iq-arrow-left"></i>}
-            />
+              <MenuItem
+                title="Webhooks"
+                route={routes.webhooks}
+                isActive={pathname == routes.webhooks}
+                icon={<i className="las la-bell iq-arrow-left"></i>}
+              />
             )}
 
             {isApproved(user) && hasAccountPermission(user, "sender_ids.manage") && (
-            <MenuItem
-              title="SMS Sender IDs"
-              route={routes.senderIds}
-              isActive={pathname == routes.senderIds}
-              icon={<i className="las la-sms iq-arrow-left"></i>}
-            />
+              <MenuItem
+                title="SMS Sender IDs"
+                route={routes.senderIds}
+                isActive={pathname == routes.senderIds}
+                icon={<i className="las la-sms iq-arrow-left"></i>}
+              />
             )}
 
             <MenuItem
@@ -330,12 +323,12 @@ const SidebarTwo = () => {
             />
 
             {hasAccountPermission(user, "tickets.manage") && (
-            <MenuItem
-              title="Support Tickets"
-              route={routes.tickets}
-              isActive={pathname == routes.tickets}
-              icon={<i className="las la-ticket-alt iq-arrow-left"></i>}
-            />
+              <MenuItem
+                title="Support Tickets"
+                route={routes.tickets}
+                isActive={pathname == routes.tickets}
+                icon={<i className="las la-ticket-alt iq-arrow-left"></i>}
+              />
             )}
 
             {(() => {
@@ -608,9 +601,8 @@ const CollapsibleMenuItem = ({
         {icon}
         <span>{title}</span>
         <i
-          className={`${
-            collapse ? "ri-arrow-right-s-line" : "ri-arrow-down-s-line"
-          } iq-arrow-right`}
+          className={`${collapse ? "ri-arrow-right-s-line" : "ri-arrow-down-s-line"
+            } iq-arrow-right`}
         ></i>
       </Link>
       <ul className={`iq-submenu show ${collapse && "hidden"}`}>

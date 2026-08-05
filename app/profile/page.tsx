@@ -284,7 +284,7 @@ const ProfilePage: React.FC = () => {
               <h2 className="text-[#344054] font-medium mb-1 text-[14px]">CAC Certificate</h2>
               <p className="text-xs text-gray-500 mb-2">
                 {user?.cac_certificate_uploaded_at
-                  ? `On file - uploaded ${formatDate(user.cac_certificate_uploaded_at)}`
+                  ? `One file - uploaded ${formatDate(user.cac_certificate_uploaded_at)}`
                   : "Not uploaded"}
               </p>
               {!approved && (
@@ -308,7 +308,7 @@ const ProfilePage: React.FC = () => {
                 <h2 className="text-[#344054] font-medium mb-1 text-[14px]">Utility Bill</h2>
                 <p className="text-xs text-gray-500 mb-2">
                   {user?.utility_bill_uploaded_at
-                    ? `On file - uploaded ${formatDate(user.utility_bill_uploaded_at)}`
+                    ? `One file - uploaded ${formatDate(user.utility_bill_uploaded_at)}`
                     : "Not uploaded"}
                 </p>
                 {!approved && (

@@ -188,6 +188,21 @@ const partnerTypeFormItemProps = {
     },
   ],
 };
+const otpFormItemProps = {
+  name: "otp",
+  rules: [
+    {
+      validator: (_: unknown, value: string) => {
+        if (!value || value == "") {
+          return Promise.reject("Enter the verification code");
+        } else if (!/^\d{6}$/.test(value)) {
+          return Promise.reject("Verification code must be exactly 6 digits");
+        }
+        return Promise.resolve();
+      },
+    },
+  ],
+};
 const checkBoxFormItemProps = {
   name: "termsAgree",
   rules: [
@@ -219,4 +234,5 @@ export {
   bvnFormItemProps,
   ninFormItemProps,
   partnerTypeFormItemProps,
+  otpFormItemProps,
 };
