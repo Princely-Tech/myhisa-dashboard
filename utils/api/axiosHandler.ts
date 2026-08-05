@@ -2,6 +2,7 @@ import axios from "axios";
 import apiEndpoints from "./apiEndpoints";
 import { MessageInstance } from "antd/es/message/interface";
 import constants from "../constants";
+import { forceReLogin } from "../session";
 
 const apiReturnMessages = {
   passwordEmailMismatch:

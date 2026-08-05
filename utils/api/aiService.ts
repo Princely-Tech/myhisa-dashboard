@@ -1,5 +1,6 @@
 import axios from 'axios';
 import apiEndpoints from './apiEndpoints';
+import { forceReLogin } from '../session';
 
 const API_BASE_URL = apiEndpoints.base;
 
@@ -17,6 +18,21 @@ aiApi.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// A 401 here means the token itself is dead (expired/revoked), not just
+// this one call unauthorized (that's a 403 - handled per-page) - same
+// "wipe the session and send them back to log in" behavior AxiosHandler
+// uses everywhere else, so this instance doesn't silently strand the user
+// on a page where every action fails the same way.
+aiApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      forceReLogin();
+    }
+    return Promise.reject(error);
+  }
+);
 
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';

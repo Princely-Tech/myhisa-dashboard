@@ -10,7 +10,8 @@ import {
   User,
   UsersList,
 } from "@/utils/types";
-import { Empty, Modal, Spin, message } from "antd";
+import { Dropdown, Empty, MenuProps, Modal, Spin, message } from "antd";
+import { DownOutlined } from "@ant-design/icons";
 import { useForm } from "antd/es/form/Form";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
@@ -52,7 +53,13 @@ const UsersListTable = ({
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);
-  const formKey = Math.random() * 100000000000;
+  // Stable per (user, action) pair - gives the form/modal a clean reset
+  // when a *different* action or user is opened, but stays the same
+  // across re-renders of the same open modal. The Math.random() key this
+  // replaced was recomputed on every render, which forced React to fully
+  // unmount and remount the modal - including the input the user was
+  // mid-keystroke in - on every single character typed.
+  const modalKey = modalContent ? `${modalContent.id}-${modalAction}` : "closed";
   const creditUser = async (values: any) => {
    
     setCreditingAccount(true);
@@ -219,6 +226,14 @@ const UsersListTable = ({
       });
       messageApi.success('Registration query sent to partner');
       setQueryMessage('');
+      // Reload so the "Last query sent" note (and every other admin's copy
+      // of this user's row) reflects what was just sent - without this,
+      // reopening the same modal a moment later still shows the stale
+      // pre-send state, which is exactly what leads to a query being sent
+      // twice.
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
     } catch (err) {
       console.error('Error sending registration query:', err);
     }
@@ -333,12 +348,118 @@ const UsersListTable = ({
     }
   };
 
+  // Every per-row action collapsed into one dropdown menu instead of ~9
+  // stacked buttons - what made every row in the table balloon in height.
+  const buildActionItems = (item: User): MenuProps["items"] => {
+    const items: MenuProps["items"] = [
+      {
+        key: "viewDetails",
+        label: "View Details",
+        onClick: () => {
+          setModalAction("viewDetails");
+          setModalContent(item);
+        },
+      },
+    ];
+
+    if (!item.approved_at) {
+      items.push({
+        key: "approve",
+        label: "Approve User",
+        onClick: () => approveUser(item),
+      });
+    }
+
+    items.push(
+      { type: "divider" },
+      {
+        key: "credit",
+        label: "Credit Balance",
+        onClick: () => {
+          setModalAction("credit");
+          setModalContent(item);
+        },
+      },
+      {
+        key: "creditCommission",
+        label: "Credit Commission",
+        onClick: () => {
+          setModalAction("creditCommission");
+          setModalContent(item);
+        },
+      },
+      {
+        key: "debit",
+        label: "Debit Balance",
+        danger: true,
+        onClick: () => {
+          setModalAction("debit");
+          setModalContent(item);
+        },
+      },
+      {
+        key: "debitCommission",
+        label: "Debit Commission",
+        danger: true,
+        onClick: () => {
+          setModalAction("debitCommission");
+          setModalContent(item);
+        },
+      }
+    );
+
+    if (item.wallet.commission > 0) {
+      items.push({
+        key: "transfer",
+        label: "Transfer to Balance",
+        onClick: () => {
+          setModalAction("transfer");
+          setModalContent(item);
+        },
+      });
+    }
+
+    items.push(
+      { type: "divider" },
+      {
+        key: "apiKey",
+        label: "API Key",
+        onClick: () => {
+          setModalAction("apiKey");
+          setModalContent(item);
+          setApiKey("");
+        },
+      }
+    );
+
+    items.push(
+      item.wallet.is_account_active
+        ? {
+            key: "blockWallet",
+            label: "Block Wallet",
+            danger: true,
+            onClick: () => {
+              setModalAction("blockWallet");
+              setModalContent(item);
+            },
+          }
+        : {
+            key: "unblockWallet",
+            label: "Unblock Wallet",
+            onClick: () => {
+              setModalAction("unblockWallet");
+              setModalContent(item);
+            },
+          }
+    );
+
+    return items;
+  };
+
   return (
     <div className={`table-responsive max-w-full ${className}`}>
       {contextHolder}
-      {modalContent != null && (
-        <CustomModal key={Math.random() * 100000000000} />
-      )}
+      {modalContent != null && renderModal()}
       <table id="datatable" className="table table-striped table-bordered ">
         <thead>
           <tr>
@@ -387,104 +508,14 @@ const UsersListTable = ({
                   </td>
                   <td>{formatDateSideBySide(item.created_at)}</td>
                   <td>
-                    <div className="flex gap-2 flex-wrap">
-                      <BlueButton
-                        className="min-w-[100px] min-h-[44px] bg-gray-600 hover:bg-gray-700"
-                        onClick={() => {
-                          setModalAction('viewDetails');
-                          setModalContent(item);
-                        }}
-                      >
-                        View Details
+                    <Dropdown
+                      menu={{ items: buildActionItems(item) }}
+                      trigger={["click"]}
+                    >
+                      <BlueButton className="min-w-[100px] min-h-[40px]">
+                        Actions <DownOutlined />
                       </BlueButton>
-                      {!item.approved_at && (
-                        <BlueButton
-                          className="min-w-[100px] min-h-[44px] bg-green-600 hover:bg-green-700"
-                          onClick={() => approveUser(item)}
-                          loading={processingAction}
-                        >
-                          Approve User
-                        </BlueButton>
-                      )}
-                      <BlueButton
-                        className="min-w-[100px] min-h-[44px]"
-                        onClick={() => {
-                          setModalAction('credit');
-                          setModalContent(item);
-                        }}
-                      >
-                        Credit Balance
-                      </BlueButton>
-                      <BlueButton
-                        className="min-w-[100px] min-h-[44px] bg-purple-600 hover:bg-purple-700"
-                        onClick={() => {
-                          setModalAction('creditCommission');
-                          setModalContent(item);
-                        }}
-                      >
-                        Credit Commission
-                      </BlueButton>
-                      <BlueButton
-                        className="min-w-[100px] min-h-[44px] bg-red-600 hover:bg-red-700"
-                        onClick={() => {
-                          setModalAction('debit');
-                          setModalContent(item);
-                        }}
-                      >
-                        Debit Balance
-                      </BlueButton>
-                      <BlueButton
-                        className="min-w-[100px] min-h-[44px] bg-orange-600 hover:bg-orange-700"
-                        onClick={() => {
-                          setModalAction('debitCommission');
-                          setModalContent(item);
-                        }}
-                      >
-                        Debit Commission
-                      </BlueButton>
-                      {item.wallet.commission > 0 && (
-                        <BlueButton
-                          className="min-w-[100px] min-h-[44px] bg-green-600 hover:bg-green-700"
-                          onClick={() => {
-                            setModalAction('transfer');
-                            setModalContent(item);
-                          }}
-                        >
-                          Transfer to Balance
-                        </BlueButton>
-                      )}
-                      <BlueButton
-                        className="min-w-[100px] min-h-[44px] bg-indigo-600 hover:bg-indigo-700"
-                        onClick={() => {
-                          setModalAction('apiKey');
-                          setModalContent(item);
-                          setApiKey('');
-                        }}
-                      >
-                        API Key
-                      </BlueButton>
-                      {item.wallet.is_account_active ? (
-                        <BlueButton
-                          className="min-w-[100px] min-h-[44px] bg-red-600 hover:bg-red-700"
-                          onClick={() => {
-                            setModalAction('blockWallet');
-                            setModalContent(item);
-                          }}
-                        >
-                          Block Wallet
-                        </BlueButton>
-                      ) : (
-                        <BlueButton
-                          className="min-w-[100px] min-h-[44px] bg-orange-600 hover:bg-orange-700"
-                          onClick={() => {
-                            setModalAction('unblockWallet');
-                            setModalContent(item);
-                          }}
-                        >
-                          Unblock Wallet
-                        </BlueButton>
-                      )}
-                    </div>
+                    </Dropdown>
                   </td>
                 </tr>
               ))}
@@ -494,7 +525,12 @@ const UsersListTable = ({
       </table>
     </div>
   );
-  function CustomModal() {
+  // A plain function returning JSX, not a nested component ("<CustomModal
+  // />") - defining a component function inside another component's body
+  // gives it a new identity every render, which makes React treat it as a
+  // different component and remount it (killing focus/state) every time
+  // the parent re-renders, exactly like the key issue above.
+  function renderModal() {
     const getModalTitle = () => {
       if (modalAction === 'credit') return `Credit Balance - ${modalContent?.name} (${modalContent?.email})`;
       if (modalAction === 'creditCommission') return `Credit Commission - ${modalContent?.name} (${modalContent?.email})`;
@@ -512,6 +548,20 @@ const UsersListTable = ({
       if (modalAction === 'viewDetails') {
         return (
           <div className="space-y-4">
+            {!modalContent?.approved_at && modalContent?.registration_query && (
+              <div className="bg-orange-50 border border-orange-200 p-3 rounded">
+                <p className="text-sm text-orange-800">
+                  <strong>⚠️ Last query sent to this partner:</strong> {modalContent.registration_query}
+                </p>
+                {modalContent.registration_query_at && (
+                  <p className="text-xs text-orange-600 mt-1">
+                    {new Date(modalContent.registration_query_at).toLocaleString()} - check with the
+                    partner before sending another one, they may already be acting on this.
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="bg-gray-100 p-3 rounded space-y-1">
               <p><strong>Business Name:</strong> {modalContent?.name || 'N/A'}</p>
               <p><strong>RC Number:</strong> {modalContent?.rc_number || 'N/A'}</p>
@@ -552,19 +602,6 @@ const UsersListTable = ({
                 </p>
               )}
             </div>
-
-            {!modalContent?.approved_at && modalContent?.registration_query && (
-              <div className="bg-orange-50 border border-orange-200 p-3 rounded">
-                <p className="text-sm text-orange-800">
-                  <strong>Last query sent:</strong> {modalContent.registration_query}
-                </p>
-                {modalContent.registration_query_at && (
-                  <p className="text-xs text-orange-600 mt-1">
-                    {new Date(modalContent.registration_query_at).toLocaleString()}
-                  </p>
-                )}
-              </div>
-            )}
 
             {!modalContent?.approved_at && (
               <div className="bg-blue-50 border border-blue-200 p-3 rounded">
@@ -667,7 +704,7 @@ const UsersListTable = ({
         return (
           <FormField
             form={form}
-            key={formKey}
+            key={modalKey}
             name="block wallet"
             onFinish={blockWallet}
           >
@@ -709,7 +746,7 @@ const UsersListTable = ({
         return (
           <FormField
             form={form}
-            key={formKey}
+            key={modalKey}
             name="unblock wallet"
             onFinish={unblockWallet}
           >
@@ -757,7 +794,7 @@ const UsersListTable = ({
         return (
           <FormField
             form={form}
-            key={formKey}
+            key={modalKey}
             name="transfer commission"
             onFinish={(values) => {
               transferCommissionToBalance(values);
@@ -793,7 +830,7 @@ const UsersListTable = ({
       return (
         <FormField
           form={form}
-          key={formKey}
+          key={modalKey}
           name="credit user"
           onFinish={(values) => {
             if (modalAction === 'credit') {
@@ -874,7 +911,7 @@ const UsersListTable = ({
 
     return (
       <Modal
-        key={formKey}
+        key={modalKey}
         title={getModalTitle()}
         open={true}
         onOk={() => {
