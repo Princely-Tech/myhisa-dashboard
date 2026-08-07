@@ -8,6 +8,7 @@ const routes = {
   login: "/",
   register: "/register",
   verifyEmail: "/verify-email",
+  documentation: "/documentation",
   dashboard: "/dashboard",
   profile: "/profile",
   transactions: "/transactions",
@@ -64,6 +65,7 @@ const routes = {
   subLoginManagement: "/settings/sub-logins",
   adminTickets: "/admin/tickets",
   adminTicketDetail: (id: number | string) => `/admin/tickets/${id}`,
+  adminSettings: "/admin/settings",
 };
 export default routes;
 export { transactionFilterStr };

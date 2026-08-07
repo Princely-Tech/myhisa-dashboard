@@ -25,10 +25,22 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as CookieSetParams;
   const headers = new Headers();
-  headers.set("Location", request.nextUrl.href);
 
-  headers.set("Set-Cookie", body.cookie);
-  return new Response(null, { status: 302, headers });
+  // Callers always bake `Secure` into the cookie string, but browsers
+  // silently drop any cookie marked Secure when it didn't arrive over
+  // https (e.g. local dev on http://localhost) - the auth middleware then
+  // never sees a token cookie and bounces every navigation straight back
+  // to the login page, with no visible error anywhere. Strip it unless
+  // this request itself came in over https.
+  const isHttps =
+    request.nextUrl.protocol === "https:" ||
+    request.headers.get("x-forwarded-proto") === "https";
+  const cookie = isHttps
+    ? body.cookie
+    : body.cookie.replace(/;\s*Secure/i, "");
+
+  headers.set("Set-Cookie", cookie);
+  return new NextResponse(null, { status: 204, headers });
 }
 export async function DELETE(request: NextRequest) {
   try {

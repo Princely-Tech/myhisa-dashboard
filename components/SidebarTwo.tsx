@@ -322,6 +322,13 @@ const SidebarTwo = () => {
               icon={<i className="las la-robot iq-arrow-left"></i>}
             />
 
+            <MenuItem
+              title="Documentation"
+              route={routes.documentation}
+              isActive={pathname == routes.documentation}
+              icon={<i className="las la-book iq-arrow-left"></i>}
+            />
+
             {hasAccountPermission(user, "tickets.manage") && (
               <MenuItem
                 title="Support Tickets"
@@ -525,6 +532,13 @@ const SidebarTwo = () => {
                   icon: <i className="las la-ticket-alt iq-arrow-left"></i>,
                   isActive: pathname.startsWith(routes.adminTickets),
                   permission: "tickets.manage",
+                },
+                {
+                  title: "Notification Settings",
+                  route: routes.adminSettings,
+                  icon: <i className="las la-bell iq-arrow-left"></i>,
+                  isActive: pathname == routes.adminSettings,
+                  permission: "settings.manage",
                 },
               ].filter((item) => hasPermission(user, item.permission));
 

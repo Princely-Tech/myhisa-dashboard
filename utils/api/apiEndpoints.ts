@@ -104,6 +104,7 @@ const apiEndpoints = {
   hourlyStatsGlobal: "admin/transactions/hourly-stats/global",
   hourlyStatsForUser: (userId: number) => `admin/transactions/hourly-stats/user/${userId}`,
   adminAuditLogs: "admin/audit-logs",
+  adminSettings: "admin/settings",
   adminPermissionsCatalog: "admin/permissions",
   adminStaffList: "admin/staff",
   adminStaffDetail: (userId: number) => `admin/staff/${userId}`,

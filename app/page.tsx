@@ -74,7 +74,8 @@ const Login: React.FC = () => {
       <div className="mt-5 fixed">
         <Image src={logo} alt="myHisa" />
       </div>
-      <div className="flex flex-col justify-center items-center flex-1">
+      {/* <div className="flex flex-col justify-center items-center flex-1"> */}
+      <div className="flex flex-col justify-center items-center flex-1 py-24">
         <AuthCard subTitle="Login Account" title="MyHisa" centerTitle={true}>
           <FormField name="login_form" onFinish={onFinish}>
             <InputField
@@ -91,15 +92,24 @@ const Login: React.FC = () => {
               Continue
             </BlueButton>
           </FormField>
+
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">
+              Don&apos;t have an account?{" "}
+              <Link href={routes.register} className="text-teal-700 font-semibold hover:underline">
+                Register here
+              </Link>
+            </p>
+          </div>
         </AuthCard>
-        
+
         <div className="mt-4 text-center">
-          <p className="text-sm text-white">
-            Don&apos;t have an account?{" "}
-            <Link href={routes.register} className="text-white font-semibold hover:underline cursor-pointer">
-              Register here
-            </Link>
-          </p>
+          <Link
+            href={routes.documentation}
+            className="text-sm text-white/90 font-medium hover:text-white hover:underline"
+          >
+            View API &amp; integration docs
+          </Link>
         </div>
       </div>
     </div>

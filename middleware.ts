@@ -9,7 +9,7 @@ import { canAccessAccountPage } from "./utils/accountPermissions";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get(apiEndpoints.tokenSetUrl);
-  const publicRoutes = [routes.login, routes.register, routes.verifyEmail];
+  const publicRoutes = [routes.login, routes.register, routes.verifyEmail, routes.documentation];
   if (!token && !publicRoutes.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(
       `${request.nextUrl.origin}${routes.login}`
@@ -32,7 +32,12 @@ export function middleware(request: NextRequest) {
   // the account's email is still unverified - keep them on the verification
   // screen everywhere else, the same way isGated/canAccessAccountPage below
   // bounce a session to routes.dashboard when it can't be where it is.
-  if (userJson && !userJson.email_verified_at && pathname !== routes.verifyEmail) {
+  if (
+    userJson &&
+    !userJson.email_verified_at &&
+    pathname !== routes.verifyEmail &&
+    pathname !== routes.documentation
+  ) {
     return NextResponse.redirect(
       `${request.nextUrl.origin}${routes.verifyEmail}?email=${encodeURIComponent(
         userJson.email
@@ -71,5 +76,5 @@ export function middleware(request: NextRequest) {
   }
 }
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|docs/).*)"],
 };

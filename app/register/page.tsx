@@ -302,6 +302,15 @@ const Register: React.FC = () => {
             </p>
           </div>
         </AuthCard>
+
+        <div className="mt-4 text-center">
+          <Link
+            href={routes.documentation}
+            className="text-sm text-white/90 font-medium hover:text-white hover:underline"
+          >
+            View API &amp; integration docs
+          </Link>
+        </div>
       </div>
 
       <Modal
