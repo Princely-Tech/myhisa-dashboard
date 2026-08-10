@@ -370,6 +370,13 @@ const SidebarTwo = () => {
                   isActive: pathname == routes.electricityBillers,
                   allowed: !isSubLogin(user),
                 },
+                {
+                  title: "Cable Billers",
+                  route: routes.cableBillers,
+                  icon: <i className="las la-tv iq-arrow-left"></i>,
+                  isActive: pathname == routes.cableBillers,
+                  allowed: !isSubLogin(user),
+                },
               ].filter((item) => item.allowed && isApproved(user));
 
               if (performTransactionItems.length === 0) {
@@ -447,6 +454,13 @@ const SidebarTwo = () => {
                   route: routes.adminTransactions,
                   icon: <i className="las la-exchange-alt iq-arrow-left"></i>,
                   isActive: pathname == routes.adminTransactions,
+                  permission: "transactions.view",
+                },
+                {
+                  title: "Export Transactions",
+                  route: routes.adminExportTransactions,
+                  icon: <i className="las la-file-export iq-arrow-left"></i>,
+                  isActive: pathname == routes.adminExportTransactions,
                   permission: "transactions.view",
                 },
                 {

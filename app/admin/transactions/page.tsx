@@ -25,7 +25,7 @@ const NETWORKS = [
   { value: "mtn", label: "MTN" },
   { value: "glo", label: "GLO" },
   { value: "airtel", label: "Airtel" },
-  { value: "9mobile", label: "9Mobile" },
+  { value: "ninemobile", label: "Ninemobile" },
 ];
 
 const STATUSES = [
@@ -195,6 +195,13 @@ const AdminTransactions = () => {
       key: "external_ref",
       width: 150,
     },
+    {
+      title: "Paid From",
+      dataIndex: "paid_from_wallet",
+      key: "paid_from_wallet",
+      width: 130,
+      render: (value: string) => (value === "commission" ? "Commission Wallet" : "Main Wallet"),
+    },
   ];
 
   const handleExport = async () => {
@@ -247,6 +254,7 @@ const AdminTransactions = () => {
         Status: item.status,
         "External Ref": item.external_ref,
         "Balance Before (₦)": plainKoboNairaConvert(item.balance_before),
+        "Paid From": item.paid_from_wallet === "commission" ? "Commission Wallet" : "Main Wallet",
       }));
       
       const fileName = `admin_transactions_${dayjs().format("YYYY-MM-DD_HH-mm-ss")}.csv`;

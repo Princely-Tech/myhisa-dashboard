@@ -31,7 +31,7 @@ import useRequirePermission from "@/utils/useRequirePermission";
 const NETWORKS = [
   { key: "mtn", label: "MTN", color: "#ffcc00", text: "#000" },
   { key: "airtel", label: "Airtel", color: "#e4002b", text: "#fff" },
-  { key: "ninemobile", label: "9Mobile", color: "#006600", text: "#fff" },
+  { key: "ninemobile", label: "Ninemobile", color: "#006600", text: "#fff" },
   { key: "glo", label: "Glo", color: "#008000", text: "#fff" },
 ];
 

@@ -384,7 +384,7 @@ const AdminCommissionRates = () => {
             {[
               { label: "MTN", field: "mtn" },
               { label: "Airtel", field: "airtel" },
-              { label: "9mobile", field: "ninemobile" },
+              { label: "Ninemobile", field: "ninemobile" },
               { label: "Glo", field: "glo" },
             ].map(({ label, field }) => (
               <div key={field}>

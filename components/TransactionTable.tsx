@@ -51,6 +51,7 @@ const TransactionTable = ({
             <th>Ref to Telco</th>
             <th>Previous Ref</th>
             <th>Channel</th>
+            <th>Paid From</th>
 
             <th>Action</th>
           </tr>
@@ -82,6 +83,11 @@ const TransactionTable = ({
                 <td>{item.ref_to_telco}</td>
                 <td>{item.retry_refs_to_telco}</td>
                 <td>{item.channel}</td>
+                <td>
+                  {item.paid_from_wallet === "commission"
+                    ? "Commission Wallet"
+                    : "Main Wallet"}
+                </td>
                 <td>
                   <div className="flex justify-center items-center">
                     <BlueButton href={routes.query(item.transaction_id)}>

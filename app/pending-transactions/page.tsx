@@ -23,7 +23,7 @@ const NETWORKS = [
   { value: "mtn", label: "MTN" },
   { value: "glo", label: "GLO" },
   { value: "airtel", label: "Airtel" },
-  { value: "9mobile", label: "9Mobile" },
+  { value: "ninemobile", label: "Ninemobile" },
 ];
 
 interface PendingTransaction {

@@ -192,7 +192,11 @@ const DataPlansPage = () => {
       dataIndex: "amount",
       key: "amount",
       width: 120,
-      render: (amount: number) => `₦${(amount / 100).toFixed(2)}`,
+      render: (amount: number) =>
+        `₦${(amount / 100).toLocaleString("en-NG", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
       sorter: (a: DataPlan, b: DataPlan) => a.amount - b.amount,
     },
     {

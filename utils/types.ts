@@ -29,6 +29,7 @@ type TransactionItem = {
   ref_to_telco: string;
   retry_refs_to_telco: string;
   channel: string;
+  paid_from_wallet: "balance" | "commission";
 };
 export type SummaryTotalItem = {
   user_id: number;
