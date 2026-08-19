@@ -2,6 +2,7 @@
 import React, { forwardRef } from "react";
 import { TransactionItem } from "@/utils/types";
 import { buildReceiptData } from "@/utils/receiptConfig";
+import appLogo from "@/app/icon.png";
 
 const statusColors: Record<string, { bg: string; text: string }> = {
   successful: { bg: "#ECFDF3", text: "#027A48" },
@@ -33,20 +34,25 @@ const TransactionReceipt = forwardRef<HTMLDivElement, { item: TransactionItem }>
         }}
       >
         <div style={{ textAlign: "center", marginBottom: 18 }}>
-          <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 1, color: "#103FD5" }}>
-            HISA
-          </div>
-          <div style={{ fontSize: 13, color: "#667085", marginTop: 4 }}>{title}</div>
+          <img
+            src={appLogo.src}
+            alt="Hisa"
+            style={{ height: 40, width: "auto", display: "inline-block" }}
+          />
+          <div style={{ fontSize: 13, color: "#667085", marginTop: 6 }}>{title}</div>
         </div>
 
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
           <span
             style={{
+              display: "inline-block",
               background: statusColor.bg,
               color: statusColor.text,
               fontSize: 12,
               fontWeight: 600,
-              padding: "4px 12px",
+              padding: "0 12px",
+              height: 24,
+              lineHeight: "24px",
               borderRadius: 999,
               textTransform: "capitalize",
             }}

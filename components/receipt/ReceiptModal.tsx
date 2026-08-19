@@ -27,6 +27,21 @@ const ReceiptModal = ({
         import("jspdf"),
       ]);
 
+      // the modal remounts on every open, so the logo <img> may still be
+      // loading at this point - wait for it (and any other images) before
+      // rasterizing, otherwise the download can capture a blank logo.
+      const images = Array.from(receiptRef.current.querySelectorAll("img"));
+      await Promise.all(
+        images.map((img) =>
+          img.complete
+            ? Promise.resolve()
+            : new Promise<void>((resolve) => {
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+              })
+        )
+      );
+
       const canvas = await html2canvas(receiptRef.current, {
         scale: 2,
         backgroundColor: "#ffffff",
