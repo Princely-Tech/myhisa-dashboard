@@ -1,17 +1,25 @@
+"use client";
 import { formatDateSideBySide, koboToNaira } from "@/utils/helperfunctions";
 import { TransactionHistory, TransactionItem } from "@/utils/types";
 import { Empty, Spin } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { BlueButton } from "./buttons";
 import routes from "@/utils/routes";
+import ReceiptModal from "./receipt/ReceiptModal";
 
 const TransactionTable = ({
   data,
   className = "",
+  showReceiptAction = false,
 }: {
   data: TransactionHistory | null;
   className?: string;
+  // shows a "Receipt" action per row, letting users download a receipt
+  // for successful transactions (e.g. an electricity purchase receipt to
+  // hand to a bank).
+  showReceiptAction?: boolean;
 }) => {
+  const [receiptItem, setReceiptItem] = useState<TransactionItem | null>(null);
   let showEmpty = true;
   if (!data) {
     showEmpty = false;
@@ -48,6 +56,7 @@ const TransactionTable = ({
             <th>Beneficiary Name</th>
             <th>Date</th>
 
+            <th>Telco Reference</th>
             <th>Ref to Telco</th>
             <th>Previous Ref</th>
             <th>Channel</th>
@@ -80,6 +89,7 @@ const TransactionTable = ({
                 <td className="min-w-[200px]">{item.token}</td>
                 <td>{item.beneficiary_name}</td>
                 <td>{formatDateSideBySide(item.created_at)}</td>
+                <td>{item.response_transaction_id}</td>
                 <td>{item.ref_to_telco}</td>
                 <td>{item.retry_refs_to_telco}</td>
                 <td>{item.channel}</td>
@@ -89,10 +99,15 @@ const TransactionTable = ({
                     : "Main Wallet"}
                 </td>
                 <td>
-                  <div className="flex justify-center items-center">
+                  <div className="flex justify-center items-center gap-2">
                     <BlueButton href={routes.query(item.transaction_id)}>
                       Query
                     </BlueButton>
+                    {showReceiptAction && item.status === "Successful" && (
+                      <BlueButton onClick={() => setReceiptItem(item)}>
+                        Receipt
+                      </BlueButton>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -100,6 +115,13 @@ const TransactionTable = ({
           )}
         </tbody>
       </table>
+      {showReceiptAction && (
+        <ReceiptModal
+          item={receiptItem}
+          open={!!receiptItem}
+          onClose={() => setReceiptItem(null)}
+        />
+      )}
     </div>
   );
 };

@@ -19,6 +19,8 @@
     "dayjs": "^1.11.11",
     "faker": "^5.5.3",
     "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "next": "^16.1.6",
     "next-auth": "^5.0.0-beta.18",
     "papaparse": "^5.4.1",

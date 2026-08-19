@@ -22,7 +22,7 @@ type TransactionItem = {
   external_ref: string;
   status: string;
   balance_before: number;
-  token: number;
+  token: string;
   commission_amount: number;
   created_at: string;
   beneficiary_name: string;
@@ -30,6 +30,15 @@ type TransactionItem = {
   retry_refs_to_telco: string;
   channel: string;
   paid_from_wallet: "balance" | "commission";
+  response_transaction_id: string | null;
+  // Customer's address (electricity/cable). Blank for services that don't collect one.
+  beneficiary_details?: string | null;
+  // Units vended, e.g. "12.5 kWh" (electricity).
+  unit?: string | null;
+  // Re-used per service: meter type ("Prepaid"/"Postpaid") for electricity,
+  // data plan description for Data, cable package name for Cable.
+  data_bundle_desc?: string | null;
+  data_bundle_code?: string | null;
 };
 export type SummaryTotalItem = {
   user_id: number;

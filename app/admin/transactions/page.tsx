@@ -196,6 +196,12 @@ const AdminTransactions = () => {
       width: 150,
     },
     {
+      title: "Telco Reference",
+      dataIndex: "response_transaction_id",
+      key: "response_transaction_id",
+      width: 180,
+    },
+    {
       title: "Paid From",
       dataIndex: "paid_from_wallet",
       key: "paid_from_wallet",
@@ -253,6 +259,7 @@ const AdminTransactions = () => {
         "Commission (₦)": plainKoboNairaConvert(item.commission_amount),
         Status: item.status,
         "External Ref": item.external_ref,
+        "Telco Reference": item.response_transaction_id,
         "Balance Before (₦)": plainKoboNairaConvert(item.balance_before),
         "Paid From": item.paid_from_wallet === "commission" ? "Commission Wallet" : "Main Wallet",
       }));

@@ -40,6 +40,7 @@ interface PendingTransaction {
   balance_before: number;
   commission_amount: number;
   remark: string;
+  response_transaction_id: string | null;
 }
 
 interface PendingTransactionsResponse {
@@ -245,6 +246,12 @@ const PendingTransactions = () => {
       width: 100,
     },
     {
+      title: "Telco Reference",
+      dataIndex: "response_transaction_id",
+      key: "response_transaction_id",
+      width: 180,
+    },
+    {
       title: "Remark",
       dataIndex: "remark",
       key: "remark",
@@ -287,9 +294,10 @@ const PendingTransactions = () => {
         "Amount (₦)": plainKoboNairaConvert(item.amount),
         Status: item.status,
         "Status Code": item.status_code,
+        "Telco Reference": item.response_transaction_id,
         Remark: item.remark,
       }));
-      
+
       const fileName = `my_pending_transactions_${dayjs().format("YYYY-MM-DD")}.csv`;
       handleDownloadCSV(exportData, fileName);
       messageApi.success(`Exported ${exportData.length} records`);

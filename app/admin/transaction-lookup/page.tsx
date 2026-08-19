@@ -26,11 +26,13 @@ interface TransactionDetail {
   balance_before: number;
   commission_amount: number;
   remark?: string;
+  response_transaction_id?: string | null;
 }
 
 interface TelcoLog {
   transaction_id: string;
   status: string;
+  response_transaction_id?: string | null;
   response_http_code: number;
   response_status_code: string;
   response_message: string;
@@ -246,6 +248,7 @@ const AdminTransactionLookup = () => {
         "Commission (₦)": plainKoboNairaConvert(result.transaction!.commission_amount),
         Refunded: result.transaction!.refunded_at ? "Yes" : "No",
         "Refunded At": result.transaction!.refunded_at ? dayjs(result.transaction!.refunded_at).format("YYYY-MM-DD HH:mm:ss") : "",
+        "Telco Reference": result.transaction!.response_transaction_id || "",
         Remark: result.transaction!.remark || "",
       }));
 
@@ -353,6 +356,12 @@ const AdminTransactionLookup = () => {
       width: 150,
     },
 {
+      title: "Telco Reference",
+      dataIndex: ["transaction", "response_transaction_id"],
+      key: "response_transaction_id",
+      width: 180,
+    },
+{
       title: "Channel",
       dataIndex: ["transaction", "channel"],
       key: "channel",
@@ -404,6 +413,10 @@ const AdminTransactionLookup = () => {
         {record.telco_log && (
           <Card title="Provider Response" size="small">
             <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Telco Reference:</span>
+                <strong>{record.telco_log.response_transaction_id}</strong>
+              </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">HTTP Code:</span>
                 <strong>{record.telco_log.response_http_code}</strong>

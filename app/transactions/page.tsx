@@ -208,6 +208,7 @@ const Transactions = () => {
         <TransactionTable
           data={data}
           className="min-h-[400px] max-h-full max-w-full"
+          showReceiptAction
         />
         {!data && (
           <div className="absolute top-0 bottom-0 left-0 right-0 flex justify-center items-center">

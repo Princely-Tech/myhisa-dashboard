@@ -42,6 +42,7 @@ interface PendingTransaction {
   balance_before: number;
   commission_amount: number;
   remark: string;
+  response_transaction_id: string | null;
 }
 
 interface PendingTransactionsResponse {
@@ -279,6 +280,12 @@ const AdminPendingTransactions = () => {
       width: 100,
     },
     {
+      title: "Telco Reference",
+      dataIndex: "response_transaction_id",
+      key: "response_transaction_id",
+      width: 180,
+    },
+    {
       title: "Remark",
       dataIndex: "remark",
       key: "remark",
@@ -323,6 +330,7 @@ const AdminPendingTransactions = () => {
         "Amount (₦)": plainKoboNairaConvert(item.amount),
         Status: item.status,
         "Status Code": item.status_code,
+        "Telco Reference": item.response_transaction_id,
         Remark: item.remark,
       }));
       
