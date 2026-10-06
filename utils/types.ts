@@ -29,6 +29,7 @@ type TransactionItem = {
   ref_to_telco: string;
   retry_refs_to_telco: string;
   channel: string;
+  connection: number;
   paid_from_wallet: "balance" | "commission";
   response_transaction_id: string | null;
   // Customer's address (electricity/cable). Blank for services that don't collect one.

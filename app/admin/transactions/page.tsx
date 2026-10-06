@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Card, Select, Spin, message, Table, DatePicker, InputNumber } from "antd";
+import { Card, Select, Spin, message, Table, DatePicker, InputNumber, Input } from "antd";
 import dayjs from "dayjs";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
@@ -50,6 +50,8 @@ const AdminTransactions = () => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedNetworks, setSelectedNetworks] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<string>("");
+  const [selectedConnection, setSelectedConnection] = useState<number | null>(null);
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
   const [minAmount, setMinAmount] = useState<number | null>(null);
   const [maxAmount, setMaxAmount] = useState<number | null>(null);
@@ -88,18 +90,20 @@ const AdminTransactions = () => {
       if (selectedTypes.length > 0) params.append("type", selectedTypes.join(","));
       if (selectedNetworks.length > 0) params.append("network", selectedNetworks.join(","));
       if (selectedStatus) params.append("status", selectedStatus);
+      if (selectedChannel.trim()) params.append("channel", selectedChannel.trim());
+      if (selectedConnection !== null) params.append("connection", selectedConnection.toString());
       if (dateRange) {
         params.append("from_date", dateRange[0].format("YYYY-MM-DD"));
         params.append("to_date", dateRange[1].format("YYYY-MM-DD"));
       }
       if (minAmount !== null) params.append("min_amount", (minAmount * 100).toString());
       if (maxAmount !== null) params.append("max_amount", (maxAmount * 100).toString());
-      
+
       const endpoint = `${apiEndpoints.adminTransactions}?${params.toString()}`;
       const response = await apiService.get({
         endPoint: endpoint,
       });
-      
+
       setData(response.data);
     } catch (error) {
       console.error("Error fetching transactions:", error);
@@ -151,6 +155,18 @@ const AdminTransactions = () => {
       title: "Network",
       dataIndex: "network",
       key: "network",
+      width: 100,
+    },
+    {
+      title: "Channel",
+      dataIndex: "channel",
+      key: "channel",
+      width: 100,
+    },
+    {
+      title: "Connection",
+      dataIndex: "connection",
+      key: "connection",
       width: 100,
     },
     {
@@ -229,13 +245,15 @@ const AdminTransactions = () => {
       if (selectedTypes.length > 0) params.append("type", selectedTypes.join(","));
       if (selectedNetworks.length > 0) params.append("network", selectedNetworks.join(","));
       if (selectedStatus) params.append("status", selectedStatus);
+      if (selectedChannel.trim()) params.append("channel", selectedChannel.trim());
+      if (selectedConnection !== null) params.append("connection", selectedConnection.toString());
       if (dateRange) {
         params.append("from_date", dateRange[0].format("YYYY-MM-DD"));
         params.append("to_date", dateRange[1].format("YYYY-MM-DD"));
       }
       if (minAmount !== null) params.append("min_amount", (minAmount * 100).toString());
       if (maxAmount !== null) params.append("max_amount", (maxAmount * 100).toString());
-      
+
       // Request all records by setting a very high limit
       params.append("per_page", data.total_records.toString());
       params.append("page", "1");
@@ -254,6 +272,8 @@ const AdminTransactions = () => {
         "User Email": item.user_email,
         Type: item.type,
         Network: item.network,
+        Channel: item.channel,
+        Connection: item.connection,
         Beneficiary: item.msisdn,
         "Amount (₦)": plainKoboNairaConvert(item.amount),
         "Commission (₦)": plainKoboNairaConvert(item.commission_amount),
@@ -289,6 +309,8 @@ const AdminTransactions = () => {
     setSelectedTypes([]);
     setSelectedNetworks([]);
     setSelectedStatus(null);
+    setSelectedChannel("");
+    setSelectedConnection(null);
     setDateRange(null);
     setMinAmount(null);
     setMaxAmount(null);
@@ -376,6 +398,28 @@ const AdminTransactions = () => {
           </div>
 
           <div>
+            <label className="block mb-2 font-medium">Channel</label>
+            <Input
+              placeholder="e.g. web, app"
+              value={selectedChannel}
+              onChange={(e) => setSelectedChannel(e.target.value)}
+              className="w-full"
+              allowClear
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2 font-medium">Connection</label>
+            <InputNumber
+              placeholder="Connection number"
+              value={selectedConnection}
+              onChange={(value) => setSelectedConnection(value)}
+              className="w-full"
+              min={0}
+            />
+          </div>
+
+          <div>
             <label className="block mb-2 font-medium">Date Range</label>
             <RangePicker
               value={dateRange}
@@ -455,7 +499,7 @@ const AdminTransactions = () => {
               showSizeChanger: false,
               showTotal: (total) => `Total ${total} records`,
             }}
-            scroll={{ x: 1600 }}
+            scroll={{ x: 1800 }}
           />
         </Card>
       )}

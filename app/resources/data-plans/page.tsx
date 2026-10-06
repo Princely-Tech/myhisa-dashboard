@@ -15,6 +15,7 @@ import {
 } from "@ant-design/icons";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
+import { User } from "@/utils/types";
 
 const { Option } = Select;
 
@@ -42,6 +43,15 @@ const DataPlansPage = () => {
   const [dataPlans, setDataPlans] = useState<DataPlan[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState<string>("mtn");
+  const [isStaffOrAdmin, setIsStaffOrAdmin] = useState(false);
+
+  useEffect(() => {
+    const raw = localStorage.getItem(apiEndpoints.userSetUrl);
+    if (raw) {
+      const user = JSON.parse(raw) as User;
+      setIsStaffOrAdmin((user.rank ?? 0) > 0);
+    }
+  }, []);
 
   useEffect(() => {
     fetchDataPlans();
@@ -87,6 +97,7 @@ const DataPlansPage = () => {
     const headers = [
       "Code",
       "Network",
+      ...(isStaffOrAdmin ? ["Network Identifier"] : []),
       "Description",
       "Amount (₦)",
       "Validity",
@@ -96,6 +107,7 @@ const DataPlansPage = () => {
     const csvData = dataPlans.map((plan) => [
       plan.code,
       plan.network_id.toUpperCase(),
+      ...(isStaffOrAdmin ? [plan.network_identifier] : []),
       plan.description,
       (plan.amount / 100).toFixed(2),
       plan.validity,
@@ -143,7 +155,7 @@ const DataPlansPage = () => {
         amount_naira: plan.amount / 100,
         validity: plan.validity,
         bundle_type: plan.bundle_type,
-        network_identifier: plan.network_identifier,
+        ...(isStaffOrAdmin ? { network_identifier: plan.network_identifier } : {}),
       })),
     };
 
@@ -181,6 +193,16 @@ const DataPlansPage = () => {
         <Tag color="blue">{network.toUpperCase()}</Tag>
       ),
     },
+    ...(isStaffOrAdmin
+      ? [
+          {
+            title: "Network Identifier",
+            dataIndex: "network_identifier",
+            key: "network_identifier",
+            width: 160,
+          },
+        ]
+      : []),
     {
       title: "Description",
       dataIndex: "description",
@@ -289,7 +311,7 @@ const DataPlansPage = () => {
             showTotal: (total) => `Total ${total} plans`,
             pageSizeOptions: ["10", "20", "50", "100"],
           }}
-          scroll={{ x: 1000 }}
+          scroll={{ x: isStaffOrAdmin ? 1160 : 1000 }}
         />
       </Card>
     </div>
