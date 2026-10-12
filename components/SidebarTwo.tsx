@@ -17,6 +17,7 @@ import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { hasPermission, isSuperAdmin } from "@/utils/permissions";
 import { hasAccountPermission, isApproved, isSubLogin } from "@/utils/accountPermissions";
+import { isSandbox } from "@/utils/environment";
 
 const SidebarTwo = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -328,6 +329,16 @@ const SidebarTwo = () => {
               isActive={pathname == routes.documentation}
               icon={<i className="las la-book iq-arrow-left"></i>}
             />
+
+            {/* SANDBOX: test values page (sandbox builds only). */}
+            {isSandbox && (
+              <MenuItem
+                title="Sandbox Test Values"
+                route={routes.sandboxTestValues}
+                isActive={pathname == routes.sandboxTestValues}
+                icon={<i className="las la-flask iq-arrow-left"></i>}
+              />
+            )}
 
             {hasAccountPermission(user, "tickets.manage") && (
               <MenuItem

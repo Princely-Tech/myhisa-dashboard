@@ -7,6 +7,7 @@ import routes from "@/utils/routes";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { User } from "@/utils/types";
 import { BlueLink } from "@/components";
+import { isSandbox } from "@/utils/environment";
 
 const postmanUrl =
   "https://documenter.getpostman.com/view/14135488/2sA3dyiWfZ#d06c4c58-6793-4ee2-8697-8b9d67b0f2b1";
@@ -56,8 +57,13 @@ const registrationChecklist = [
   "Contact person's name, designation, phone and email",
   "BVN and NIN",
   "Partner type - Bank or Non-Bank",
-  "CAC Certificate (PDF, JPG or PNG, max 5MB)",
-  "Utility Bill (required for non-bank partners)",
+  // SANDBOX: KYC documents are optional in the sandbox.
+  isSandbox
+    ? "CAC Certificate (optional in the sandbox)"
+    : "CAC Certificate (PDF, JPG or PNG, max 5MB)",
+  isSandbox
+    ? "Utility Bill (optional in the sandbox)"
+    : "Utility Bill (required for non-bank partners)",
 ];
 
 const gettingStartedSteps = [
@@ -67,7 +73,10 @@ const gettingStartedSteps = [
   },
   {
     title: "Get approved",
-    body: "Our team reviews new registrations, usually within 24 hours.",
+    // SANDBOX: sandbox accounts are auto-approved on email verification.
+    body: isSandbox
+      ? "Automatic in the sandbox once your email is verified."
+      : "Our team reviews new registrations, usually within 24 hours.",
   },
   {
     title: "Verify your email",
@@ -117,6 +126,32 @@ const DocumentationBody = () => (
         API.
       </p>
     </div>
+
+    {/* SANDBOX: sandbox base URL + test values (sandbox builds only). */}
+    {isSandbox && (
+      <div className="mb-10 rounded-lg border border-amber-300 bg-amber-50 p-6">
+        <h2 className="text-[16px] font-semibold text-eigengrau">
+          Sandbox environment
+        </h2>
+        <p className="mt-2 text-[13px] text-steelBlue">
+          Point your integration at the sandbox base URL below. Everything
+          works like live, but no real airtime, bills or money move. Use your
+          sandbox API key (sent when you register here), not your live one.
+        </p>
+        <p className="mt-3 text-[13px] text-steelBlue">
+          Base URL:{" "}
+          <code className="break-all rounded bg-white px-2 py-1 text-[13px]">
+            {apiEndpoints.base || "(NEXT_PUBLIC_API_URL not set)"}
+          </code>
+        </p>
+        <Link
+          href={routes.sandboxTestValues}
+          className="mt-3 inline-block text-[13px] font-semibold text-royalBlue"
+        >
+          Test values (outcome table, test BVN/NIN, funding) &rarr;
+        </Link>
+      </div>
+    )}
 
     <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {gettingStartedSteps.map((step, i) => (

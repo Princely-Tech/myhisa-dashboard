@@ -133,7 +133,9 @@ const TransactionStatsComponent = ({
     }
   }
 };
-const WalletBalances = () => {
+// SANDBOX: refreshKey lets the dashboard re-fetch balances after the
+// sandbox tools add test funds (bump it to reload; defaults keep live as-is).
+const WalletBalances = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   const [wallet, setWallet] = useState<{
     balance: number;
     commission: number;
@@ -144,7 +146,7 @@ const WalletBalances = () => {
   } | null>(null);
   useEffect(() => {
     process();
-  }, []);
+  }, [refreshKey]);
   const [generatingAccount, setGeneratingAccount] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 

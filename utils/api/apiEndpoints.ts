@@ -118,6 +118,15 @@ const apiEndpoints = {
   adminTicketAssign: (id: number | string) => `admin/tickets/${id}/assign`,
   adminTicketResolve: (id: number | string) => `admin/tickets/${id}/resolve`,
   adminTicketMessages: (id: number | string) => `admin/tickets/${id}/messages`,
+  // SANDBOX: sandbox-only endpoints (registered by the Go API only in
+  // sandbox builds; 404 on live). test-values is public; the rest need the
+  // primary login's token, and resolve also needs an approved account.
+  sandboxTestValues: "sandbox/test-values",
+  sandboxWalletFund: "sandbox/wallet/fund",
+  sandboxBankTransfer: "sandbox/bank-transfer",
+  // :ref is the transaction_id or the partner's external_ref.
+  sandboxResolveTransaction: (ref: string) =>
+    `sandbox/transactions/${encodeURIComponent(ref)}/resolve`,
 };
 export const localApiEndPoints = {
   main: "/api",

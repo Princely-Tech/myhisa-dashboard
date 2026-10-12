@@ -7,6 +7,8 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BlueButton, CustomButton } from "@/components/buttons";
 import { formatCurrency, formatNumber } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
+import { isSandbox } from "@/utils/environment";
+import SandboxResolveActions from "@/components/SandboxResolveActions";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -258,6 +260,24 @@ const PendingTransactions = () => {
       width: 150,
       ellipsis: true,
     },
+    // SANDBOX: per-row resolve actions (sandbox builds only).
+    ...(isSandbox
+      ? [
+          {
+            title: "Sandbox",
+            dataIndex: "sandbox_resolve",
+            key: "sandbox_resolve",
+            width: 260,
+            render: (_: any, record: PendingTransaction) => (
+              <SandboxResolveActions
+                reference={record.transaction_id}
+                status={record.status}
+                onResolved={fetchPendingTransactions}
+              />
+            ),
+          },
+        ]
+      : []),
   ];
 
   const handleExport = async () => {
@@ -512,7 +532,7 @@ const PendingTransactions = () => {
             columns={columns}
             rowKey="transaction_id"
             pagination={false}
-            scroll={{ x: 1600 }}
+            scroll={{ x: isSandbox ? 1860 : 1600 }}
           />
         </Card>
       )}
