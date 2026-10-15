@@ -21,6 +21,7 @@ const formatSize = (n: number) => {
 const ServerLogsPage = () => {
   useRequirePermission("logs.view");
   const [messageApi, contextHolder] = message.useMessage();
+  const [source, setSource] = useState<"logs" | "reports">("logs");
   const [path, setPath] = useState("");
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,11 +31,11 @@ const ServerLogsPage = () => {
     Authorization: `Bearer ${localStorage.getItem(apiEndpoints.tokenSetUrl)}`,
   });
 
-  const load = async (p: string) => {
+  const load = async (p: string, src: "logs" | "reports" = source) => {
     setLoading(true);
     try {
       const res = await fetch(
-        `${apiEndpoints.base}${apiEndpoints.adminLogFiles}?path=${encodeURIComponent(p)}`,
+        `${apiEndpoints.base}${apiEndpoints.adminLogFiles}?source=${src}&path=${encodeURIComponent(p)}`,
         { headers: authHeaders() }
       );
       if (!res.ok) throw new Error("Failed to load directory");
@@ -57,7 +58,7 @@ const ServerLogsPage = () => {
     setDownloading(p);
     try {
       const res = await fetch(
-        `${apiEndpoints.base}${apiEndpoints.adminLogFiles}/download?path=${encodeURIComponent(p)}`,
+        `${apiEndpoints.base}${apiEndpoints.adminLogFiles}/download?source=${source}&path=${encodeURIComponent(p)}`,
         { headers: authHeaders() }
       );
       if (!res.ok) throw new Error("Download failed");
@@ -75,18 +76,46 @@ const ServerLogsPage = () => {
   };
 
   const crumbs = path ? path.split("/") : [];
+  const switchSource = (src: "logs" | "reports") => {
+    setSource(src);
+    setPath("");
+    load("", src);
+  };
+  const goUp = () => load(crumbs.slice(0, -1).join("/"));
 
   return (
     <div className="px-8 py-4 flex-1 max-h-full overflow-auto">
       {contextHolder}
       <h2 className="text-2xl font-bold">Server Logs</h2>
       <p className="text-gray-600 text-sm mt-1 mb-4">
-        Browse the log directory. Downloads are delivered as zip archives.
+        Browse server logs and generated reports. Downloads are delivered as zip archives.
       </p>
 
+      <div className="flex gap-2 mb-4">
+        {(["logs", "reports"] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => switchSource(s)}
+            className={`px-4 py-2 rounded capitalize ${
+              source === s ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
       <div className="flex items-center gap-2 mb-4 text-sm flex-wrap">
+        <button
+          className="px-2 py-1 border rounded disabled:opacity-40"
+          disabled={!path || loading}
+          onClick={goUp}
+          title="Back one level"
+        >
+          <i className="las la-arrow-left"></i> Back
+        </button>
         <button className="text-blue-600 hover:underline" onClick={() => load("")}>
-          logs
+          {source}
         </button>
         {crumbs.map((c, i) => (
           <span key={i} className="flex items-center gap-2">
@@ -102,7 +131,7 @@ const ServerLogsPage = () => {
         <button
           className="ml-auto px-3 py-1 bg-gray-700 text-white rounded disabled:bg-gray-400"
           disabled={downloading !== null}
-          onClick={() => download(path, crumbs[crumbs.length - 1] || "logs")}
+          onClick={() => download(path, crumbs[crumbs.length - 1] || source)}
         >
           Download this folder
         </button>
