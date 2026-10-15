@@ -63,6 +63,7 @@ const routes = {
   adminTransactionStats: "/admin/transaction-stats",
   adminTransactionGraphs: "/admin/transaction-graphs",
   adminAuditLogs: "/admin/audit-logs",
+  adminServerLogs: "/admin/server-logs",
   adminStaffManagement: "/admin/staff-management",
   subLoginManagement: "/settings/sub-logins",
   adminTickets: "/admin/tickets",

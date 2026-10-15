@@ -44,6 +44,7 @@ export const PAGE_PERMISSIONS: Record<string, string> = {
   [routes.adminTransactionStats]: "reports.view",
   [routes.adminTransactionGraphs]: "transactions.view",
   [routes.adminAuditLogs]: "audit_logs.view",
+  [routes.adminServerLogs]: "logs.view",
   [routes.adminSettings]: "settings.manage",
 };
 

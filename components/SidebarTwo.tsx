@@ -541,6 +541,13 @@ const SidebarTwo = () => {
                   permission: "audit_logs.view",
                 },
                 {
+                  title: "Server Logs",
+                  route: routes.adminServerLogs,
+                  icon: <i className="las la-file-download iq-arrow-left"></i>,
+                  isActive: pathname == routes.adminServerLogs,
+                  permission: "logs.view",
+                },
+                {
                   title: "Support Tickets",
                   route: routes.adminTickets,
                   icon: <i className="las la-ticket-alt iq-arrow-left"></i>,
