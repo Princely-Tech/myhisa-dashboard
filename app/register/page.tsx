@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { message, type FormProps, Modal, Form, Select, Upload } from "antd";
+import { message, type FormProps, Modal, Form, Select, Upload, Alert } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import { AuthCard, BlueButton, FormField, InputField } from "@/components";
 import logo from "@/app/icon.png";
@@ -25,6 +25,7 @@ import { CookieSetParams, PartnerType } from "@/utils/types";
 import Image from "next/image";
 import Link from "next/link";
 import type { UploadProps } from "antd";
+import { isSandbox } from "@/utils/environment";
 
 const { Dragger } = Upload;
 
@@ -99,11 +100,13 @@ const Register: React.FC = () => {
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    if (!cacFile) {
+    // SANDBOX: KYC documents are optional in sandbox builds (the backend
+    // skips the CAC/utility checks there), so only enforce them on live.
+    if (!isSandbox && !cacFile) {
       messageApi.error("Please upload your CAC Certificate");
       return;
     }
-    if (!isBank && !utilityFile) {
+    if (!isSandbox && !isBank && !utilityFile) {
       messageApi.error("Please upload a Utility Bill (required for non-bank partners)");
       return;
     }
@@ -123,7 +126,10 @@ const Register: React.FC = () => {
       formData.append("bvn", values.bvn || "");
       formData.append("nin", values.nin || "");
       formData.append("partner_type", values.partner_type || "");
-      formData.append("cac_certificate", cacFile);
+      // SANDBOX: cacFile can only be null here in sandbox builds.
+      if (cacFile) {
+        formData.append("cac_certificate", cacFile);
+      }
       if (!isBank && utilityFile) {
         formData.append("utility_bill", utilityFile);
       }
@@ -184,6 +190,25 @@ const Register: React.FC = () => {
       </div>
       <div className="flex flex-col justify-center items-center flex-1 py-24">
         <AuthCard subTitle="Create Account" title="MyHisa" centerTitle={true}>
+          {/* SANDBOX: the backend still requires RC number, BVN and NIN
+              (11 digits) in sandbox, but does not verify them. */}
+          {isSandbox && (
+            <Alert
+              className="mb-4"
+              type="warning"
+              showIcon
+              message="Sandbox registration"
+              description={
+                <span>
+                  No KYC documents needed. Any 11-digit BVN and NIN and any RC
+                  number (e.g. RC1234567) will work.{" "}
+                  <Link href={routes.sandboxTestValues} className="underline">
+                    See test values
+                  </Link>
+                </span>
+              }
+            />
+          )}
           <FormField name="register_form" form={form} onFinish={onFinish}>
             <InputField
               placeholder="Business Name"
@@ -251,6 +276,8 @@ const Register: React.FC = () => {
               </Select>
             </Form.Item>
 
+            {/* SANDBOX: KYC uploads are hidden in sandbox builds. */}
+            {!isSandbox && (
             <div className="mb-4">
               <h2 className="text-[#344054] font-medium mb-1 text-[14px]">
                 CAC Certificate
@@ -267,8 +294,9 @@ const Register: React.FC = () => {
                 </p>
               </Dragger>
             </div>
+            )}
 
-            {!isBank && (
+            {!isSandbox && !isBank && (
               <div className="mb-4">
                 <h2 className="text-[#344054] font-medium mb-1 text-[14px]">
                   Utility Bill
@@ -333,6 +361,16 @@ const Register: React.FC = () => {
             </p>
           </div>
 
+          {/* SANDBOX: sandbox accounts are auto-approved on email verification. */}
+          {isSandbox ? (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-blue-800 font-medium">Verify your email and you&apos;re in</p>
+              <p className="text-blue-600 text-sm mt-2">
+                Sandbox accounts are approved automatically as soon as you verify
+                your email - no review needed.
+              </p>
+            </div>
+          ) : (
           <div className="p-4 bg-blue-50 border border-blue-200 rounded">
             <p className="text-blue-800 font-medium">⏳ Account Activation Required</p>
             <p className="text-blue-600 text-sm mt-2">
@@ -341,6 +379,7 @@ const Register: React.FC = () => {
               account is approved and activated.
             </p>
           </div>
+          )}
 
           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
             <p className="text-yellow-800 font-medium">📧 Check Your Email</p>

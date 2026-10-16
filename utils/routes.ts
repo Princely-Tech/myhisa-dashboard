@@ -69,6 +69,8 @@ const routes = {
   adminTickets: "/admin/tickets",
   adminTicketDetail: (id: number | string) => `/admin/tickets/${id}`,
   adminSettings: "/admin/settings",
+  // SANDBOX: only meaningful in sandbox builds (see utils/environment.ts).
+  sandboxTestValues: "/sandbox/test-values",
 };
 export default routes;
 export { transactionFilterStr };

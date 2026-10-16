@@ -11,9 +11,12 @@ import ResponsiveSidebar from "@/components/ResponsiveSidebar";
 import { cookies } from "next/headers";
 import apiEndpoints from "@/utils/api/apiEndpoints";
 import { User } from "@/utils/types";
+import EnvironmentBanner from "@/components/EnvironmentBanner";
+import { isSandbox } from "@/utils/environment";
 
 export const metadata = {
-  title: "Hisa:Send Airtime and Data",
+  // SANDBOX: prefix the tab title so sandbox tabs are easy to tell apart.
+  title: `${isSandbox ? "[SANDBOX] " : ""}Hisa:Send Airtime and Data`,
   description: "Hisa:Send Airtime and Data",
 };
 
@@ -32,6 +35,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AntdRegistry>
+          {/* SANDBOX: test-mode / misconfiguration banner on every page. */}
+          <EnvironmentBanner />
           <ResponsiveSidebar>{children}</ResponsiveSidebar>
         </AntdRegistry>
       </body>

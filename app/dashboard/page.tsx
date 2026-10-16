@@ -10,9 +10,13 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 import { User } from "@/utils/types";
 import { hasAccountPermission, isApproved, isSubLogin } from "@/utils/accountPermissions";
 import routes from "@/utils/routes";
+import { isSandbox } from "@/utils/environment";
+import SandboxTools from "./SandboxTools";
 
 const Dashbaord = () => {
   const [user, setUser] = useState<User | null>(null);
+  // SANDBOX: bumped after sandbox funding so WalletBalances re-fetches.
+  const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
 
   useEffect(() => {
     const raw = localStorage.getItem(apiEndpoints.userSetUrl);
@@ -57,9 +61,16 @@ const Dashbaord = () => {
           }
         />
       )}
+      {/* SANDBOX: test funding tools (sandbox builds, primary login only -
+          the backend's sandbox funding routes are PrimaryLoginOnly). The
+          pending-approval alert above needs no sandbox change: sandbox
+          accounts are auto-approved on email verification, so it never shows. */}
+      {isSandbox && user && !isSubLogin(user) && (
+        <SandboxTools onFunded={() => setBalanceRefreshKey((k) => k + 1)} />
+      )}
       <h3 className="">Wallet Balances</h3>
       <div className="grid md:grid-cols-2 gap-4 mb-4 lg:grid-cols-3 ">
-        <WalletBalances />
+        <WalletBalances refreshKey={balanceRefreshKey} />
         <Clock />
       </div>
 

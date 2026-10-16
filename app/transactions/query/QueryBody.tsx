@@ -5,6 +5,7 @@ import { Card, Descriptions, message, Spin } from "antd";
 import { formatDateSideBySide, koboToNaira } from "@/utils/helperfunctions";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
+import SandboxResolveActions, { isSandboxResolvable } from "@/components/SandboxResolveActions";
 
 const QueryBody = ({ id }: { id: string }) => {
   const [data, setData] = useState<QueryGetResponse["data"]>();
@@ -31,12 +32,16 @@ const QueryBody = ({ id }: { id: string }) => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  useEffect(() => {
+  // SANDBOX: extracted so the sandbox resolve actions can refresh the view.
+  const loadTransaction = () =>
     apiService
       .get({
         endPoint: apiEndpoints.transactionQuery(id),
       })
-      .then((response: QueryGetResponse) => setData(response.data));
+      .then((response: QueryGetResponse) => setData(response.data))
+      .catch(() => {});
+  useEffect(() => {
+    loadTransaction();
   }, [id]);
   if (!data)
     return (
@@ -78,6 +83,16 @@ const QueryBody = ({ id }: { id: string }) => {
               <Descriptions.Item label="Status">
                 {transaction.status}
               </Descriptions.Item>
+              {/* SANDBOX: resolve a pending sandbox transaction. */}
+              {isSandboxResolvable(transaction.status) && (
+                <Descriptions.Item label="Sandbox">
+                  <SandboxResolveActions
+                    reference={transaction.transaction_id}
+                    status={transaction.status}
+                    onResolved={loadTransaction}
+                  />
+                </Descriptions.Item>
+              )}
 
               {transaction.type === "Electricity" && (
                 <>

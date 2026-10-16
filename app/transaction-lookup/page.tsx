@@ -7,6 +7,8 @@ import apiEndpoints from "@/utils/api/apiEndpoints";
 import { BlueButton, CustomButton } from "@/components/buttons";
 import { formatCurrency } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
+import { isSandbox } from "@/utils/environment";
+import SandboxResolveActions from "@/components/SandboxResolveActions";
 
 const { TextArea } = Input;
 
@@ -272,6 +274,26 @@ const TransactionLookup = () => {
       width: 150,
     },
 
+    // SANDBOX: per-row resolve actions for pending rows (sandbox builds only).
+    ...(isSandbox
+      ? [
+          {
+            title: "Sandbox",
+            dataIndex: ["transaction", "transaction_id"],
+            key: "sandbox_resolve",
+            width: 260,
+            render: (_: any, record: LookupResult) =>
+              record.transaction ? (
+                <SandboxResolveActions
+                  reference={record.transaction.transaction_id}
+                  status={record.transaction.status}
+                  refundedAt={record.transaction.refunded_at}
+                  onResolved={handleLookup}
+                />
+              ) : null,
+          },
+        ]
+      : []),
   ];
 
   const expandedRowRender = (record: LookupResult) => {
@@ -487,7 +509,7 @@ const TransactionLookup = () => {
               rowExpandable: (record) => record.status === "found" || record.status === "error",
             }}
             pagination={false}
-            scroll={{ x: 1400 }}
+            scroll={{ x: isSandbox ? 1660 : 1400 }}
           />
         </Card>
       )}

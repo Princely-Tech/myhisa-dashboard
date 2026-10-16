@@ -6,10 +6,17 @@ import routes from "./utils/routes";
 import { User } from "./utils/types";
 import { canAccessPage } from "./utils/permissions";
 import { canAccessAccountPage } from "./utils/accountPermissions";
+import { isSandbox } from "./utils/environment";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get(apiEndpoints.tokenSetUrl);
   const publicRoutes = [routes.login, routes.register, routes.verifyEmail, routes.documentation];
+  // SANDBOX: the test-values page is linked from the sandbox banner on the
+  // login/register screens (it shows the test BVN/NIN/RC values) and its
+  // backend endpoint is public, so it is public too - sandbox builds only.
+  if (isSandbox) {
+    publicRoutes.push(routes.sandboxTestValues);
+  }
   if (!token && !publicRoutes.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(
       `${request.nextUrl.origin}${routes.login}`
@@ -36,7 +43,9 @@ export function middleware(request: NextRequest) {
     userJson &&
     !userJson.email_verified_at &&
     pathname !== routes.verifyEmail &&
-    pathname !== routes.documentation
+    pathname !== routes.documentation &&
+    // SANDBOX: test values stay reachable before email verification.
+    !(isSandbox && pathname === routes.sandboxTestValues)
   ) {
     return NextResponse.redirect(
       `${request.nextUrl.origin}${routes.verifyEmail}?email=${encodeURIComponent(
