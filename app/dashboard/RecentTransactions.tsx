@@ -9,22 +9,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import StatusPill from "@/components/ui/StatusPill";
 import { btnSecondary, textLink } from "@/components/ui/styles";
 import { formatLagosDateTime, formatNaira, maskBeneficiary, toLagos } from "@/utils/format";
-
-const NETWORK_LABELS: Record<string, string> = {
-  mtn: "MTN",
-  airtel: "Airtel",
-  glo: "Glo",
-  ninemobile: "9mobile",
-  "9mobile": "9mobile",
-};
-
-function serviceLabel(t: TransactionItem): string {
-  const net = (t.network ?? "").trim();
-  const netLabel =
-    NETWORK_LABELS[net.toLowerCase()] ?? (net.length <= 6 ? net.toUpperCase() : net);
-  const type = (t.type ?? "").toLowerCase();
-  return [netLabel, type].filter(Boolean).join(" ");
-}
+import { serviceLabel } from "@/utils/transactions";
 
 function timeLabel(createdAt: string): string {
   const d = toLagos(createdAt);

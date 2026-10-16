@@ -42,6 +42,35 @@ type TransactionItem = {
   data_bundle_code?: string | null;
   // Set once the debit was refunded to the wallet (status keeps its value).
   refunded_at?: string | null;
+  // Further fields the Go API serialises on models.Transaction (optional:
+  // older responses/fixtures may not carry them).
+  status_code?: string | null;
+  remark?: string | null;
+  fee?: number | null;
+  balance_after?: number | null;
+  // When the wallet was debited / the (current) attempt was sent to the provider.
+  billed_at?: string | null;
+  attempt_sent_at?: string | null;
+  reconciled_at?: string | null;
+  retry_of_transaction_id?: string | null;
+  // Vend instructions returned by some billers (electricity).
+  instruction?: string | null;
+};
+
+// models.TransactionTelcoLog as returned in full by
+// self-service/transactions/by-refs (TransactionDetails returns a subset
+// without timestamps).
+export type TransactionTelcoLog = {
+  transaction_id: string;
+  status: string | null;
+  response_transaction_id?: string | null;
+  response_http_code?: number;
+  response_status_code?: string | null;
+  response_message?: string | null;
+  error?: string | null;
+  connection?: number;
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 export type SummaryTotalItem = {
   user_id: number;
@@ -297,6 +326,11 @@ export interface QueryGetResponse {
       external_ref: string;
       status: string;
       created_at: string;
+      // Electricity vend details (QueryBody shows them when present).
+      token?: string;
+      beneficiary_name?: string | null;
+      beneficiary_details?: string | null;
+      unit?: string | null;
     };
   };
   status: string;
