@@ -1,7 +1,12 @@
 "use client";
 import React, { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Tabs } from "antd";
+import Card from "@/components/ui/Card";
+import { textLink } from "@/components/ui/styles";
+import routes from "@/utils/routes";
+import { isApproved } from "@/utils/accountPermissions";
 import PageHeader from "@/components/ui/PageHeader";
 import { useShell } from "@/components/shell/ShellContext";
 import useRequirePrimaryLogin from "@/utils/useRequirePrimaryLogin";
@@ -60,7 +65,30 @@ const DevelopersContent = () => {
             children: <IpWhitelistTab settings={settings} userId={current?.id} />,
           },
           { key: "webhooks", label: "Webhooks", children: <WebhooksTab /> },
-          { key: "alerts", label: "Alerts", children: <AlertsTab settings={settings} /> },
+          {
+            key: "alerts",
+            label: "Alerts",
+            children: (
+              <div className="flex flex-col gap-[18px]">
+                <AlertsTab settings={settings} />
+                {/* The daily email report is configured on the Reports page
+                    (GET/PUT me/report-settings needs an approved account). */}
+                <Card title="Daily email report">
+                  <p className="m-0 text-sm text-hisa-muted">
+                    Get yesterday&apos;s transactions, success rates and revenue by network in your inbox every
+                    morning, with an optional CSV.
+                  </p>
+                  {isApproved(current) ? (
+                    <Link href={`${routes.reports}#email-report`} className={`self-start text-sm ${textLink}`}>
+                      Set up the daily email on the Reports page
+                    </Link>
+                  ) : (
+                    <p className="m-0 text-[13px] text-hisa-muted">Available once your account is approved.</p>
+                  )}
+                </Card>
+              </div>
+            ),
+          },
         ]}
       />
     </div>

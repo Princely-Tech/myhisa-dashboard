@@ -66,7 +66,7 @@ const EnvironmentBanner = () => {
   if (!isSandbox && !mismatch) return null;
 
   return (
-    <div className="w-full">
+    <div className="w-full print:hidden">
       {isSandbox && (
         <div
           role="status"

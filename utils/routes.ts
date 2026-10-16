@@ -79,6 +79,13 @@ const routes = {
   adminSettings: "/admin/settings",
   adminOnboarding: "/admin/onboarding",
   adminOnboardingDetail: (userId: number | string) => `/admin/onboarding/${userId}`,
+  // Partner daily report (?date=YYYY-MM-DD, Lagos; default yesterday).
+  reports: "/reports",
+  reportsForDate: (date: string) => `/reports?date=${date}`,
+  // Staff view of a partner's daily report + email settings.
+  adminPartnerReportsPrefix: "/admin/partners/",
+  adminPartnerReports: (userId: number | string, date?: string) =>
+    `/admin/partners/${userId}/reports${date ? `?date=${date}` : ""}`,
   // SANDBOX: only meaningful in sandbox builds (see utils/environment.ts).
   sandboxTestValues: "/sandbox/test-values",
   // Developers area (API keys, IP whitelist, webhooks, alerts); tabs are

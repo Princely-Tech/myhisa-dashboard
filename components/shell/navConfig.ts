@@ -92,6 +92,7 @@ export function buildNav(user: User): NavGroup[] {
       title: "Transactions",
       entries: compact([
         item("History", routes.transactions, canHistory),
+        item("Daily report", routes.reports, canHistory),
         item("Pending", routes.pendingTransactions, canHistory),
         item("Lookup", routes.transactionLookup, canHistory),
         item("Stats", routes.transactionStats, canHistory),
@@ -176,7 +177,7 @@ export function buildNav(user: User): NavGroup[] {
       defaultCollapsed: true,
       entries: compact([
         heading("Partners & staff"),
-        item("Users", routes.users, perm("users.view")),
+        item("Users", routes.users, perm("users.view"), [routes.adminPartnerReportsPrefix]),
         item("Onboarding queue", routes.adminOnboarding, perm("users.view"), [`${routes.adminOnboarding}/`]),
         item("Staff management", routes.adminStaffManagement, isSuperAdmin(user)),
         item("User credit history", routes.adminUserCreditHistory, perm("wallet.view")),
