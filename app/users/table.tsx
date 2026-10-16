@@ -15,6 +15,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { useForm } from "antd/es/form/Form";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
+import routes from "@/utils/routes";
 import React, { useState } from "react";
 
 const UsersListTable = ({
@@ -361,6 +362,15 @@ const UsersListTable = ({
         },
       },
     ];
+
+    // ONBOARDING v2: the review queue shows checks, documents and history.
+    if (item.onboarding_status && item.onboarding_status !== "email_unverified") {
+      items.push({
+        key: "onboardingReview",
+        label: item.approved_at ? "Onboarding record" : "Review onboarding",
+        onClick: () => router.push(routes.adminOnboardingDetail(item.id)),
+      });
+    }
 
     if (!item.approved_at) {
       items.push({

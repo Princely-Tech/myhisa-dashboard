@@ -298,6 +298,17 @@ export type User = {
   // API-key IP whitelist entries (IPs / CIDRs); empty = any IP. /me includes
   // it on the onboarding-v2 backend.
   ip_whitelist?: string[] | null;
+  // Onboarding v2. Absent on an older backend - callers then fall back to
+  // the legacy approved_at / email_verified_at checks.
+  onboarding_status?: OnboardingStatus | "" | null;
+  onboarding_flow?: OnboardingFlow | "" | null;
+  onboarding_submitted_at?: string | null;
+  business_type?: BusinessType | null;
+  trading_name?: string | null;
+  partner_category?: PartnerCategory | null;
+  signatory_name?: string | null;
+  rejection_reason?: string | null;
+  reapply_after?: string | null;
   wallet: {
     balance: number;
     commission: number;
@@ -310,6 +321,266 @@ export type User = {
     blocked_at?: string | null;
   };
 };
+// ---------------------------------------------------------------------------
+// Onboarding v2 (hisa_go_api docs/ONBOARDING_V2_API.md, models/onboarding.go,
+// services/onboarding/view.go). Field names match the API exactly.
+// ---------------------------------------------------------------------------
+
+export type OnboardingStatus =
+  | "email_unverified"
+  | "profile_incomplete"
+  | "submitted"
+  | "in_review"
+  | "queried"
+  | "approved"
+  | "rejected"
+  | "suspended";
+
+export type OnboardingFlow = "legacy" | "v2";
+export type BusinessType = "RC" | "BN" | "IT";
+export type PartnerCategory = "bank" | "mfb" | "fintech" | "aggregator" | "reseller" | "merchant" | "other";
+export type ServiceOfInterest =
+  | "airtime"
+  | "data"
+  | "electricity"
+  | "cable_tv"
+  | "betting"
+  | "exam_pins"
+  | "internet"
+  | "bulk_airtime"
+  | "vouchers";
+export type VolumeBand = "under_1m" | "1m_10m" | "10m_50m" | "50m_200m" | "over_200m";
+export type IntegrationMethod = "api" | "dashboard" | "both";
+export type KycDocumentType =
+  | "cac_certificate"
+  | "cac_status_report"
+  | "proof_of_address"
+  | "cbn_licence"
+  | "director_id";
+/** "missing" = not uploaded (onboarding view only). */
+export type KycDocumentStatus = "missing" | "uploaded" | "accepted" | "flagged";
+export type KycCheckStatus = "passed" | "failed" | "pending" | "error";
+export type IdentityMatch = "match" | "mismatch" | "unverified";
+
+export interface OnboardingSteps {
+  account_created: boolean;
+  email_verified: boolean;
+  business: boolean;
+  cac: boolean;
+  signatory: boolean;
+  identity: boolean;
+  documents: boolean;
+  ready_to_submit: boolean;
+  submitted: boolean;
+  approved: boolean;
+  funding_account: boolean;
+}
+
+export interface OnboardingBusiness {
+  name: string;
+  business_type: BusinessType | null;
+  rc_number: string | null;
+  trading_name: string | null;
+  partner_category: PartnerCategory | null;
+  services_of_interest: ServiceOfInterest[];
+  expected_volume_band: VolumeBand | null;
+  integration_method: IntegrationMethod | null;
+  address_line: string | null;
+  address_state: string | null;
+  address_lga: string | null;
+  website: string | null;
+  cac_verified_at: string | null;
+  cac_registered_name: string | null;
+  cac_registered_address: string | null;
+}
+
+export interface OnboardingSignatory {
+  name: string | null;
+  role: string | null;
+  phone: string | null;
+  email: string | null;
+  dob: string | null;
+  /** Masked to the last 4 digits ("****1234"). */
+  bvn: string | null;
+  nin: string | null;
+  identity_verified_at: string | null;
+  identity_match: IdentityMatch | null;
+}
+
+export interface OnboardingDocument {
+  type: KycDocumentType;
+  required: boolean;
+  status: KycDocumentStatus;
+  uploaded_at: string | null;
+  reviewed_at: string | null;
+  reviewer_note: string | null;
+}
+
+export interface OnboardingCheck {
+  status: KycCheckStatus;
+  provider: string;
+  match_score: number | null;
+  created_at: string;
+  /** Partner view: masked summary. Admin view: the full stored result. */
+  summary: Record<string, unknown>;
+}
+
+export interface OnboardingQuery {
+  note: string;
+  fields: string[];
+  documents: string[];
+  /** Go zero time ("0001-01-01T00:00:00Z") for a legacy query without a date. */
+  created_at: string;
+  queried_by?: number;
+  reply: string | null;
+  replied_at: string | null;
+}
+
+export interface OnboardingRejection {
+  reason: string | null;
+  reapply_after: string | null;
+  can_reapply: boolean;
+}
+
+/** GET /me/onboarding `data` (and the onboarding part of the admin detail). */
+export interface OnboardingView {
+  status: OnboardingStatus;
+  flow: OnboardingFlow | "";
+  submitted_at: string | null;
+  approved_at: string | null;
+  steps: OnboardingSteps;
+  account: {
+    email: string;
+    phone: string | null;
+    email_verified_at: string | null;
+    terms_version: string | null;
+    terms_accepted_at: string | null;
+  };
+  business: OnboardingBusiness;
+  signatory: OnboardingSignatory;
+  documents: OnboardingDocument[];
+  required_documents: KycDocumentType[];
+  checks: { cac: OnboardingCheck | null; bvn: OnboardingCheck | null; nin: OnboardingCheck | null };
+  open_query: OnboardingQuery | null;
+  query_history: OnboardingQuery[];
+  rejection: OnboardingRejection | null;
+  /** Keys still blocking submission (e.g. "rc_number", "cac", "documents.proof_of_address"). */
+  missing: string[];
+  missing_details: Record<string, string[]>;
+  editable_fields: string[];
+  editable_documents: KycDocumentType[];
+}
+
+/** POST /me/onboarding/verify-cac `verification`. */
+export interface CacVerification {
+  status: KycCheckStatus;
+  rc_number: string;
+  business_type: BusinessType;
+  company_name?: string;
+  company_status?: string;
+  address?: string;
+  affiliates?: { name: string; role: string }[];
+  message: string;
+}
+
+export interface IdentityPartResult {
+  status: KycCheckStatus;
+  name: string;
+  message: string;
+  bvn?: string;
+  nin?: string;
+}
+
+/** POST /me/onboarding/verify-identity `verification`. */
+export interface IdentityVerification {
+  bvn: IdentityPartResult;
+  nin: IdentityPartResult;
+  identity_match: IdentityMatch;
+  signatory_match: boolean | null;
+  nin_match: boolean | null;
+  affiliate_match: boolean | null;
+  dob_match: boolean | null;
+}
+
+export interface FundingAccountResult {
+  created: boolean;
+  message?: string;
+  account_number?: string;
+  account_name?: string;
+  bank_name?: string;
+}
+
+export interface OnboardingEvent {
+  id: number;
+  user_id: number;
+  from_status: OnboardingStatus | "";
+  to_status: OnboardingStatus;
+  actor_id: number | null;
+  note: string | null;
+  created_at: string;
+}
+
+/** GET /admin/onboarding/:userID `data`. */
+export interface AdminOnboardingDetail extends OnboardingView {
+  events: OnboardingEvent[];
+  legacy: {
+    partner_type: PartnerType | null;
+    contact_person_name: string | null;
+    contact_person_designation: string | null;
+    contact_person_phone: string | null;
+    contact_person_email: string | null;
+    cac_certificate_uploaded_at: string | null;
+    utility_bill_uploaded_at: string | null;
+    registration_query: string | null;
+    registration_query_at: string | null;
+  };
+  /** doc type (or legacy_cac_certificate / legacy_utility_bill) -> "/api/admin/user/:id/document/:type". */
+  document_urls: Record<string, string>;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    phone: string | null;
+    created_at: string;
+    ban_code: number;
+  };
+}
+
+export interface AdminOnboardingQueueItem {
+  user_id: number;
+  name: string;
+  trading_name: string | null;
+  email: string;
+  phone: string | null;
+  onboarding_status: OnboardingStatus;
+  flow: OnboardingFlow | "";
+  partner_category: PartnerCategory | null;
+  partner_type: PartnerType | null;
+  business_type: BusinessType | null;
+  rc_number: string | null;
+  /** Not returned by the queue endpoint today; shown when present. */
+  expected_volume_band?: VolumeBand | null;
+  submitted_at: string | null;
+  waiting_seconds: number;
+  waiting: string;
+  cac_verified_at: string | null;
+  identity_match: IdentityMatch | null;
+  checks: Record<"cac" | "bvn" | "nin", { status: KycCheckStatus; checked_at: string } | null>;
+  documents: { type: KycDocumentType; status: KycDocumentStatus; uploaded_at: string; url: string }[];
+  missing_documents: KycDocumentType[];
+  needs_attention: string[];
+  legacy_documents: {
+    cac_certificate_uploaded_at: string | null;
+    utility_bill_uploaded_at: string | null;
+  };
+}
+
+export interface AdminOnboardingQueue {
+  total: number;
+  items: AdminOnboardingQueueItem[];
+  pagination: { current_page: number; per_page: number; total_pages: number };
+}
+
 export interface QueryGetResponse {
   data: {
     telco_log: {

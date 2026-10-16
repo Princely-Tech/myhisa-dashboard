@@ -152,7 +152,13 @@ export function buildNav(user: User): NavGroup[] {
       id: "account",
       title: "Account",
       entries: compact([
-        item("My registration", routes.profile, primary),
+        // v2 partners follow their application on the onboarding status
+        // page; legacy partners keep the old registration form.
+        item(
+          user.onboarding_flow === "v2" ? "My application" : "My registration",
+          user.onboarding_flow === "v2" ? routes.onboardingStatus : routes.profile,
+          primary
+        ),
         item("Sub-logins", routes.subLoginManagement, approved && primary),
       ]),
     },
@@ -171,6 +177,7 @@ export function buildNav(user: User): NavGroup[] {
       entries: compact([
         heading("Partners & staff"),
         item("Users", routes.users, perm("users.view")),
+        item("Onboarding queue", routes.adminOnboarding, perm("users.view"), [`${routes.adminOnboarding}/`]),
         item("Staff management", routes.adminStaffManagement, isSuperAdmin(user)),
         item("User credit history", routes.adminUserCreditHistory, perm("wallet.view")),
         heading("Transactions ops"),
