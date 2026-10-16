@@ -79,20 +79,25 @@ function describeRevealError(err: unknown): RevealError {
 
 interface ApiKeysTabProps {
   userId?: number;
+  /** Last 4 characters of the key from /me (onboarding-v2 backend). */
+  apiKeyLast4?: string;
   /** Primary login email; me/refresh-api-key requires it with the password. */
   email?: string;
   /** False when another Developers tab is selected (hides a revealed key). */
   active: boolean;
 }
 
-const ApiKeysTab = ({ userId, email, active }: ApiKeysTabProps) => {
+const ApiKeysTab = ({ userId, apiKeyLast4, email, active }: ApiKeysTabProps) => {
   const [messageApi, contextHolder] = message.useMessage();
 
-  // Nothing about the key is fetched on load (/me doesn't expose it). The
-  // last 4 characters are remembered, in memory only, from a reveal/rotate
-  // response; the full key is held only while revealed (or in the one-time
-  // new-key modal).
-  const [last4, setLast4] = useState<string | null>(null);
+  // The full key is never fetched on load. /me supplies the last 4
+  // characters (newer backends); otherwise they are learned, in memory only,
+  // from a reveal/rotate response. The full key is held only while revealed
+  // (or in the one-time new-key modal).
+  const [last4, setLast4] = useState<string | null>(apiKeyLast4 || null);
+  useEffect(() => {
+    if (apiKeyLast4) setLast4((prev) => prev ?? apiKeyLast4);
+  }, [apiKeyLast4]);
   const [revealed, setRevealed] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
 

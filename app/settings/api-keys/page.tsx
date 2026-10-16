@@ -52,7 +52,7 @@ const DevelopersContent = () => {
           {
             key: "api-keys",
             label: "API keys",
-            children: <ApiKeysTab userId={current?.id} email={current?.email} active={tab === "api-keys"} />,
+            children: <ApiKeysTab userId={current?.id} apiKeyLast4={current?.api_key_last4} email={current?.email} active={tab === "api-keys"} />,
           },
           {
             key: "ip-whitelist",

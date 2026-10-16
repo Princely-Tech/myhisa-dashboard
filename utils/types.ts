@@ -309,6 +309,10 @@ export type User = {
   signatory_name?: string | null;
   rejection_reason?: string | null;
   reapply_after?: string | null;
+  // Whether the account has an API key and its last 4 characters. /me never
+  // includes the key itself. Absent on backends older than onboarding-v2.
+  has_api_key?: boolean;
+  api_key_last4?: string;
   wallet: {
     balance: number;
     commission: number;

@@ -10,8 +10,8 @@ import { isSandbox } from "@/utils/environment";
 import { btnSecondary, textLink } from "@/components/ui/styles";
 import { useAsync } from "./useAsync";
 
-// localStorage keys (per user id). The API-key flag is set by the Stage 3
-// API keys page when the key is first viewed.
+// localStorage keys (per user id). The API-key flag is only a fallback for
+// backends that don't report has_api_key on /me.
 export const goLiveStorageKeys = {
   dismissed: (id: number) => `hisa:golive-dismissed:${id}`,
   apiKeyViewed: (id: number) => `hisa:apikey-viewed:${id}`,
@@ -110,7 +110,13 @@ const GoLiveChecklist = ({ user, transactionCount, onFund }: GoLiveChecklistProp
     {
       key: "apikey",
       label: isSandbox ? "Get your sandbox API key" : "Get your live API key",
-      done: apiKeyViewed,
+      // Every account gets a key at signup (users.api_key is NOT NULL), so
+      // this is done whenever /me says a key exists. Older backends don't send
+      // has_api_key: then an approved account, a live transaction, or a key
+      // viewed in this browser counts as done.
+      done:
+        user.has_api_key ??
+        (apiKeyViewed || !!user.approved_at || (transactionCount ?? 0) > 0),
       action: <Link href={routes.apiKeys} className={textLink}>Get key</Link>,
     },
     {
