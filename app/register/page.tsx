@@ -1,396 +1,283 @@
 "use client";
-import React, { useState } from "react";
-import { message, type FormProps, Modal, Form, Select, Upload, Alert } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
-import { AuthCard, BlueButton, FormField, InputField } from "@/components";
-import logo from "@/app/icon.png";
+// Onboarding v2, stage 1: create the account (POST /auth/signup). Business,
+// identity and documents are collected afterwards by the /onboarding wizard.
+import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import routes from "@/utils/routes";
-import {
-  emailFormItemProps,
-  passwordFormItemProps,
-  nameFormItemProps,
-  phoneFormItemProps,
-  rcNumberFormItemProps,
-  contactPersonNameFormItemProps,
-  contactPersonDesignationFormItemProps,
-  contactPersonPhoneFormItemProps,
-  contactPersonEmailFormItemProps,
-  bvnFormItemProps,
-  ninFormItemProps,
-  partnerTypeFormItemProps,
-} from "@/utils/formItemProps";
-import apiEndpoints from "@/utils/api/apiEndpoints";
-import { CookieSetParams, PartnerType } from "@/utils/types";
-import Image from "next/image";
-import Link from "next/link";
-import type { UploadProps } from "antd";
-import { isSandbox } from "@/utils/environment";
+import { PRIVACY_URL, TERMS_URL, isSandbox } from "@/utils/environment";
+import { storeSession } from "@/utils/session";
+import { authApi, isApiError } from "@/utils/api/onboardingApi";
+import { TERMS_VERSION, isEmail, passwordProblem, toE164NG } from "@/utils/onboarding";
+import AuthSplitLayout from "@/components/onboarding/AuthSplitLayout";
+import PasswordStrength from "@/components/onboarding/PasswordStrength";
+import { CheckIcon, Field, Notice, PhoneInput, btnPrimaryLg, fieldA11y, inputClass } from "@/components/onboarding/ui";
+import { textLink } from "@/components/ui/styles";
 
-const { Dragger } = Upload;
-
-type FieldType = {
-  name?: string;
-  email?: string;
-  phone?: string;
-  password?: string;
-  rc_number?: string;
-  contact_person_name?: string;
-  contact_person_designation?: string;
-  contact_person_phone?: string;
-  contact_person_email?: string;
-  bvn?: string;
-  nin?: string;
-  partner_type?: PartnerType;
-};
-
-const KYC_MAX_FILE_SIZE_MB = 5;
+type Errors = Partial<Record<"email" | "password" | "confirm_password" | "phone" | "terms_version" | "form", string>>;
+type EmailState = "idle" | "checking" | "available" | "taken" | "unknown";
 
 const Register: React.FC = () => {
-  const [messageApi, contextHolder] = message.useMessage();
-  const [form] = Form.useForm<FieldType>();
   const router = useRouter();
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
-  const [registeredEmail, setRegisteredEmail] = useState<string>("");
-  const [cacFile, setCacFile] = useState<File | null>(null);
-  const [utilityFile, setUtilityFile] = useState<File | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [phone, setPhone] = useState("");
+  const [terms, setTerms] = useState(false);
+  const [errors, setErrors] = useState<Errors>({});
+  const [emailState, setEmailState] = useState<EmailState>("idle");
+  const [submitting, setSubmitting] = useState(false);
+  const checkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastChecked = useRef("");
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const partnerType = Form.useWatch("partner_type", form);
-  const isBank = partnerType === "bank";
+  useEffect(() => () => {
+    if (checkTimer.current) clearTimeout(checkTimer.current);
+  }, []);
 
-  const validateDocument = (file: File): boolean => {
-    const isAllowedType = ["application/pdf", "image/jpeg", "image/png"].includes(file.type);
-    if (!isAllowedType) {
-      messageApi.error("Only PDF, JPG and PNG files are allowed!");
-      return false;
-    }
-    const isWithinSize = file.size / 1024 / 1024 < KYC_MAX_FILE_SIZE_MB;
-    if (!isWithinSize) {
-      messageApi.error(`File must be smaller than ${KYC_MAX_FILE_SIZE_MB}MB!`);
-      return false;
-    }
-    return true;
-  };
-
-  const cacUploadProps: UploadProps = {
-    name: "cac_certificate",
-    multiple: false,
-    accept: ".pdf,.jpg,.jpeg,.png",
-    beforeUpload: (file) => {
-      if (!validateDocument(file)) return false;
-      setCacFile(file);
-      return false;
-    },
-    onRemove: () => setCacFile(null),
-    fileList: cacFile ? [cacFile as any] : [],
-  };
-
-  const utilityUploadProps: UploadProps = {
-    name: "utility_bill",
-    multiple: false,
-    accept: ".pdf,.jpg,.jpeg,.png",
-    beforeUpload: (file) => {
-      if (!validateDocument(file)) return false;
-      setUtilityFile(file);
-      return false;
-    },
-    onRemove: () => setUtilityFile(null),
-    fileList: utilityFile ? [utilityFile as any] : [],
-  };
-
-  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    // SANDBOX: KYC documents are optional in sandbox builds (the backend
-    // skips the CAC/utility checks there), so only enforce them on live.
-    if (!isSandbox && !cacFile) {
-      messageApi.error("Please upload your CAC Certificate");
+  const checkEmail = (value: string) => {
+    const v = value.trim().toLowerCase();
+    if (checkTimer.current) clearTimeout(checkTimer.current);
+    if (!v || !isEmail(v)) {
+      setEmailState("idle");
       return;
     }
-    if (!isSandbox && !isBank && !utilityFile) {
-      messageApi.error("Please upload a Utility Bill (required for non-bank partners)");
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      const formData = new FormData();
-      formData.append("name", values.name || "");
-      formData.append("email", values.email || "");
-      formData.append("phone", values.phone || "");
-      formData.append("password", values.password || "");
-      formData.append("rc_number", values.rc_number || "");
-      formData.append("contact_person_name", values.contact_person_name || "");
-      formData.append("contact_person_designation", values.contact_person_designation || "");
-      formData.append("contact_person_phone", values.contact_person_phone || "");
-      formData.append("contact_person_email", values.contact_person_email || "");
-      formData.append("bvn", values.bvn || "");
-      formData.append("nin", values.nin || "");
-      formData.append("partner_type", values.partner_type || "");
-      // SANDBOX: cacFile can only be null here in sandbox builds.
-      if (cacFile) {
-        formData.append("cac_certificate", cacFile);
-      }
-      if (!isBank && utilityFile) {
-        formData.append("utility_bill", utilityFile);
-      }
-
-      const response = await fetch(`${apiEndpoints.base}${apiEndpoints.register}`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.data) {
-        setRegisteredEmail(values.email || "");
-        setShowSuccessModal(true);
-        messageApi.success("Account created successfully!");
-
-        // Register logs the account in the same way Login does (a token is
-        // always issued, verified or not) - stash it now so the
-        // verification screen the modal sends them to next can call /me
-        // once they've entered the OTP, without making them log in again.
-        if (result.data.token) {
-          localStorage.setItem(apiEndpoints.tokenSetUrl, result.data.token);
-          localStorage.setItem(apiEndpoints.userSetUrl, JSON.stringify(result.data.user));
-          const expires = new Date(Date.now() + 31536000000);
-          const userBody: CookieSetParams = {
-            cookie: `${apiEndpoints.userSetUrl}=${JSON.stringify(
-              result.data.user
-            )}; Path=/;Expires=${expires.toUTCString()}; HttpOnly; Secure; SameSite=Strict`,
-          };
-          const tokenBody: CookieSetParams = {
-            cookie: `${apiEndpoints.tokenSetUrl}=${
-              result.data.token
-            }; Path=/;Expires=${expires.toUTCString()}; HttpOnly; Secure; SameSite=Strict`,
-          };
-          await fetch(apiEndpoints.cookie, { method: "POST", body: JSON.stringify(userBody) });
-          await fetch(apiEndpoints.cookie, { method: "POST", body: JSON.stringify(tokenBody) });
+    if (v === lastChecked.current && emailState !== "unknown") return;
+    checkTimer.current = setTimeout(async () => {
+      setEmailState("checking");
+      try {
+        const res = await authApi.checkEmail(v);
+        lastChecked.current = v;
+        setEmailState(res.available ? "available" : "taken");
+        setErrors((e) => ({ ...e, email: res.available ? undefined : "An account already exists for this email. Log in instead." }));
+      } catch (err) {
+        // Rate limited or offline: don't block sign-up, the server checks again.
+        setEmailState("unknown");
+        if (isApiError(err) && err.status === 422) {
+          setErrors((e) => ({ ...e, email: err.field("email") ?? err.message }));
         }
-      } else {
-        messageApi.error(result.message || result.error || "Registration failed");
       }
-    } catch (err) {
-      console.error("Registration error:", err);
-      messageApi.error("An error occurred. Try again");
-    }
-    setIsProcessing(false);
+    }, 350);
   };
 
-  const handleModalClose = () => {
-    setShowSuccessModal(false);
-    router.push(`${routes.verifyEmail}?email=${encodeURIComponent(registeredEmail)}`);
+  const validate = (): Errors => {
+    const e: Errors = {};
+    if (!email.trim()) e.email = "Enter your business email";
+    else if (!isEmail(email)) e.email = "Enter a valid email address";
+    else if (emailState === "taken") e.email = "An account already exists for this email. Log in instead.";
+    const pw = passwordProblem(password);
+    if (!password) e.password = "Choose a password";
+    else if (pw) e.password = pw;
+    if (confirm !== password) e.confirm_password = "Passwords do not match";
+    if (!phone.trim()) e.phone = "Enter your phone number";
+    else if (!toE164NG(phone)) e.phone = "Enter a valid Nigerian mobile number, e.g. 803 123 4567";
+    if (!terms) e.terms_version = "You need to accept the terms to continue";
+    return e;
   };
+
+  const focusFirstError = (e: Errors) => {
+    const order: (keyof Errors)[] = ["email", "password", "confirm_password", "phone", "terms_version"];
+    const first = order.find((k) => e[k]);
+    const id = first === "terms_version" ? "terms" : first;
+    if (id) formRef.current?.querySelector<HTMLElement>(`#${id}`)?.focus();
+  };
+
+  const onSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length) {
+      focusFirstError(e);
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const normalizedEmail = email.trim().toLowerCase();
+      const res = await authApi.signup({
+        email: normalizedEmail,
+        password,
+        confirm_password: confirm,
+        phone: toE164NG(phone) as string,
+        terms_version: TERMS_VERSION,
+      });
+      await storeSession(res.data.token, res.data.user);
+      router.push(`${routes.verifyEmail}?email=${encodeURIComponent(normalizedEmail)}&sent=1`);
+    } catch (err) {
+      setSubmitting(false);
+      if (isApiError(err)) {
+        const fe: Errors = {
+          email: err.field("email"),
+          password: err.field("password"),
+          confirm_password: err.field("confirm_password"),
+          phone: err.field("phone"),
+          terms_version: err.field("terms_version"),
+        };
+        const hasField = Object.values(fe).some(Boolean);
+        if (!hasField) {
+          fe.form =
+            err.status === 429
+              ? `Too many sign-up attempts from this network. Try again in ${err.retryAfterSeconds ?? 60} seconds.`
+              : err.message;
+        }
+        if (fe.email && /taken/i.test(fe.email)) {
+          fe.email = "An account already exists for this email. Log in instead.";
+          setEmailState("taken");
+        }
+        setErrors(fe);
+        focusFirstError(fe);
+      } else {
+        setErrors({ form: "Something went wrong. Please try again." });
+      }
+    }
+  };
+
+  const emailHint =
+    emailState === "checking" ? "Checking…" : emailState === "available" ? undefined : "Use an address your team checks: we send verification codes here.";
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-teal-700 relative overflow-y-auto">
-      {contextHolder}
-      <div className="mt-5 fixed">
-        <Image src={logo} alt="myHisa" />
-      </div>
-      <div className="flex flex-col justify-center items-center flex-1 py-24">
-        <AuthCard subTitle="Create Account" title="MyHisa" centerTitle={true}>
-          {/* SANDBOX: the backend still requires RC number, BVN and NIN
-              (11 digits) in sandbox, but does not verify them. */}
-          {isSandbox && (
-            <Alert
-              className="mb-4"
-              type="warning"
-              showIcon
-              message="Sandbox registration"
-              description={
-                <span>
-                  No KYC documents needed. Any 11-digit BVN and NIN and any RC
-                  number (e.g. RC1234567) will work.{" "}
-                  <Link href={routes.sandboxTestValues} className="underline">
-                    See test values
-                  </Link>
-                </span>
-              }
-            />
-          )}
-          <FormField name="register_form" form={form} onFinish={onFinish}>
-            <InputField
-              placeholder="Business Name"
-              type="text"
-              formItemProps={nameFormItemProps}
-            />
-            <InputField
-              placeholder="Email Address"
-              type="email"
-              formItemProps={emailFormItemProps}
-            />
-            <InputField
-              placeholder="Phone Number"
-              type="tel"
-              formItemProps={phoneFormItemProps}
-            />
-            <InputField
-              placeholder="Preferred Password"
-              type="password"
-              formItemProps={passwordFormItemProps}
-            />
-            <InputField
-              placeholder="RC Number"
-              type="text"
-              formItemProps={rcNumberFormItemProps}
-            />
-            <InputField
-              placeholder="Contact Person Name"
-              type="text"
-              formItemProps={contactPersonNameFormItemProps}
-            />
-            <InputField
-              placeholder="Contact Person Designation"
-              type="text"
-              formItemProps={contactPersonDesignationFormItemProps}
-            />
-            <InputField
-              placeholder="Contact Person Phone Number"
-              type="tel"
-              formItemProps={contactPersonPhoneFormItemProps}
-            />
-            <InputField
-              placeholder="Contact Person Email Address"
-              type="email"
-              formItemProps={contactPersonEmailFormItemProps}
-            />
-            <InputField
-              placeholder="BVN"
-              type="text"
-              formItemProps={bvnFormItemProps}
-            />
-            <InputField
-              placeholder="NIN"
-              type="text"
-              formItemProps={ninFormItemProps}
-            />
-
-            <h2 className="text-[#344054] font-medium mb-1 text-[14px]">
-              Partner Type
-            </h2>
-            <Form.Item {...partnerTypeFormItemProps}>
-              <Select placeholder="Select partner type" style={{ width: "100%" }}>
-                <Select.Option value="bank">Bank</Select.Option>
-                <Select.Option value="non_bank">Non-Bank</Select.Option>
-              </Select>
-            </Form.Item>
-
-            {/* SANDBOX: KYC uploads are hidden in sandbox builds. */}
-            {!isSandbox && (
-            <div className="mb-4">
-              <h2 className="text-[#344054] font-medium mb-1 text-[14px]">
-                CAC Certificate
-              </h2>
-              <Dragger {...cacUploadProps}>
-                <p className="ant-upload-drag-icon">
-                  <InboxOutlined />
-                </p>
-                <p className="ant-upload-text">
-                  Click or drag file to this area to upload
-                </p>
-                <p className="ant-upload-hint">
-                  PDF, JPG or PNG. Max {KYC_MAX_FILE_SIZE_MB}MB. Required.
-                </p>
-              </Dragger>
-            </div>
-            )}
-
-            {!isSandbox && !isBank && (
-              <div className="mb-4">
-                <h2 className="text-[#344054] font-medium mb-1 text-[14px]">
-                  Utility Bill
-                </h2>
-                <Dragger {...utilityUploadProps}>
-                  <p className="ant-upload-drag-icon">
-                    <InboxOutlined />
-                  </p>
-                  <p className="ant-upload-text">
-                    Click or drag file to this area to upload
-                  </p>
-                  <p className="ant-upload-hint">
-                    PDF, JPG or PNG. Max {KYC_MAX_FILE_SIZE_MB}MB. Required for
-                    non-bank partners.
-                  </p>
-                </Dragger>
-              </div>
-            )}
-
-            <BlueButton htmlType="submit" block loading={isProcessing}>
-              Create Account
-            </BlueButton>
-          </FormField>
-
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link href={routes.login} className="text-teal-700 font-semibold hover:underline">
-                Login here
-              </Link>
-            </p>
-          </div>
-        </AuthCard>
-
-        <div className="mt-4 text-center">
-          <Link
-            href={routes.documentation}
-            className="text-sm text-white/90 font-medium hover:text-white hover:underline"
-          >
-            View API &amp; integration docs
+    <AuthSplitLayout
+      title="Create your account"
+      subtitle="Step 1 of 5 · about 2 minutes. Business details come next."
+      showProgress
+      footer={
+        <>
+          <p className="m-0">
+            Already have an account?{" "}
+            <Link href={routes.login} className={textLink}>
+              Log in
+            </Link>
+          </p>
+          <p className="m-0">
+            Want to read the API first?{" "}
+            <Link href={routes.documentation} className={textLink}>
+              View the documentation
+            </Link>
+          </p>
+        </>
+      }
+    >
+      {/* SANDBOX: sandbox accounts are approved automatically and KYC is simulated. */}
+      {isSandbox && (
+        <Notice tone="info" title="Sandbox sign-up">
+          Your account is approved as soon as you verify your email. Business and KYC checks use simulated data.{" "}
+          <Link href={routes.sandboxTestValues} className={textLink}>
+            See test values
           </Link>
-        </div>
-      </div>
+        </Notice>
+      )}
 
-      <Modal
-        title="Account Created Successfully"
-        open={showSuccessModal}
-        onOk={handleModalClose}
-        onCancel={handleModalClose}
-        footer={[
-          <BlueButton key="ok" onClick={handleModalClose}>
-            Continue to Verification
-          </BlueButton>
-        ]}
-        width={500}
-      >
-        <div className="space-y-4 py-4">
-          <div className="p-4 bg-green-50 border border-green-200 rounded">
-            <p className="text-green-800 font-medium">✓ Registration Successful!</p>
-            <p className="text-green-600 text-sm mt-2">
-              Your account has been created with email: <strong>{registeredEmail}</strong>
-            </p>
-          </div>
+      {errors.form && (
+        <Notice tone="error" live>
+          {errors.form}
+        </Notice>
+      )}
 
-          {/* SANDBOX: sandbox accounts are auto-approved on email verification. */}
-          {isSandbox ? (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded">
-              <p className="text-blue-800 font-medium">Verify your email and you&apos;re in</p>
-              <p className="text-blue-600 text-sm mt-2">
-                Sandbox accounts are approved automatically as soon as you verify
-                your email - no review needed.
-              </p>
-            </div>
-          ) : (
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-blue-800 font-medium">⏳ Account Activation Required</p>
-            <p className="text-blue-600 text-sm mt-2">
-              Your registration has been received and will be reviewed within a
-              maximum of 24 hours. You will receive an email as soon as your
-              account is approved and activated.
-            </p>
-          </div>
+      <form ref={formRef} noValidate onSubmit={onSubmit} className="flex flex-col gap-[18px]">
+        <Field id="email" label="Business email" error={errors.email} hint={emailHint}>
+          <input
+            {...fieldA11y("email", { error: errors.email, hint: emailHint, required: true })}
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailState !== "idle") setEmailState("idle");
+              if (errors.email) setErrors((x) => ({ ...x, email: undefined }));
+            }}
+            onBlur={(e) => checkEmail(e.target.value)}
+            className={inputClass(!!errors.email)}
+          />
+          <span aria-live="polite" className="text-[13px]">
+            {emailState === "available" && (
+              <span className="flex items-center gap-[6px] text-[#067647]">
+                <CheckIcon /> Available
+              </span>
+            )}
+          </span>
+        </Field>
+
+        <Field id="password" label="Password" error={errors.password}>
+          <input
+            {...fieldA11y("password", { error: errors.password, hint: true, required: true })}
+            aria-describedby={`password-strength${errors.password ? " password-error" : ""}`}
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password) setErrors((x) => ({ ...x, password: undefined }));
+            }}
+            className={inputClass(!!errors.password)}
+          />
+          <PasswordStrength id="password-strength" password={password} />
+        </Field>
+
+        <Field id="confirm_password" label="Confirm password" error={errors.confirm_password}>
+          <input
+            {...fieldA11y("confirm_password", { error: errors.confirm_password, required: true })}
+            type="password"
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => {
+              setConfirm(e.target.value);
+              if (errors.confirm_password) setErrors((x) => ({ ...x, confirm_password: undefined }));
+            }}
+            className={inputClass(!!errors.confirm_password)}
+          />
+        </Field>
+
+        <Field id="phone" label="Phone number" error={errors.phone}>
+          <PhoneInput
+            id="phone"
+            value={phone}
+            required
+            invalid={!!errors.phone}
+            describedBy={errors.phone ? "phone-error" : undefined}
+            onChange={(v) => {
+              setPhone(v);
+              if (errors.phone) setErrors((x) => ({ ...x, phone: undefined }));
+            }}
+          />
+        </Field>
+
+        <div className="flex flex-col gap-[6px]">
+          <label className="m-0 flex items-start gap-3 text-sm leading-[1.5] text-hisa-body">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={terms}
+              onChange={(e) => {
+                setTerms(e.target.checked);
+                if (errors.terms_version) setErrors((x) => ({ ...x, terms_version: undefined }));
+              }}
+              aria-describedby={errors.terms_version ? "terms-error" : undefined}
+              aria-invalid={!!errors.terms_version || undefined}
+              className="mt-[2px] h-[18px] w-[18px] shrink-0 accent-hisa-primary"
+            />
+            <span>
+              I agree to the{" "}
+              <a href={TERMS_URL} className={textLink} target="_blank" rel="noopener noreferrer">
+                Terms of Service
+              </a>{" "}
+              and the{" "}
+              <a href={PRIVACY_URL} className={textLink} target="_blank" rel="noopener noreferrer">
+                Privacy Notice
+              </a>
+              , including how MyHisa processes BVN and NIN data under the NDPA.
+            </span>
+          </label>
+          {errors.terms_version && (
+            <span id="terms-error" className="text-[13px] text-[#B42318]">
+              {errors.terms_version}
+            </span>
           )}
-
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
-            <p className="text-yellow-800 font-medium">📧 Check Your Email</p>
-            <p className="text-yellow-600 text-sm mt-2">
-              An OTP has been sent to your email address to verify it. We've also
-              sent your auto-generated API key in a separate email - keep it safe.
-            </p>
-          </div>
         </div>
-      </Modal>
-    </div>
+
+        <button type="submit" disabled={submitting} className={`${btnPrimaryLg} h-[50px] text-base`}>
+          {submitting ? "Creating account…" : "Create account"}
+        </button>
+      </form>
+    </AuthSplitLayout>
   );
 };
 

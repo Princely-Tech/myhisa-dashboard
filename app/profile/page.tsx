@@ -6,8 +6,11 @@ import type { UploadProps } from "antd";
 import { BlueButton, FormField, InputField } from "@/components";
 import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
-import { CookieSetParams, PartnerType, User } from "@/utils/types";
+import { PartnerType, User } from "@/utils/types";
 import { isApproved, isSubLogin } from "@/utils/accountPermissions";
+import { useRouter } from "next/navigation";
+import routes from "@/utils/routes";
+import { readStoredUser, storeUser } from "@/utils/session";
 import {
   nameFormItemProps,
   phoneFormItemProps,
@@ -47,12 +50,21 @@ const ProfilePage: React.FC = () => {
   const [cacFile, setCacFile] = useState<File | null>(null);
   const [utilityFile, setUtilityFile] = useState<File | null>(null);
 
+  const router = useRouter();
   const partnerType = Form.useWatch("partner_type", form);
   const isBank = partnerType === "bank";
   const approved = isApproved(user);
 
   useEffect(() => {
+    // ONBOARDING v2: v2 accounts follow their application on the onboarding
+    // status page (POST /me/registration answers 409 for them). Legacy
+    // accounts keep this form.
+    if (readStoredUser()?.onboarding_flow === "v2") {
+      router.replace(routes.onboardingStatus);
+      return;
+    }
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = async () => {
@@ -60,6 +72,10 @@ const ProfilePage: React.FC = () => {
     try {
       const res = await apiService.get({ endPoint: apiEndpoints.me });
       const u: User = res.data;
+      if (u.onboarding_flow === "v2") {
+        router.replace(routes.onboardingStatus);
+        return;
+      }
       setUser(u);
       form.setFieldsValue({
         name: u.name,
@@ -153,14 +169,7 @@ const ProfilePage: React.FC = () => {
         // Keep localStorage/cookie in sync with what was just saved, same as
         // the login flow, so the rest of the app (sidebar, greeting, etc.)
         // reflects the change without requiring a re-login.
-        localStorage.setItem(apiEndpoints.userSetUrl, JSON.stringify(result.data));
-        const expires = new Date(Date.now() + 31536000000);
-        const userBody: CookieSetParams = {
-          cookie: `${apiEndpoints.userSetUrl}=${JSON.stringify(
-            result.data
-          )}; Path=/;Expires=${expires.toUTCString()}; HttpOnly; Secure; SameSite=Strict`,
-        };
-        await fetch(apiEndpoints.cookie, { method: "POST", body: JSON.stringify(userBody) });
+        await storeUser(result.data);
       } else {
         messageApi.error(result.message || result.error || "Failed to update registration details");
       }

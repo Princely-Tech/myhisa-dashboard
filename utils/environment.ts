@@ -29,3 +29,13 @@ export const LIVE_DASHBOARD_URL = process.env.NEXT_PUBLIC_LIVE_DASHBOARD_URL || 
 // (models.PendingLikeStatuses in hisa_go_api) - only these can be resolved
 // via POST sandbox/transactions/:ref/resolve.
 export const SANDBOX_RESOLVABLE_STATUSES = ["Pending", "Processing", "TelcoError", "InternalError"];
+
+// ONBOARDING v2: optional links shown on the sign-up / onboarding screens.
+// NEXT_PUBLIC_* values are inlined at build time.
+// Sandbox dashboard, linked from the live "While you wait" card (hidden when
+// unset, and never shown on a sandbox build itself).
+export const SANDBOX_DASHBOARD_URL = process.env.NEXT_PUBLIC_SANDBOX_DASHBOARD_URL || "";
+// Terms / privacy / pricing pages. Fall back to the in-app documentation.
+export const TERMS_URL = process.env.NEXT_PUBLIC_TERMS_URL || "/documentation";
+export const PRIVACY_URL = process.env.NEXT_PUBLIC_PRIVACY_URL || "/documentation";
+export const PRICING_URL = process.env.NEXT_PUBLIC_PRICING_URL || "/documentation";

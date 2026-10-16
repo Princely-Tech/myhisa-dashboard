@@ -12,4 +12,6 @@ export const btnPrimary = `inline-flex h-10 items-center justify-center gap-2 wh
 
 export const btnSecondary = `inline-flex h-9 items-center justify-center gap-2 whitespace-nowrap rounded-[8px] border-[1px] border-solid border-[#D0D5DD] bg-white px-[12px] text-sm text-hisa-body no-underline transition-colors hover:bg-[#F9FAFB] hover:text-hisa-ink disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`;
 
+export const btnDanger = `inline-flex h-9 items-center justify-center gap-2 whitespace-nowrap rounded-[8px] border-[1px] border-solid border-[#FDA29B] bg-white px-[12px] text-sm font-semibold text-[#B42318] no-underline transition-colors hover:bg-[#FEF3F2] hover:text-[#912018] disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`;
+
 export const textLink = `font-semibold text-hisa-primary no-underline hover:text-hisa-primary-hover hover:underline rounded-[2px] ${focusRing}`;

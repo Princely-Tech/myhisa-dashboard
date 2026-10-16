@@ -123,10 +123,19 @@ export function buildNav(user: User): NavGroup[] {
       id: "developers",
       title: "Developers",
       entries: compact([
-        // Webhooks deliberately work pre-approval (not approval-gated).
-        item("Webhooks", routes.webhooks, hasAccountPermission(user, "webhooks.manage"), [
-          "/webhooks/",
-        ]),
+        // Developers area (API keys, IP whitelist, webhooks, alerts): primary
+        // login only, works pre-approval like the backend endpoints. The old
+        // webhooks page redirects primary logins here, so its paths (and the
+        // per-webhook deliveries pages) mark this item active.
+        item("API keys & webhooks", routes.apiKeys, primary, [routes.webhooks, "/webhooks/"]),
+        // Sub-logins can't open the Developers area; one with webhooks.manage
+        // keeps the standalone webhooks page (pre-approval, as before).
+        item(
+          "Webhooks",
+          routes.webhooks,
+          !primary && hasAccountPermission(user, "webhooks.manage"),
+          ["/webhooks/"]
+        ),
         heading(isSandbox ? "Test console" : "Live test console"),
         item("Test beneficiaries", routes.testBeneficiaries, canTestTx),
         item("Test transactions", routes.testTransactions, canTestTx),
@@ -143,7 +152,13 @@ export function buildNav(user: User): NavGroup[] {
       id: "account",
       title: "Account",
       entries: compact([
-        item("My registration", routes.profile, primary),
+        // v2 partners follow their application on the onboarding status
+        // page; legacy partners keep the old registration form.
+        item(
+          user.onboarding_flow === "v2" ? "My application" : "My registration",
+          user.onboarding_flow === "v2" ? routes.onboardingStatus : routes.profile,
+          primary
+        ),
         item("Sub-logins", routes.subLoginManagement, approved && primary),
       ]),
     },
@@ -162,6 +177,7 @@ export function buildNav(user: User): NavGroup[] {
       entries: compact([
         heading("Partners & staff"),
         item("Users", routes.users, perm("users.view")),
+        item("Onboarding queue", routes.adminOnboarding, perm("users.view"), [`${routes.adminOnboarding}/`]),
         item("Staff management", routes.adminStaffManagement, isSuperAdmin(user)),
         item("User credit history", routes.adminUserCreditHistory, perm("wallet.view")),
         heading("Transactions ops"),

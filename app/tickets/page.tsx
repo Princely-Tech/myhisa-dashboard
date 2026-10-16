@@ -61,6 +61,30 @@ const TicketsPage: React.FC = () => {
     fetchTickets();
   }, [statusFilter, pagination.page]);
 
+  // "Raise a ticket" from the transaction drawer links here with ?ref=<id>:
+  // open the create form prefilled for that transaction. Read from
+  // window.location (no Suspense boundary needed) and drop the param so a
+  // refresh doesn't reopen the form.
+  const [prefill, setPrefill] = useState<Partial<CreateTicketRequest> | null>(null);
+  useEffect(() => {
+    let ref: string | null = null;
+    try {
+      ref = new URLSearchParams(window.location.search).get('ref');
+    } catch {
+      ref = null;
+    }
+    ref = (ref ?? '').trim().slice(0, 100);
+    if (!ref) return;
+    setPrefill({
+      category: 'transaction_issue',
+      subject: `Issue with transaction ${ref}`,
+      description: `Transaction reference: ${ref}\n\nWhat went wrong: `,
+    });
+    setIsModalOpen(true);
+    router.replace('/tickets', { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
       case 'urgent':
@@ -225,6 +249,12 @@ const TicketsPage: React.FC = () => {
           }}
           footer={null}
           width={600}
+          afterOpenChange={(visible) => {
+            if (visible && prefill) {
+              form.setFieldsValue(prefill);
+              setPrefill(null);
+            }
+          }}
         >
           <Form
             form={form}
