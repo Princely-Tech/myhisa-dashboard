@@ -71,8 +71,11 @@ const routes = {
   adminSettings: "/admin/settings",
   // SANDBOX: only meaningful in sandbox builds (see utils/environment.ts).
   sandboxTestValues: "/sandbox/test-values",
-  // Stage 3 builds this page; linked from the dashboard go-live checklist.
+  // Developers area (API keys, IP whitelist, webhooks, alerts); tabs are
+  // selected with ?tab= (see app/settings/api-keys/tabs.ts).
   apiKeys: "/settings/api-keys",
+  apiKeysTab: (tab: "api-keys" | "ip-whitelist" | "webhooks" | "alerts") =>
+    `/settings/api-keys?tab=${tab}`,
 };
 export default routes;
 export { transactionFilterStr };

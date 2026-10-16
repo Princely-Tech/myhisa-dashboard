@@ -295,6 +295,9 @@ export type User = {
   registration_query_at?: string | null;
   // Kobo. 0 (or absent) = low-balance alerts off. Serialised by /me.
   low_balance_threshold?: number | null;
+  // API-key IP whitelist entries (IPs / CIDRs); empty = any IP. /me includes
+  // it on the onboarding-v2 backend.
+  ip_whitelist?: string[] | null;
   wallet: {
     balance: number;
     commission: number;
@@ -467,6 +470,36 @@ export interface WebhookItem {
 
 export interface WebhookResponse {
   data: WebhookItem[] | WebhookItem;
+}
+
+/** GET/PUT me/settings `data`. */
+export interface PartnerSettings {
+  /** Kobo; 0 = low-balance alert off. */
+  low_balance_threshold: number;
+  /** Canonical IPs / CIDRs; [] = no whitelist (any IP may use the API key). */
+  ip_whitelist: string[];
+}
+
+export interface PartnerSettingsResponse {
+  message?: string;
+  data: PartnerSettings;
+}
+
+/** POST webhooks/:id/test `data` (a failed delivery still answers 200). */
+export interface WebhookTestResult {
+  delivery_id: number;
+  status: string; // success | failed | skipped
+  success: boolean;
+  response_code: number;
+  response_body: string;
+  error_message: string;
+  webhook: { id: number; url: string };
+}
+
+/** GET me/api-key, POST me/api-key/reveal and POST me/refresh-api-key `data`. */
+export interface ApiKeyResponse {
+  message?: string;
+  data: { api_key: string };
 }
 
 export interface WebhookDeliveryItem {

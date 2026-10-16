@@ -46,6 +46,16 @@ const apiEndpoints = {
   webhooks: "webhooks",
   webhookById: (id: number) => `webhooks/${id}`,
   webhookDeliveries: (id: number) => `webhooks/${id}/deliveries`,
+  // Sends a {"event":"test"} delivery synchronously (10/min per account).
+  webhookTest: (id: number) => `webhooks/${id}/test`,
+  // Developers area (app/settings/api-keys). Primary login only except
+  // GET me/settings; none of them need an approved account.
+  // GET me/api-key is kept for existing integrations; the dashboard reveals
+  // with POST me/api-key/reveal {password} (5/min per account, no-store).
+  meApiKey: "me/api-key",
+  meRevealApiKey: "me/api-key/reveal",
+  meRefreshApiKey: "me/refresh-api-key",
+  meSettings: "me/settings",
   adminAvailability: "admin/availability",
   adminWebhookDeliveries: "admin/webhook-deliveries",
   selfServicePendingTransactions: "self-service/transactions/pending",

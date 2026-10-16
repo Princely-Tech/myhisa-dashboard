@@ -42,14 +42,19 @@ export function describeStatus(
 }
 
 interface StatusPillProps {
-  status: string | null | undefined;
+  status?: string | null;
+  /** Explicit tone/label for non-transaction states (e.g. "Active"). */
+  tone?: StatusTone;
+  label?: string;
   /** Truthy (e.g. a transaction's refunded_at) forces the Refunded pill. */
   refunded?: boolean | string | null;
   className?: string;
 }
 
-const StatusPill = ({ status, refunded, className = "" }: StatusPillProps) => {
-  const { tone, label } = describeStatus(status, refunded);
+const StatusPill = ({ status, refunded, tone: toneProp, label: labelProp, className = "" }: StatusPillProps) => {
+  const described = describeStatus(status, refunded);
+  const tone = toneProp ?? described.tone;
+  const label = labelProp ?? described.label;
   return (
     <span
       className={`inline-block whitespace-nowrap rounded-full px-[10px] py-[3px] text-xs font-semibold ${TONE_CLASSES[tone]} ${className}`}

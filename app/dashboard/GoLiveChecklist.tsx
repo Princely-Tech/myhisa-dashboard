@@ -114,13 +114,14 @@ const GoLiveChecklist = ({ user, transactionCount, onFund }: GoLiveChecklistProp
       action: <Link href={routes.apiKeys} className={textLink}>Get key</Link>,
     },
     {
-      // The IP whitelist isn't exposed by /me, so the partner confirms it.
+      // Done once /me reports whitelist entries (onboarding-v2 backend), or
+      // when the partner marks it done (e.g. they deliberately allow any IP).
       key: "ips",
       label: "Add server IPs to the whitelist",
-      done: ipsConfirmed,
+      done: ipsConfirmed || (user.ip_whitelist?.length ?? 0) > 0,
       action: (
         <span className="flex items-center gap-3">
-          <Link href={routes.tickets} className={textLink}>Send IPs</Link>
+          <Link href={routes.apiKeysTab("ip-whitelist")} className={textLink}>Add IPs</Link>
           <button
             type="button"
             className={`border-0 bg-transparent p-0 text-sm ${textLink}`}
@@ -136,9 +137,9 @@ const GoLiveChecklist = ({ user, transactionCount, onFund }: GoLiveChecklistProp
     },
     {
       key: "webhook",
-      label: "Set up a transaction webhook",
+      label: "Set up a webhook",
       done: webhooks.data !== null ? webhooks.data > 0 : webhooks.error ? false : null,
-      action: <Link href={routes.webhooks} className={textLink}>Set up</Link>,
+      action: <Link href={routes.apiKeysTab("webhooks")} className={textLink}>Set up</Link>,
     },
     {
       key: "firsttx",

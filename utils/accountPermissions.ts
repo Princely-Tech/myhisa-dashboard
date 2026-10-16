@@ -56,7 +56,19 @@ export const ACCOUNT_PAGE_PERMISSIONS: Record<string, string> = {
 // dataPlans/electricityBillers stay primary-only alongside sub-login
 // management itself, rather than referencing a "purchases.manage"
 // permission that doesn't exist in the catalog).
-const PRIMARY_LOGIN_ONLY_PAGES = [routes.subLoginManagement, routes.dataPlans, routes.electricityBillers];
+//
+// The Developers area (routes.apiKeys) is primary-only because the API key
+// endpoints are PrimaryLoginOnly on the backend. It is deliberately NOT in
+// APPROVAL_REQUIRED_PAGES: me/api-key, me/refresh-api-key and me/settings
+// sit in main.go's emailVerified group, so a pending partner can already get
+// a key and set up IPs/webhooks. Sub-logins with webhooks.manage keep using
+// routes.webhooks (which redirects primary logins here).
+const PRIMARY_LOGIN_ONLY_PAGES = [
+  routes.subLoginManagement,
+  routes.dataPlans,
+  routes.electricityBillers,
+  routes.apiKeys,
+];
 
 // Pages backed by an endpoint that sits behind the backend's `approved`
 // middleware group (main.go) - i.e. it 403s for an account still pending
