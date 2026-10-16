@@ -1,178 +1,237 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { message, type FormProps } from "antd";
-import { AuthCard, BlueButton, FormField, InputField } from "@/components";
-import logo from "@/app/icon.png";
+// Stage 1b: verify the email with the 6-digit code (POST /auth/verify-email).
+// Backend rules: 5 wrong codes lock entry for 15 minutes (429 +
+// retry_after_seconds), resend has a 60 s server-side cooldown (429 +
+// retry_after_seconds).
+import React, { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import routes from "@/utils/routes";
-import { otpFormItemProps } from "@/utils/formItemProps";
-import AxiosHandler from "@/utils/api/axiosHandler";
 import apiEndpoints from "@/utils/api/apiEndpoints";
-import Image from "next/image";
-import Link from "next/link";
-import { CookieSetParams } from "@/utils/types";
+import { isSandbox } from "@/utils/environment";
+import { clearSession, readStoredUser } from "@/utils/session";
+import { authApi, isApiError, refreshStoredUser } from "@/utils/api/onboardingApi";
+import { routeAfterAuth } from "@/utils/onboarding";
+import AuthSplitLayout from "@/components/onboarding/AuthSplitLayout";
+import OtpInput from "@/components/onboarding/OtpInput";
+import { Notice, btnPrimaryLg, linkButton } from "@/components/onboarding/ui";
 
-type FieldType = {
-  otp?: string;
-};
+const RESEND_COOLDOWN_SECONDS = 60;
 
-// Cooldown (seconds) before "Resend code" can be pressed again - purely a
-// client-side spam guard, the backend has no rate limit of its own on
-// resend-verification-otp.
-const RESEND_COOLDOWN_SECONDS = 30;
+function formatWait(seconds: number): string {
+  if (seconds >= 120) return `${Math.ceil(seconds / 60)} minutes`;
+  if (seconds >= 60) return "about a minute";
+  return `${seconds} seconds`;
+}
 
-const VerifyEmail: React.FC = () => {
-  const [messageApi, contextHolder] = message.useMessage();
-  const apiService = new AxiosHandler(messageApi);
+function useCountdown(initial = 0) {
+  const [left, setLeft] = useState(initial);
+  useEffect(() => {
+    if (left <= 0) return;
+    const t = setTimeout(() => setLeft((s) => Math.max(0, s - 1)), 1000);
+    return () => clearTimeout(t);
+  }, [left]);
+  return [left, setLeft] as const;
+}
+
+const VerifyEmailInner: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  const [isResending, setIsResending] = useState<boolean>(false);
-  const [resendCooldown, setResendCooldown] = useState<number>(0);
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useCountdown(0);
+  const [lockLeft, setLockLeft] = useCountdown(0);
+  const submittedFor = useRef("");
 
   useEffect(() => {
-    // The email address survives a page refresh two ways: the query string
-    // (set when Login/Register redirect here) or, failing that, whichever
-    // account is still sitting in localStorage from that same redirect.
     const fromQuery = searchParams.get("email");
-    if (fromQuery) {
-      setEmail(fromQuery);
-      return;
-    }
-    const raw = localStorage.getItem(apiEndpoints.userSetUrl);
-    if (raw) {
-      try {
-        setEmail((JSON.parse(raw) as { email?: string }).email || "");
-      } catch {}
-    }
+    if (fromQuery) setEmail(fromQuery);
+    else setEmail(readStoredUser()?.email ?? "");
+    // Signup / login just sent a code: start the resend countdown.
+    if (searchParams.get("sent") === "1") setCooldown(RESEND_COOLDOWN_SECONDS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const timer = setInterval(() => {
-      setResendCooldown((secs) => Math.max(0, secs - 1));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [resendCooldown]);
+  const routeAfterVerify = useCallback(async () => {
+    if (!localStorage.getItem(apiEndpoints.tokenSetUrl)) {
+      router.push(routes.login);
+      return;
+    }
+    try {
+      const user = await refreshStoredUser();
+      router.push(routeAfterAuth(user, false));
+    } catch {
+      router.push(routes.login);
+    }
+  }, [router]);
 
-  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+  const verify = async (value: string) => {
+    if (verifying || lockLeft > 0) return;
     if (!email) {
-      messageApi.error("We couldn't tell which account to verify. Please log in again.");
+      setError("We couldn't tell which account to verify. Please log in again.");
       return;
     }
-    setIsVerifying(true);
-    try {
-      await apiService.post({
-        endPoint: apiEndpoints.verifyEmail,
-        body: { email, otp: values.otp },
-      });
-      messageApi.success("Email verified successfully!");
-      await syncVerifiedSession();
-    } catch (err) {}
-    setIsVerifying(false);
-  };
-
-  const handleResend = async () => {
-    if (!email || resendCooldown > 0) return;
-    setIsResending(true);
-    try {
-      await apiService.post({
-        endPoint: apiEndpoints.resendVerificationOtp,
-        body: { email },
-      });
-      messageApi.success("A new verification code has been sent to your email");
-      setResendCooldown(RESEND_COOLDOWN_SECONDS);
-    } catch (err) {}
-    setIsResending(false);
-  };
-
-  // After a successful verify, refresh the stored user from /me (now
-  // reachable - EmailVerified middleware no longer blocks it) so the rest
-  // of the app sees email_verified_at set without requiring a re-login. If
-  // there's no session token (e.g. this tab never logged in - the link was
-  // opened fresh), fall back to sending them to log in normally.
-  const syncVerifiedSession = async () => {
-    const token = localStorage.getItem(apiEndpoints.tokenSetUrl);
-    if (!token) {
-      router.push(routes.login);
+    if (!/^\d{6}$/.test(value)) {
+      setError("Enter the 6-digit code from the email.");
       return;
     }
+    submittedFor.current = value;
+    setVerifying(true);
+    setError(null);
+    setInfo(null);
     try {
-      const res = await apiService.get({ endPoint: apiEndpoints.me });
-      localStorage.setItem(apiEndpoints.userSetUrl, JSON.stringify(res.data));
-      const expires = new Date(Date.now() + 31536000000);
-      const userBody: CookieSetParams = {
-        cookie: `${apiEndpoints.userSetUrl}=${JSON.stringify(
-          res.data
-        )}; Path=/;Expires=${expires.toUTCString()}; HttpOnly; Secure; SameSite=Strict`,
-      };
-      await fetch(apiEndpoints.cookie, { method: "POST", body: JSON.stringify(userBody) });
-      router.push(routes.dashboard);
+      const res = await authApi.verifyEmail({ email, otp: value });
+      setInfo(
+        res.onboarding_status === "approved" || isSandbox
+          ? "Email verified. Taking you to your dashboard…"
+          : "Email verified. Next, tell us about your business…"
+      );
+      await routeAfterVerify();
     } catch (err) {
-      router.push(routes.login);
+      setVerifying(false);
+      setCode("");
+      if (isApiError(err)) {
+        if (err.status === 429) {
+          const wait = err.retryAfterSeconds ?? 900;
+          setLockLeft(wait);
+          setError(`Too many incorrect codes. For your security, code entry is paused for ${formatWait(wait)}.`);
+        } else if (err.attemptsRemaining !== null) {
+          setError(
+            err.attemptsRemaining > 0
+              ? `That code isn't right. ${err.attemptsRemaining} ${err.attemptsRemaining === 1 ? "try" : "tries"} left.`
+              : "That code isn't right."
+          );
+        } else {
+          // Expired / no code: the backend says to request a new one.
+          setError(err.message);
+        }
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     }
   };
+
+  const resend = async () => {
+    if (!email || cooldown > 0 || resending) return;
+    setResending(true);
+    setError(null);
+    setInfo(null);
+    try {
+      const res = await authApi.resendOtp(email);
+      if (/already verified/i.test(res.message)) {
+        setInfo("Your email is already verified.");
+        await routeAfterVerify();
+        return;
+      }
+      setInfo(`We've sent a new code to ${email}.`);
+      setCooldown(RESEND_COOLDOWN_SECONDS);
+    } catch (err) {
+      if (isApiError(err) && err.status === 429) {
+        setCooldown(err.retryAfterSeconds ?? RESEND_COOLDOWN_SECONDS);
+        setInfo("A code was sent moments ago. You can request another when the timer runs out.");
+      } else {
+        setError(isApiError(err) ? err.message : "Couldn't send a new code. Please try again.");
+      }
+    }
+    setResending(false);
+  };
+
+  const changeEmail = async () => {
+    await clearSession();
+    router.push(routes.register);
+  };
+
+  const locked = lockLeft > 0;
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-teal-700 relative">
-      {contextHolder}
-      <div className="mt-5 fixed">
-        <Image src={logo} alt="myHisa" />
-      </div>
-      <div className="flex flex-col justify-center items-center flex-1">
-        <AuthCard subTitle="Verify Your Email" title="MyHisa" centerTitle={true}>
-          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-blue-800 text-sm">
-              {email ? (
-                <>
-                  We&apos;ve sent a 6-digit verification code to{" "}
-                  <strong>{email}</strong>. Enter it below to continue.
-                </>
-              ) : (
-                "We've sent a 6-digit verification code to your email. Enter it below to continue."
-              )}
-            </p>
-          </div>
+    <AuthSplitLayout
+      title="Check your email"
+      showProgress
+      subtitle={
+        <>
+          We sent a 6-digit code to <strong className="text-hisa-ink">{email || "your email"}</strong>. It expires in 15 minutes.
+        </>
+      }
+      footer={
+        <>
+          <p className="m-0">
+            Wrong address?{" "}
+            <button type="button" onClick={changeEmail} className={linkButton}>
+              Change email
+            </button>
+          </p>
+          <p className="m-0">
+            Not you?{" "}
+            <Link href={routes.login} className="font-semibold text-hisa-primary hover:underline">
+              Log in with another account
+            </Link>
+          </p>
+        </>
+      }
+    >
+      <form
+        noValidate
+        onSubmit={(e) => {
+          e.preventDefault();
+          verify(code);
+        }}
+        className="flex flex-col gap-5"
+      >
+        <div className="flex flex-col gap-2">
+          <span id="otp-label" className="text-sm font-semibold text-hisa-body">
+            Verification code
+          </span>
+          <OtpInput
+            label="Verification code"
+            value={code}
+            onChange={(v) => {
+              setCode(v);
+              if (error && !locked) setError(null);
+            }}
+            onComplete={(v) => {
+              if (v !== submittedFor.current) verify(v);
+            }}
+            disabled={verifying || locked}
+            invalid={!!error && !locked}
+            describedBy={error ? "otp-status" : undefined}
+            autoFocus
+          />
+        </div>
 
-          <FormField name="verify_email_form" onFinish={onFinish}>
-            <InputField
-              placeholder="6-digit code"
-              type="text"
-              maxLength={6}
-              formItemProps={otpFormItemProps}
-            />
-            <BlueButton htmlType="submit" block loading={isVerifying}>
-              Verify Email
-            </BlueButton>
-          </FormField>
+        <div id="otp-status" aria-live="polite" className="flex flex-col gap-2">
+          {error && (
+            <Notice tone={locked ? "warning" : "error"}>
+              {error}
+              {locked && <span className="block">You can try again in {formatWait(lockLeft)}.</span>}
+            </Notice>
+          )}
+          {info && <Notice tone="success">{info}</Notice>}
+        </div>
 
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">
-              Didn&apos;t get a code?{" "}
-              <button
-                type="button"
-                onClick={handleResend}
-                disabled={isResending || resendCooldown > 0}
-                className="text-teal-700 font-semibold hover:underline disabled:text-gray-400 disabled:no-underline disabled:cursor-not-allowed"
-              >
-                {resendCooldown > 0 ? `Resend code (${resendCooldown}s)` : "Resend code"}
-              </button>
-            </p>
-          </div>
+        <button type="submit" disabled={verifying || locked || code.length !== 6} className={btnPrimaryLg}>
+          {verifying ? "Verifying…" : "Verify email"}
+        </button>
 
-          <div className="mt-2 text-center">
-            <p className="text-sm text-gray-600">
-              Wrong account?{" "}
-              <Link href={routes.login} className="text-teal-700 font-semibold hover:underline">
-                Log in again
-              </Link>
-            </p>
-          </div>
-        </AuthCard>
-      </div>
-    </div>
+        <p className="m-0 text-sm text-hisa-muted">
+          Didn&apos;t get it? Check spam, or{" "}
+          <button type="button" onClick={resend} disabled={cooldown > 0 || resending || !email} className={linkButton}>
+            {cooldown > 0 ? `resend code in ${cooldown}s` : resending ? "sending…" : "resend code"}
+          </button>
+          .
+        </p>
+      </form>
+    </AuthSplitLayout>
   );
 };
+
+const VerifyEmail = () => (
+  <Suspense fallback={null}>
+    <VerifyEmailInner />
+  </Suspense>
+);
 
 export default VerifyEmail;

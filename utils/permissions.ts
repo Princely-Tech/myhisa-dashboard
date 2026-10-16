@@ -46,6 +46,7 @@ export const PAGE_PERMISSIONS: Record<string, string> = {
   [routes.adminAuditLogs]: "audit_logs.view",
   [routes.adminServerLogs]: "logs.view",
   [routes.adminSettings]: "settings.manage",
+  [routes.adminOnboarding]: "users.view",
 };
 
 // routes.adminStaffManagement is intentionally absent from PAGE_PERMISSIONS -
@@ -60,6 +61,13 @@ export function canAccessPage(user: User | null | undefined, path: string): bool
   // /admin/tickets tree (list and detail) on the one prefix check instead.
   if (path.startsWith(routes.adminTickets)) {
     return hasPermission(user, "tickets.manage");
+  }
+
+  // routes.adminOnboardingDetail is a dynamic /admin/onboarding/:userId
+  // route: viewing needs users.view like the queue (decisions need
+  // users.manage, enforced by the backend and the page's buttons).
+  if (path.startsWith(`${routes.adminOnboarding}/`)) {
+    return hasPermission(user, "users.view");
   }
 
   const required = PAGE_PERMISSIONS[path];

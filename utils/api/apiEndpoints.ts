@@ -1,3 +1,4 @@
+import type { KycDocumentType } from "../types";
 const apiEndpoints = {
   cookie: "/api/cookie",
   userSetUrl: "user",
@@ -7,6 +8,28 @@ const apiEndpoints = {
   register: "auth/register",
   verifyEmail: "auth/verify-email",
   resendVerificationOtp: "auth/resend-verification-otp",
+  // Onboarding v2 (docs/ONBOARDING_V2_API.md in hisa_go_api).
+  signup: "auth/signup",
+  checkEmail: (email: string) => `auth/check-email?email=${encodeURIComponent(email)}`,
+  forgotPassword: "auth/forgot-password",
+  resetPassword: "auth/reset-password",
+  onboarding: "me/onboarding",
+  onboardingBusiness: "me/onboarding/business",
+  onboardingVerifyCac: "me/onboarding/verify-cac",
+  onboardingSignatory: "me/onboarding/signatory",
+  onboardingVerifyIdentity: "me/onboarding/verify-identity",
+  onboardingDocument: (type: string) => `me/onboarding/documents/${encodeURIComponent(type)}`,
+  onboardingSubmit: "me/onboarding/submit",
+  onboardingReply: "me/onboarding/reply",
+  onboardingReapply: "me/onboarding/reapply",
+  adminOnboardingQueue: "admin/onboarding/queue",
+  adminOnboardingDetail: (userId: number | string) => `admin/onboarding/${userId}`,
+  adminOnboardingStartReview: (userId: number | string) => `admin/onboarding/${userId}/start-review`,
+  adminOnboardingApprove: (userId: number | string) => `admin/onboarding/${userId}/approve`,
+  adminOnboardingQuery: (userId: number | string) => `admin/onboarding/${userId}/query`,
+  adminOnboardingReject: (userId: number | string) => `admin/onboarding/${userId}/reject`,
+  adminOnboardingDocumentReview: (userId: number | string, type: string) =>
+    `admin/onboarding/${userId}/documents/${encodeURIComponent(type)}/review`,
   me: "me",
   updateRegistration: "me/registration",
   transactionStats: "transaction-stats",
@@ -86,8 +109,12 @@ const apiEndpoints = {
   adminUnapprovedUsers: "admin/users/unapproved",
   adminSendRegistrationQuery: (userId: number) => `admin/user/${userId}/registration-query`,
   adminUserProfile: (userId: number) => `admin/user/${userId}`,
-  adminUserDocument: (userId: number, type: "cac-certificate" | "utility-bill") =>
-    `admin/user/${userId}/document/${type}`,
+  // Legacy types (cac-certificate, utility-bill) and, since onboarding v2,
+  // the KYC document types (cac_certificate, proof_of_address, ...).
+  adminUserDocument: (
+    userId: number,
+    type: "cac-certificate" | "utility-bill" | KycDocumentType
+  ) => `admin/user/${userId}/document/${type}`,
   adminGetUserApiKey: (userId: number) => `admin/user/${userId}/api-key`,
   adminRefreshUserApiKey: (userId: number) => `admin/user/${userId}/refresh-api-key`,
   adminBlockWallet: (userId: number) => `admin/user/${userId}/block-wallet`,

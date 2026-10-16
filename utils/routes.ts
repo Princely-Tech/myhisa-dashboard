@@ -8,6 +8,14 @@ const routes = {
   login: "/",
   register: "/register",
   verifyEmail: "/verify-email",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
+  // Onboarding v2 (self-onboarding wizard + status page).
+  onboarding: "/onboarding",
+  onboardingBusiness: "/onboarding/business",
+  onboardingIdentity: "/onboarding/identity",
+  onboardingReview: "/onboarding/review",
+  onboardingStatus: "/onboarding/status",
   documentation: "/documentation",
   dashboard: "/dashboard",
   profile: "/profile",
@@ -69,6 +77,8 @@ const routes = {
   adminTickets: "/admin/tickets",
   adminTicketDetail: (id: number | string) => `/admin/tickets/${id}`,
   adminSettings: "/admin/settings",
+  adminOnboarding: "/admin/onboarding",
+  adminOnboardingDetail: (userId: number | string) => `/admin/onboarding/${userId}`,
   // SANDBOX: only meaningful in sandbox builds (see utils/environment.ts).
   sandboxTestValues: "/sandbox/test-values",
   // Developers area (API keys, IP whitelist, webhooks, alerts); tabs are

@@ -19,7 +19,17 @@ import { focusRing } from "@/components/ui/styles";
 // Never shelled (same as the old ResponsiveSidebar/SidebarTwo for login and
 // register; verify-email is only reachable by an unverified session, which
 // the middleware keeps off every other page, so a nav there is useless).
-const BARE_ROUTES = [routes.login, routes.register, routes.verifyEmail];
+const BARE_ROUTES = [
+  routes.login,
+  routes.register,
+  routes.verifyEmail,
+  routes.forgotPassword,
+  routes.resetPassword,
+];
+// The onboarding wizard/status page brings its own slim header
+// (app/onboarding/layout.tsx).
+const isBarePath = (p: string) =>
+  BARE_ROUTES.includes(p) || p === routes.onboarding || p.startsWith(`${routes.onboarding}/`);
 // Public pages: shelled only when a session user exists (as before, when
 // SidebarTwo rendered nothing without a stored user).
 const PUBLIC_ROUTES = [routes.documentation, routes.sandboxTestValues];
@@ -53,7 +63,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
     setNavOpen(false);
   }, [pathname]);
 
-  const isBare = BARE_ROUTES.includes(pathname);
+  const isBare = isBarePath(pathname);
   const shelled =
     !isBare && (mounted ? !!user : !PUBLIC_ROUTES.includes(pathname));
 
