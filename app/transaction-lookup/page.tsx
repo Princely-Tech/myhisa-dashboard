@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Spin, message, Table, Tag, Modal, Input } from "antd";
 import dayjs from "dayjs";
 import AxiosHandler from "@/utils/api/axiosHandler";
@@ -9,6 +9,7 @@ import { formatCurrency } from "@/utils/commissionHelpers";
 import { handleDownloadCSV, plainKoboNairaConvert } from "@/utils/helperfunctions";
 import { isSandbox } from "@/utils/environment";
 import SandboxResolveActions from "@/components/SandboxResolveActions";
+import { LOOKUP_SEARCH_EVENT } from "@/components/shell/events";
 
 const { TextArea } = Input;
 
@@ -70,8 +71,37 @@ const TransactionLookup = () => {
   const [exportLoading, setExportLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const handleLookup = async () => {
-    if (!transactionRefs.trim()) {
+  // Top-bar search (components/shell/TopBar.tsx) lands here as ?q=<ref>:
+  // prefill the box and run the lookup once. Read from window.location
+  // rather than useSearchParams so the page needs no Suspense boundary.
+  useEffect(() => {
+    let q: string | null = null;
+    try {
+      q = new URLSearchParams(window.location.search).get("q");
+    } catch {
+      q = null;
+    }
+    if (q && q.trim()) {
+      setTransactionRefs(q);
+      lookupRefs(q);
+    }
+    // Searches made while this page is already open.
+    const onSearch = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (typeof detail === "string" && detail.trim()) {
+        setTransactionRefs(detail);
+        lookupRefs(detail);
+      }
+    };
+    window.addEventListener(LOOKUP_SEARCH_EVENT, onSearch);
+    return () => window.removeEventListener(LOOKUP_SEARCH_EVENT, onSearch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLookup = () => lookupRefs(transactionRefs);
+
+  const lookupRefs = async (refsInput: string) => {
+    if (!refsInput.trim()) {
       messageApi.warning("Please enter transaction IDs or external references");
       return;
     }
@@ -80,7 +110,7 @@ const TransactionLookup = () => {
     setLookupResults(null);
     try {
       const apiService = new AxiosHandler(messageApi);
-      const cleanedRefs = transactionRefs
+      const cleanedRefs = refsInput
         .split(/[\n,;]/)
         .map(ref => ref.trim())
         .filter(ref => ref.length > 0)

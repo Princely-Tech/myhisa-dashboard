@@ -5,17 +5,36 @@ import "@/css/typography.css";
 import "@/css/variable.css";
 import "@/css/style-customizer.css";
 import "@/css/fontawesome.css";
-//import { MyHisaSideBar } from "@/components";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import ResponsiveSidebar from "@/components/ResponsiveSidebar";
-import { cookies } from "next/headers";
-import apiEndpoints from "@/utils/api/apiEndpoints";
-import { User } from "@/utils/types";
+import { ConfigProvider } from "antd";
+import { Manrope, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import EnvironmentBanner from "@/components/EnvironmentBanner";
+import AppShell from "@/components/shell/AppShell";
 import { isSandbox } from "@/utils/environment";
+import { antdTheme } from "@/utils/theme";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+const plexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-sans",
+  display: "swap",
+});
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
+  display: "swap",
+});
 
 export const metadata = {
   // SANDBOX: prefix the tab title so sandbox tabs are easy to tell apart.
+  // AppShell refines this per page from the active nav item.
   title: `${isSandbox ? "[SANDBOX] " : ""}Hisa:Send Airtime and Data`,
   description: "Hisa:Send Airtime and Data",
 };
@@ -25,19 +44,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // const cookie = cookies();
-  // const user = cookie.get(apiEndpoints.userSetUrl);
-  // let userJSON: User | null = null;
-  // if (user) {
-  //   userJSON = JSON.parse(user.value);
-  // }
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${manrope.variable} ${plexSans.variable} ${plexMono.variable}`}
+    >
       <body>
         <AntdRegistry>
-          {/* SANDBOX: test-mode / misconfiguration banner on every page. */}
-          <EnvironmentBanner />
-          <ResponsiveSidebar>{children}</ResponsiveSidebar>
+          <ConfigProvider theme={antdTheme}>
+            {/* SANDBOX: test-mode / misconfiguration banner on every page. */}
+            <EnvironmentBanner />
+            <AppShell>{children}</AppShell>
+          </ConfigProvider>
         </AntdRegistry>
       </body>
     </html>

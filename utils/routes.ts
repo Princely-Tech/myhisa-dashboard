@@ -24,7 +24,7 @@ const routes = {
   users: "/users",
   queryPlain: "/transactions/query",
   query: (id: string) => `${routes.queryPlain}?id=${id}`,
-  telcoReconciliation: "/reconciliation",
+  telcoReconciliation: "/telco_reconciliation",
   commissionSummary: "/commission/summary",
   commissionDetails: "/commission/details",
   commissionByNetwork: "/commission/by-network",
@@ -71,6 +71,8 @@ const routes = {
   adminSettings: "/admin/settings",
   // SANDBOX: only meaningful in sandbox builds (see utils/environment.ts).
   sandboxTestValues: "/sandbox/test-values",
+  // Stage 3 builds this page; linked from the dashboard go-live checklist.
+  apiKeys: "/settings/api-keys",
 };
 export default routes;
 export { transactionFilterStr };
