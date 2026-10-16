@@ -40,6 +40,8 @@ type TransactionItem = {
   // data plan description for Data, cable package name for Cable.
   data_bundle_desc?: string | null;
   data_bundle_code?: string | null;
+  // Set once the debit was refunded to the wallet (status keeps its value).
+  refunded_at?: string | null;
 };
 export type SummaryTotalItem = {
   user_id: number;
@@ -262,6 +264,8 @@ export type User = {
   // backend strips it from this user's own responses at that point.
   registration_query?: string | null;
   registration_query_at?: string | null;
+  // Kobo. 0 (or absent) = low-balance alerts off. Serialised by /me.
+  low_balance_threshold?: number | null;
   wallet: {
     balance: number;
     commission: number;
