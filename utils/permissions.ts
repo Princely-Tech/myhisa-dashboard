@@ -22,6 +22,11 @@ export function hasAnyPermission(user?: User | null, permissionList?: string[]):
   return permissionList.some((permission) => user.permissions?.includes(permission));
 }
 
+/** Staff access to a partner's daily report (see canAccessPage). */
+export function canViewPartnerReports(user?: User | null): boolean {
+  return hasPermission(user, "users.view") && hasPermission(user, "reports.view");
+}
+
 // Maps every admin-only page route to the permission required to view it.
 // Routes not present here are not permission-gated (e.g. pages shared by
 // every authenticated user, or the login/register pages).
@@ -68,6 +73,15 @@ export function canAccessPage(user: User | null | undefined, path: string): bool
   // users.manage, enforced by the backend and the page's buttons).
   if (path.startsWith(`${routes.adminOnboarding}/`)) {
     return hasPermission(user, "users.view");
+  }
+
+  // routes.adminPartnerReports is a dynamic /admin/partners/:userId/...
+  // route, opened from the Users page: it needs users.view (partner
+  // details) plus reports.view, which the backend requires for
+  // admin/partners/:id/reports/daily. Changing the partner's daily email
+  // needs users.manage (enforced by the backend and the settings card).
+  if (path.startsWith(routes.adminPartnerReportsPrefix)) {
+    return canViewPartnerReports(user);
   }
 
   const required = PAGE_PERMISSIONS[path];

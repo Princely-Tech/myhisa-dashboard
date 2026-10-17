@@ -155,6 +155,17 @@ const apiEndpoints = {
   adminTicketAssign: (id: number | string) => `admin/tickets/${id}/assign`,
   adminTicketResolve: (id: number | string) => `admin/tickets/${id}/resolve`,
   adminTicketMessages: (id: number | string) => `admin/tickets/${id}/messages`,
+  // Partner daily report (date = YYYY-MM-DD Lagos; omit for yesterday).
+  // The export answers a CSV attachment; report-settings is GET/PUT (PUT is
+  // primary login only).
+  meDailyReport: (date: string) => `me/reports/daily?date=${encodeURIComponent(date)}`,
+  meDailyReportExport: (date: string) => `me/reports/daily/export?date=${encodeURIComponent(date)}`,
+  meReportSettings: "me/report-settings",
+  adminPartnerDailyReport: (userId: number | string, date: string) =>
+    `admin/partners/${userId}/reports/daily?date=${encodeURIComponent(date)}`,
+  adminPartnerDailyReportExport: (userId: number | string, date: string) =>
+    `admin/partners/${userId}/reports/daily/export?date=${encodeURIComponent(date)}`,
+  adminPartnerReportSettings: (userId: number | string) => `admin/partners/${userId}/report-settings`,
   // SANDBOX: sandbox-only endpoints (registered by the Go API only in
   // sandbox builds; 404 on live). test-values is public; the rest need the
   // primary login's token, and resolve also needs an approved account.

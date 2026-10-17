@@ -122,7 +122,7 @@ const TopBar = ({ user, me, meLoading, canSeeWallet, navOpen, onOpenNav, onFund 
   const balance = me?.wallet?.balance;
 
   return (
-    <header className="sticky top-0 z-30 flex flex-wrap items-center gap-3 border-b-[1px] border-solid border-hisa-border bg-white px-[16px] py-[12px] sm:px-[28px]">
+    <header className="sticky top-0 z-30 flex print:hidden flex-wrap items-center gap-3 border-b-[1px] border-solid border-hisa-border bg-white px-[16px] py-[12px] sm:px-[28px]">
       <button
         type="button"
         onClick={onOpenNav}

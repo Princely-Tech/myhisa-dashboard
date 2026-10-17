@@ -16,7 +16,9 @@ import { useForm } from "antd/es/form/Form";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
 import routes from "@/utils/routes";
-import React, { useState } from "react";
+import { canViewPartnerReports } from "@/utils/permissions";
+import { readStoredUser } from "@/utils/session";
+import React, { useEffect, useState } from "react";
 
 const UsersListTable = ({
   data,
@@ -52,6 +54,13 @@ const UsersListTable = ({
   const [queryMessage, setQueryMessage] = useState('');
   const [sendingQuery, setSendingQuery] = useState(false);
   const [form] = useForm();
+  // "Daily report" opens /admin/partners/:id/reports (users.view +
+  // reports.view, see canViewPartnerReports). Read after mount: the stored
+  // session lives in localStorage.
+  const [canViewReports, setCanViewReports] = useState(false);
+  useEffect(() => {
+    setCanViewReports(canViewPartnerReports(readStoredUser()));
+  }, []);
   const [messageApi, contextHolder] = message.useMessage();
   const apiService = new AxiosHandler(messageApi);
   // Stable per (user, action) pair - gives the form/modal a clean reset
@@ -362,6 +371,14 @@ const UsersListTable = ({
         },
       },
     ];
+
+    if (canViewReports) {
+      items.push({
+        key: "dailyReport",
+        label: "Daily report",
+        onClick: () => router.push(routes.adminPartnerReports(item.id)),
+      });
+    }
 
     // ONBOARDING v2: the review queue shows checks, documents and history.
     if (item.onboarding_status && item.onboarding_status !== "email_unverified") {

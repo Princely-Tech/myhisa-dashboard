@@ -134,7 +134,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           </a>
         )}
         {shelled && (
-          <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 overflow-y-auto border-r-[1px] border-solid border-hisa-border bg-white lg:block">
+          <aside className="sticky top-0 hidden h-screen print:hidden w-[264px] shrink-0 overflow-y-auto border-r-[1px] border-solid border-hisa-border bg-white lg:block">
             {user && <Sidebar groups={groups} activeKey={active?.key ?? null} user={user} idPrefix="desktop" />}
           </aside>
         )}

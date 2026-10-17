@@ -38,6 +38,8 @@ export const ACCOUNT_PAGE_PERMISSIONS: Record<string, string> = {
   [routes.transactionStats]: "history.view",
   [routes.pendingTransactions]: "history.view",
   [routes.transactionLookup]: "history.view",
+  // Daily report: GET me/reports/daily requires what GET /history requires.
+  [routes.reports]: "history.view",
 
   [routes.bulkAirtimeUpload]: "bulk_airtime.manage",
   [routes.bulkAirtimeCampaigns]: "bulk_airtime.manage",
@@ -85,6 +87,7 @@ const APPROVAL_REQUIRED_PAGES = [
   routes.exportWalletLogs,
   routes.pendingTransactions,
   routes.transactionLookup,
+  routes.reports,
   routes.commissionSummary,
   routes.commissionDetails,
   routes.commissionByNetwork,

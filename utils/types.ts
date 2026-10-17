@@ -1011,6 +1011,119 @@ export interface AdminAuditLogsResponse {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Partner daily report (GET me/reports/daily, admin/partners/:id/reports/daily).
+// Money is kobo; day boundaries are Africa/Lagos calendar days; rates are
+// percentages 0-100 (1 decimal) and null when the denominator is 0.
+// success_rate = successful / (successful + failed + refunded) * 100.
+// ---------------------------------------------------------------------------
+
+export interface DailyReportTotals {
+  count: number;
+  /** Attempted value: sum over all rows of the day. */
+  value_kobo: number;
+  successful_count: number;
+  /** Revenue: sum over successful (not refunded) rows. */
+  successful_value_kobo: number;
+  failed_count: number;
+  /** Subset of failed_count whose status starts with "Invalid". */
+  invalid_count: number;
+  pending_count: number;
+  refunded_count: number;
+  success_rate: number | null;
+}
+
+export interface DailyReportPreviousDay {
+  date: string;
+  count: number;
+  successful_value_kobo: number;
+  success_rate: number | null;
+}
+
+export interface DailyReportProduct {
+  type: string;
+  count: number;
+  value_kobo: number;
+  successful_count: number;
+  successful_value_kobo: number;
+  failed_count: number;
+  pending_count: number;
+  refunded_count: number;
+  success_rate: number | null;
+}
+
+export interface DailyReportNetworkProduct {
+  type: string;
+  count: number;
+  successful_count: number;
+  failed_count: number;
+  pending_count: number;
+  refunded_count: number;
+  success_rate: number | null;
+}
+
+export interface DailyReportNetwork {
+  /** As stored, lower-case (mtn, airtel, glo, 9mobile, biller keys...). */
+  network: string;
+  /** Display name (MTN, Airtel, Glo, 9mobile, else Title Case). */
+  label: string;
+  count: number;
+  value_kobo: number;
+  successful_count: number;
+  successful_value_kobo: number;
+  failed_count: number;
+  pending_count: number;
+  refunded_count: number;
+  success_rate: number | null;
+  products: DailyReportNetworkProduct[];
+}
+
+export interface DailyReportHour {
+  /** 0-23, Lagos. */
+  hour: number;
+  count: number;
+  successful_count: number;
+}
+
+export interface DailyReport {
+  date: string;
+  timezone: string;
+  partner: { id: number; name: string };
+  totals: DailyReportTotals;
+  previous_day: DailyReportPreviousDay | null;
+  /** Sorted by count desc, only rows with count > 0. */
+  by_product: DailyReportProduct[];
+  /** Sorted by count desc, only rows with count > 0. */
+  by_network: DailyReportNetwork[];
+  /** Always 24 entries. */
+  by_hour: DailyReportHour[];
+  generated_at: string;
+}
+
+export interface DailyReportResponse {
+  message?: string;
+  data: DailyReport;
+}
+
+/** GET/PUT me/report-settings (and admin/partners/:id/report-settings). */
+export interface ReportSettings {
+  daily_email_enabled: boolean;
+  /** 1-5 emails, required when enabled. */
+  recipients: string[];
+  /** 0-23, Lagos. */
+  send_hour: number;
+  include_csv: boolean;
+  /** Read-only; YYYY-MM-DD of the last report emailed, null if never. */
+  last_sent_date?: string | null;
+}
+
+export type ReportSettingsUpdate = Omit<ReportSettings, "last_sent_date">;
+
+export interface ReportSettingsResponse {
+  message?: string;
+  data: ReportSettings;
+}
+
 export type {
   TransactionItem,
   CustomLinkProps,
